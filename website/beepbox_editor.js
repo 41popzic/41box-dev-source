@@ -41437,6 +41437,13 @@ You should be redirected to the song at:<br /><br />
             this._renderedBarWidth = -1;
             this._renderedBarLoopStart = -1;
             this._renderedBarLoopEnd = -1;
+            this._loopGradient = SVG.linearGradient({
+                id: "loopRainbowGradient",
+                x1: "0%",
+                y1: "0%",
+                x2: "100%",
+                y2: "0%",
+            });
             this._whenMouseOver = (event) => {
                 if (this._mouseOver)
                     return;
@@ -41515,7 +41522,10 @@ You should be redirected to the song at:<br /><br />
             };
             this._animateLoopAccent = () => {
                 if (this._doc.prefs.rainbowLoop) {
-                    this._loop.setAttribute("stroke", `hsl(${(performance.now() / 15) % 360}, 100%, 60%)`);
+                    const speed = 40;
+                    const offset = (performance.now() / 1000 * speed) % 400;
+                    this._loopGradient.setAttribute("gradientTransform", `translate(${offset} 0)`);
+                    this._loop.setAttribute("stroke", "url(#loopRainbowGradient)");
                 }
                 else {
                     this._loop.setAttribute("stroke", ColorConfig.loopAccent);
@@ -41536,7 +41546,40 @@ You should be redirected to the song at:<br /><br />
             this.container.addEventListener("touchcancel", this._whenTouchReleased);
             this._loop.setAttribute("stroke-dasharray", "0");
             this._barLoop.setAttribute("stroke-dasharray", "0");
-            this._animateLoopAccent();
+            this._loopGradient.setAttribute("spreadMethod", "repeat");
+            this._loopGradient.setAttribute("gradientUnits", "userSpaceOnUse");
+            this._loopGradient.setAttribute("x1", "-200");
+            this._loopGradient.setAttribute("x2", "200");
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "0%",
+                "stop-color": "red",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "16.6%",
+                "stop-color": "yellow",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "33.3%",
+                "stop-color": "lime",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "50%",
+                "stop-color": "cyan",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "66.6%",
+                "stop-color": "blue",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "83.3%",
+                "stop-color": "magenta",
+            }));
+            this._loopGradient.appendChild(SVG.stop({
+                offset: "100%",
+                "stop-color": "red",
+            }));
+            this._svg.appendChild(this._loopGradient);
+            requestAnimationFrame(this._animateLoopAccent);
         }
         _updateCursorStatus() {
             const bar = this._mouseX / this._barWidth;
