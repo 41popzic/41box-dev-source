@@ -932,7 +932,7 @@ export class SongEditor {
     private readonly _panDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["pan delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePanDelay(this.doc, oldValue, newValue), false);
     private readonly _panDelayRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("panDelay") }, "‣ Delay:"), this._panDelaySlider.container);
     private readonly _panDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._panDelayRow);
-    private readonly _chipWaveSelect: HTMLSelectElement = select();
+    private readonly _chipWaveSelect: HTMLSelectElement = buildOptions(select(), Config.chipWaves.map(wave => wave.name));
     private readonly _chipNoiseSelect: HTMLSelectElement = buildOptions(select(), Config.chipNoises.map(wave => wave.name));
     // advloop addition
     // @TODO: Add a dropdown for these. Or maybe this checkbox is fine?
@@ -1575,7 +1575,7 @@ export class SongEditor {
             const amplitudeSlider: Slider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this.doc, (oldValue: number, newValue: number) => new ChangeOperatorAmplitude(this.doc, operatorIndex, oldValue, newValue), false);
             const waveformSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map(wave => wave.name));
     
-            this._chipWaveSelect.innerHTML = "";
+            /*this._chipWaveSelect.innerHTML = "";
             
             const groups: Record<string, HTMLOptGroupElement> = {};
 
@@ -1593,7 +1593,7 @@ export class SongEditor {
                     wave.name
                 )
             );
-        }
+        }*/
             
             const waveformDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.FM, i) }, "▼");
             const waveformDropdownHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:");
