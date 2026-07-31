@@ -15072,8 +15072,8 @@ var beepbox = (function (exports) {
                                     }
                                 }
                             }
-                            else if (((fromSlarmoosBox && beforeFour) || from41Box) || (fromUltraBox && beforeFive)) {
-                                const rhythmMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+                            else if (((fromSlarmoosBox && beforeFour) || !from41Box) || (fromUltraBox && beforeFive)) {
+                                const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
                                 this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
                             }
                             else {
@@ -15719,7 +15719,7 @@ var beepbox = (function (exports) {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                const unisonLength = ((beforeFive || !fromSlarmoosBox) || !from41Box) ? 27 : Config.unisons.length;
+                                const unisonLength = from41Box ? (beforeThree ? 27 : beforeFive ? 49 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
                                 if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                                     instrument.unison = Config.unisons.length;
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];

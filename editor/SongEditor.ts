@@ -894,7 +894,7 @@ export class SongEditor {
     private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
     private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });    
     private readonly _rhythmActionSelect: HTMLSelectElement = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
-    private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Note Divisions");
+    private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Subgrid");
     private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
     private readonly _rhythmDisabledLabel: HTMLSpanElement = span({ style: ` position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; color: #d77777; font-style: italic; `}, "(disabled)");
     private _favoriteRhythms: number[] = [];
@@ -1396,7 +1396,7 @@ export class SongEditor {
                 ),
             ),
             div({ class: "selectRow" },
-                span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm")}, "Note Divs: "),
+                span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm")}, "Subgrid: "),
                 //span({ style: "display: flex;" },
                 div({ style: "position: relative; display: inline-block;"}, this._rhythmInput, this._rhythmDisabledLabel), this._rhythmActionSelect
                 //),
@@ -1526,9 +1526,9 @@ export class SongEditor {
             )
             
         );
-        const commonDivisions = [ 3, 4, 6, 8, 12, 24, 32];
+        const commonDivisions = [ 3, 4, 6, 8, 24, 32];
 
-        const commonGroup = optgroup({ label: "Main Divisions" });
+        const commonGroup = optgroup({ label: "Quick-Find" });
 
         for (const rhythm of Config.rhythms) {
             if (commonDivisions.includes(rhythm.stepsPerBeat)) {
@@ -5468,8 +5468,8 @@ export class SongEditor {
 
                 this._rhythmActionOption.textContent =
                     this._patternEditor.rhythmEnabled
-                        ? "Disable Note Divisions"
-                        : "Enable Note Divisions";
+                        ? "Disable Subgrid"
+                        : "Enable Subgrid";
                 break;
 
             case "toggleFavoriteRhythm": {

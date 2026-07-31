@@ -97,7 +97,7 @@ export class Preferences {
 		this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
 		this.enableNotePreview = window.localStorage.getItem("enableNotePreview") != "false";
 		this.showFifth = window.localStorage.getItem("showFifth") != "false";
-		this.showThird = window.localStorage.getItem("showThird") == "true";
+		this.showThird = (window.localStorage.getItem("showThird") ?? "true") == "true";
 		this.advancedColorScheme = window.localStorage.getItem("advancedColorScheme") == "true";
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
@@ -126,10 +126,10 @@ export class Preferences {
 		this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "pianoTransposingC";
 		this.bassOffset = (+(<any>window.localStorage.getItem("bassOffset"))) || 0;
-		this.layout = window.localStorage.getItem("layout") || "small";
+		this.layout = window.localStorage.getItem("layout") || "wide long";
 		this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
 		this.customTheme = window.localStorage.getItem("customTheme");
-		this.rainbowLoop = window.localStorage.getItem("rainbowLoop") == "true";
+		this.rainbowLoop = (window.localStorage.getItem("rainbowLoop") ?? "true") == "true";
 		this.customThemeImage = window.localStorage.getItem("customThemeImage") ||
 		window.localStorage.getItem("customTheme2"); //customTheme2 is not really a descriptive name for what it entails, so it's being deprecated		
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;

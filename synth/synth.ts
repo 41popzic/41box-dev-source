@@ -4685,8 +4685,8 @@ export class Song {
                         useFastTwoNoteArp = true;
                     }
                     }
-                } else if (((fromSlarmoosBox && beforeFour) || from41Box) || (fromUltraBox && beforeFive)) {
-                    const rhythmMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];  
+                } else if (((fromSlarmoosBox && beforeFour) || !from41Box) || (fromUltraBox && beforeFive)) {
+                    const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];  
                     this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
                 } else {
                     this.rhythm = clamp(0, Config.rhythms.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5357,8 +5357,7 @@ export class Song {
                 } else {
                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    const unisonLength = ((beforeFive || !fromSlarmoosBox) || !from41Box) ? 27 : Config.unisons.length; //27 was the old length before I added >2 voice presets
-                    
+                    const unisonLength = from41Box ? (beforeThree ? 27 : beforeFive ? 49 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
                     if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                         // if (instrument.unison == Config.unisons.length) {
                         instrument.unison = Config.unisons.length;
