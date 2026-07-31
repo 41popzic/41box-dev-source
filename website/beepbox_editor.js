@@ -41522,9 +41522,11 @@ You should be redirected to the song at:<br /><br />
             };
             this._animateLoopAccent = () => {
                 if (this._doc.prefs.rainbowLoop) {
-                    const speed = 40;
-                    const offset = (performance.now() / 1000 * speed) % 400;
-                    this._loopGradient.setAttribute("gradientTransform", `translate(${offset} 0)`);
+                    const bpm = this._doc.song.getBeatsPerMinute();
+                    const beatsPerBar = this._doc.song.beatsPerBar;
+                    const barDuration = (60 / bpm) * beatsPerBar;
+                    const cycle = (performance.now() / 1000) / barDuration;
+                    this._loopGradient.setAttribute("gradientTransform", `translate(${(cycle % 1) * 400} 0)`);
                     this._loop.setAttribute("stroke", "url(#loopRainbowGradient)");
                 }
                 else {

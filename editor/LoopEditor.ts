@@ -410,19 +410,29 @@ export class LoopEditor {
 
     private _animateLoopAccent = (): void => {
         if (this._doc.prefs.rainbowLoop) {
-            const speed = 40; // Higher = faster speed -41popzic
-            const offset = (performance.now() / 1000 * speed) % 400;
+            const bpm = this._doc.song.getBeatsPerMinute();
+            const beatsPerBar = this._doc.song.beatsPerBar;
+
+            const barDuration = (60 / bpm) * beatsPerBar;
+
+            const cycle = (performance.now() / 1000) / barDuration;
 
             this._loopGradient.setAttribute(
                 "gradientTransform",
-                `translate(${offset} 0)`
+                `translate(${(cycle % 1) * 400} 0)`
             );
 
-            this._loop.setAttribute("stroke", "url(#loopRainbowGradient)");
+            this._loop.setAttribute(
+                "stroke",
+                "url(#loopRainbowGradient)"
+            );
         } else {
-            this._loop.setAttribute("stroke", ColorConfig.loopAccent);
+            this._loop.setAttribute(
+                "stroke",
+                ColorConfig.loopAccent
+            );
         }
 
         requestAnimationFrame(this._animateLoopAccent);
-    }
+    };
 }
