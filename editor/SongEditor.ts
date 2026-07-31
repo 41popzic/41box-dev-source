@@ -834,6 +834,7 @@ export class SongEditor {
         option({ value: "showDescription" }, "Show Description"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
+        option({ value: "rainbowLoop" }, "Toggle Rainbow Loop..." ),
 	    option({ value: "customTheme" }, "Custom Theme... (ADVANCED)"),
         ),
     );
@@ -2694,6 +2695,7 @@ export class SongEditor {
             (prefs.showDescription ? textOnIcon : textOffIcon) + "Show Description",
             textSpacingIcon + "Set Layout...",
             textSpacingIcon + "Set Theme...",
+            textSpacingIcon + "Toggle Rainbow Loop...",
 	        textSpacingIcon + "Custom Theme...",
         ];
         // Technical dropdown
@@ -5929,6 +5931,14 @@ export class SongEditor {
                 break;
             case "colorTheme":
                 this._openPrompt("theme");
+                break;
+            case "rainbowLoop":
+                this.doc.prefs.rainbowLoop = !this.doc.prefs.rainbowLoop;
+                window.localStorage.setItem(
+                    "rainbowLoop",
+                    this.doc.prefs.rainbowLoop.toString()
+                );
+                this.doc.notifier.changed();
                 break;
             case "customTheme":
                 this._openPrompt("customTheme");

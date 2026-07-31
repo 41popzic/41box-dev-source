@@ -362,18 +362,13 @@ export class LoopEditor {
     }
 
     private _animateLoopAccent = (): void => {
-        if (this._doc.prefs.colorTheme == "41box") {
-            const hue = (performance.now() / 15) % 360;
-
+        if (this._doc.prefs.rainbowLoop) {
             this._loop.setAttribute(
                 "stroke",
-                `hsl(${hue}, 100%, 60%)`
+                `hsl(${(performance.now() / 15) % 360}, 100%, 60%)`
             );
         } else {
-            this._loop.setAttribute(
-                "stroke",
-                ColorConfig.loopAccent
-            );
+            this._loop.setAttribute("stroke", ColorConfig.loopAccent);
         }
 
         requestAnimationFrame(this._animateLoopAccent);

@@ -64,6 +64,7 @@ export class Preferences {
 	public instrumentButtonsAtTop: boolean;
 	public enableChannelMuting: boolean;
 	public colorTheme: string;
+	public rainbowLoop: boolean;
 	public layout: string;
 	public displayBrowserUrl: boolean;
 	public volume: number = 75;
@@ -128,8 +129,9 @@ export class Preferences {
 		this.layout = window.localStorage.getItem("layout") || "small";
 		this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
 		this.customTheme = window.localStorage.getItem("customTheme");
+		this.rainbowLoop = window.localStorage.getItem("rainbowLoop") == "true";
 		this.customThemeImage = window.localStorage.getItem("customThemeImage") ||
-			window.localStorage.getItem("customTheme2"); //customTheme2 is not really a descriptive name for what it entails, so it's being deprecated		
+		window.localStorage.getItem("customTheme2"); //customTheme2 is not really a descriptive name for what it entails, so it's being deprecated		
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;
 		this.selectiveRandom.fromJsonObject(JSON.parse(window.localStorage.getItem("selectiveRandom") || "{}"));
 		this.selectivePaste.fromJsonObject(JSON.parse(window.localStorage.getItem("selectivePaste") || "{}"));
