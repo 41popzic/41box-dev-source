@@ -4330,8 +4330,10 @@ var beepbox = (function (exports) {
             if (effectsIncludeChord(this.effects)) {
                 instrumentObject["chord"] = this.getChord().name;
                 if (this.getChord().arpeggiates) {
-                    instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
-                    instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
+                    if (this.getChord() === Config.chords.dictionary["arpeggio"]) {
+                        instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
+                        instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
+                    }
                 }
                 if (this.getChord().name == "monophonic")
                     instrumentObject["monoChordTone"] = this.monoChordTone;
@@ -4488,7 +4490,9 @@ var beepbox = (function (exports) {
             }
             else if (this.type == 11) {
                 const operatorArray = [];
-                for (const operator of this.operators) {
+                const operatorCount = Config.operatorCount + (this.type === 11 ? 2 : 0);
+                for (let operatorIndex = 0; operatorIndex < operatorCount; operatorIndex++) {
+                    const operator = this.operators[operatorIndex];
                     operatorArray.push({
                         "frequency": Config.operatorFrequencies[operator.frequency].name,
                         "amplitude": operator.amplitude,
@@ -5379,6 +5383,7 @@ var beepbox = (function (exports) {
     }
     class Song {
         constructor(string) {
+            this.titleNotifier = [];
             this.scaleCustom = [];
             this.channels = [];
             this.limitDecay = 4.0;
@@ -5618,7 +5623,7 @@ var beepbox = (function (exports) {
                 this.eqSubFilters[i] = null;
             }
             this.title = "Untitled";
-            document.title = this.title + " - " + EditorConfig.versionDisplayName;
+            this.titleNotifier.forEach(o => o());
             if (andResetChannels) {
                 this.pitchChannelCount = 3;
                 this.noiseChannelCount = 1;
@@ -6463,7 +6468,7 @@ var beepbox = (function (exports) {
                         {
                             var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
-                            document.title = this.title + " - " + EditorConfig.versionDisplayName;
+                            this.titleNotifier.forEach(o => o());
                             charIndex += songNameLength;
                         }
                         break;
@@ -9416,7 +9421,7 @@ var beepbox = (function (exports) {
     Song._oldestSlarmoosBoxVersion = 1;
     Song._latestSlarmoosBoxVersion = 5;
     Song._oldest41BoxVersion = 1;
-    Song._latest41BoxVersion = 3;
+    Song._latest41BoxVersion = 4;
     Song._variant = 0x70;
     class PickedString {
         constructor() {
@@ -11549,8 +11554,14 @@ var beepbox = (function (exports) {
                                             && pattern.notes.find(n => n.pitches[0] == (Config.modCount - 1 - mod))) {
                                             foundMod = true;
                                             pattern.notes.sort(function (a, b) { return (a.start == b.start) ? a.pitches[0] - b.pitches[0] : a.start - b.start; });
-                                            for (const note of pattern.notes) {
+                                            for (let noteIndex = 0; noteIndex < pattern.notes.length; noteIndex++) {
+                                                const note = pattern.notes[noteIndex];
                                                 if (note.pitches[0] == (Config.modCount - 1 - mod)) {
+                                                    if (noteIndex + 1 < pattern.notes.length
+                                                        && note.pitches[0] === pattern.notes[noteIndex + 1].pitches[0]
+                                                        && note.start === pattern.notes[noteIndex + 1].start) {
+                                                        continue;
+                                                    }
                                                     totalSamples += (Math.min(partsInBar - currentPart, note.start - currentPart)) * Config.ticksPerPart * this.getSamplesPerTickSpecificBPM(prevTempo);
                                                     if (note.start < partsInBar) {
                                                         for (let pinIdx = 1; pinIdx < note.pins.length; pinIdx++) {
@@ -11996,7 +12007,7 @@ var beepbox = (function (exports) {
             this.tick = 0;
             this.tickSampleCountdown = samplesPerTick;
             this.isAtStartOfTick = true;
-            if (this.loopRepeatCount != 0 && this.bar == Math.max(this.song.loopStart + this.song.loopLength, this.loopBarEnd)) {
+            if (this.loopRepeatCount != 0 && this.bar == Math.max(this.song.loopStart + this.song.loopLength, this.loopBarEnd + 1)) {
                 this.bar = this.song.loopStart;
                 if (this.loopBarStart != -1)
                     this.bar = this.loopBarStart;

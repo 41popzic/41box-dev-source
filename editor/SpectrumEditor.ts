@@ -393,6 +393,7 @@ export class SpectrumEditorPrompt implements Prompt {
             this._drumsetButtonContainer.style.display = "";
             this.spectrumEditor.container.style.display = "";
             this.spectrumEditor.resetToInitial();
+            this.spectrumEditor.resetToInitial();
             this.spectrumEditor.setSpectrumWave(this.spectrumEditors[this._drumsetSpectrumIndex].getSpectrumWave().spectrum);
             this.spectrumEditor.storeChange();
         } else {

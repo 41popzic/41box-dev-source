@@ -782,6 +782,8 @@ export class SongEditor {
         option({ value: "copy" }, "Copy Pattern (C)"),
         option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"),
         option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"),
+        option({ value: "pasteSelective" }, "Selective Instrument Paste (Alt+V)"),
+        option({ value: "customizePasteSelective" }, "Customize Selective Paste (" + EditorConfig.ctrlSymbol + "Alt+V)"),
         option({ value: "insertBars" }, "Insert Bar (⏎)"),
         option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"),
         option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"),
@@ -816,7 +818,9 @@ export class SongEditor {
             option({ value: "recordingSetup" }, "Note Recording..."),
         ),
         optgroup({ label: "Appearance" },
+        option({ value: "showThird" }, 'Highlight "Third" Note'),
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+        option({ value: "advancedColorScheme"}, "Advanced Color Scheme (ModBox)"),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
@@ -2674,7 +2678,9 @@ export class SongEditor {
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
             textSpacingIcon + "Note Recording...",
             textSpacingIcon + "Appearance",
+            (prefs.showThird ? textOnIcon : textOffIcon) + 'Highlight "Third" Note',
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
+            (prefs.advancedColorScheme ? textOnIcon : textOffIcon) + 'Advanced Color Scheme (ModBox)',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
@@ -5884,6 +5890,12 @@ export class SongEditor {
             case "showFifth":
                 this.doc.prefs.showFifth = !this.doc.prefs.showFifth;
                 break;
+            case "showThird":
+                this.doc.prefs.showThird = !this.doc.prefs.showThird;
+                break;    
+            case "advancedColorScheme":
+                this.doc.prefs.advancedColorScheme = !this.doc.prefs.advancedColorScheme;
+                break;        
             case "notesOutsideScale":
                 this.doc.prefs.notesOutsideScale = !this.doc.prefs.notesOutsideScale;
                 break;

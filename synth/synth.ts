@@ -2092,8 +2092,10 @@ export class Instrument {
         if (effectsIncludeChord(this.effects)) {
             instrumentObject["chord"] = this.getChord().name;
             if (this.getChord().arpeggiates) {
+            if (this.getChord() === Config.chords.dictionary["arpeggio"]) {
                 instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
                 instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
+            }
             }
             if (this.getChord().name == "monophonic") instrumentObject["monoChordTone"] = this.monoChordTone;
         }
@@ -2258,7 +2260,9 @@ export class Instrument {
             instrumentObject["operators"] = operatorArray;
         } else if (this.type == InstrumentType.fm6op) {
             const operatorArray: Object[] = [];
-            for (const operator of this.operators) {
+            const operatorCount: number = Config.operatorCount + (this.type === InstrumentType.fm6op ? 2 : 0);
+            for (let operatorIndex: number = 0; operatorIndex < operatorCount; operatorIndex++) {
+                const operator: Operator = this.operators[operatorIndex];
                 operatorArray.push({
                     "frequency": Config.operatorFrequencies[operator.frequency].name,
                     "amplitude": operator.amplitude,
@@ -3215,12 +3219,13 @@ export class Song {
     private static readonly _oldestSlarmoosBoxVersion: number = 1;
     private static readonly _latestSlarmoosBoxVersion: number = 5;
     private static readonly _oldest41BoxVersion: number = 1;
-    private static readonly _latest41BoxVersion: number = 3;
+    private static readonly _latest41BoxVersion: number = 4;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
     //also "u" is ultrabox lol
     private static readonly _variant = 0x70; //"p" ~ 41box //where's the p in 41box you ask?? there isn't. it's from my display name -41popzic
 
     public title: string;
+    public titleNotifier: Function[] = [];
     public scale: number;
     public scaleCustom: boolean[] = [];
     public key: number;
@@ -3231,7 +3236,7 @@ export class Song {
     public barCount: number;
     public patternsPerChannel: number;
     public rhythm: number;
-    //public rhythmEnabled: boolean;
+    //public rhythmEnabled: boolean; (This isn't needed as it's an editor tool rather than a song element)
     public layeredInstruments: boolean;
     public patternInstruments: boolean;
     public loopStart: number;
@@ -3515,7 +3520,7 @@ export class Song {
 
         //This is the tab's display name
         this.title = "Untitled";
-        document.title = this.title + " - " + EditorConfig.versionDisplayName;
+        this.titleNotifier.forEach(o => o());
 
         if (andResetChannels) {
             this.pitchChannelCount = 3;
@@ -4493,7 +4498,7 @@ export class Song {
                 // Length of song name string
                 var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
-                document.title = this.title + " - " + EditorConfig.versionDisplayName;
+                this.titleNotifier.forEach(o => o());
 
                 charIndex += songNameLength;
             } break;
@@ -9971,6 +9976,7 @@ export class Synth {
     private tempDrumSetControlPoint: FilterControlPoint = new FilterControlPoint();
     public tempFrequencyResponse: FrequencyResponse = new FrequencyResponse();
     public loopBarStart: number = -1;
+    /** An *inclusive* bound. */
     public loopBarEnd: number = -1;
 
     private static readonly fmSynthFunctionCache: Dictionary<Function> = {};
@@ -10188,8 +10194,28 @@ export class Synth {
                                         foundMod = true;
                                         // Need to re-sort the notes by start time to make the next part much less painful.
                                         pattern.notes.sort(function (a, b) { return (a.start == b.start) ? a.pitches[0] - b.pitches[0] : a.start - b.start; });
-                                        for (const note of pattern.notes) {
+                                        for (let noteIndex: number = 0; noteIndex < pattern.notes.length; noteIndex++) {
+                                            const note: Note = pattern.notes[noteIndex];
                                             if (note.pitches[0] == (Config.modCount - 1 - mod)) {
+                                                if (
+                                                    noteIndex + 1 < pattern.notes.length
+                                                    && note.pitches[0] === pattern.notes[noteIndex + 1].pitches[0]
+                                                    && note.start === pattern.notes[noteIndex + 1].start
+                                                ) {
+                                                    // TODO: This is a kludge to prevent the computed song length from becoming negative.
+                                                    //
+                                                    // The assumption in the addition below is that `currentPart <= note.start`, but it won't be the case if there are
+                                                    // e.g. two notes on top of each other at the same pitch, which was present in at least one issue report we've seen.
+                                                    //
+                                                    // At the time of writing this comment, the cause for that note overlap is unknown (presumably some issue in the editor).
+                                                    // In the meantime, it's easy to paper over this, and crucially, it won't destructively change any songs out there.
+                                                    // Once the actual issue is fixed, overlaps like this probably should be normalized away at song reading/writing time instead.
+                                                    //
+                                                    // This is likely an issue in JummBox as well, though there it doesn't seem to prevent audio exporting,
+                                                    // presumably because of the higher minimum value for tempo.
+                                                    continue;
+                                                }
+
                                                 // Compute samples up to this note
                                                 totalSamples += (Math.min(partsInBar - currentPart, note.start - currentPart)) * Config.ticksPerPart * this.getSamplesPerTickSpecificBPM(prevTempo);
 
@@ -10584,7 +10610,7 @@ export class Synth {
         this.tickSampleCountdown = samplesPerTick;
         this.isAtStartOfTick = true;
 
-        if (this.loopRepeatCount != 0 && this.bar == Math.max(this.song.loopStart + this.song.loopLength, this.loopBarEnd)) {
+        if (this.loopRepeatCount != 0 && this.bar == Math.max(this.song.loopStart + this.song.loopLength, this.loopBarEnd + 1)) {
             this.bar = this.song.loopStart;
             if (this.loopBarStart != -1)
                 this.bar = this.loopBarStart;
