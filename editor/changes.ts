@@ -4600,9 +4600,39 @@ export function setDefaultInstruments(song: Song): void {
         for (const instrument of song.channels[channelIndex].instruments) {
             const isNoise: boolean = song.getChannelIsNoise(channelIndex);
             const isMod: boolean = song.getChannelIsMod(channelIndex);
-            const presetValue: number = (channelIndex == song.pitchChannelCount) ? EditorConfig.nameToPresetValue(Math.random() > 0.5 ? "chip noise" : "standard drumset")! : pickRandomPresetValue(isNoise);
-            const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
-            instrument.fromJsonObject(preset.settings, isNoise, isMod, song.rhythm == 0 || song.rhythm == 2, song.rhythm >= 2, 1);
+            let presetName: string;
+
+            if (isNoise) {
+                presetName = "chip noise";
+            } else {
+                switch (channelIndex) {
+                    case 0:
+                        presetName = "square wave";
+                        break;
+                    case 1:
+                        presetName = "triangle wave";
+                        break;
+                    case 2:
+                        presetName = "synth kick";
+                        break;
+                    default:
+                        presetName = "square wave";
+                        break;
+                }
+            }
+
+            const presetValue = EditorConfig.nameToPresetValue(presetName)!;
+            const preset = EditorConfig.valueToPreset(presetValue)!;
+
+            instrument.fromJsonObject(
+                preset.settings,
+                isNoise,
+                isMod,
+                song.rhythm == 0 || song.rhythm == 2,
+                song.rhythm >= 2,
+                1
+            );
+
             instrument.preset = presetValue;
             instrument.effects |= 1 << EffectType.panning;
         }

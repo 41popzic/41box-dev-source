@@ -592,8 +592,6 @@ var beepbox = (function (exports) {
         { name: "÷30", stepsPerBeat: 30, roundUpThresholds: null },
         { name: "÷31", stepsPerBeat: 31, roundUpThresholds: null },
         { name: "÷32", stepsPerBeat: 32, roundUpThresholds: null },
-        { name: "÷120", stepsPerBeat: 120, roundUpThresholds: null },
-        { name: "÷240", stepsPerBeat: 240, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
     Config.instrumentTypeHasSpecialInterval = [true, true, false, false, false, true, false, false, false, false, false];

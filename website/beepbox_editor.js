@@ -606,8 +606,6 @@ var beepbox = (function (exports) {
         { name: "÷30", stepsPerBeat: 30, roundUpThresholds: null },
         { name: "÷31", stepsPerBeat: 31, roundUpThresholds: null },
         { name: "÷32", stepsPerBeat: 32, roundUpThresholds: null },
-        { name: "÷120", stepsPerBeat: 120, roundUpThresholds: null },
-        { name: "÷240", stepsPerBeat: 240, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
     Config.instrumentTypeHasSpecialInterval = [true, true, false, false, false, true, false, false, false, false, false];
@@ -31898,7 +31896,27 @@ li.select2-results__option[role=group] > strong:hover {
             for (const instrument of song.channels[channelIndex].instruments) {
                 const isNoise = song.getChannelIsNoise(channelIndex);
                 const isMod = song.getChannelIsMod(channelIndex);
-                const presetValue = (channelIndex == song.pitchChannelCount) ? EditorConfig.nameToPresetValue(Math.random() > 0.5 ? "chip noise" : "standard drumset") : pickRandomPresetValue(isNoise);
+                let presetName;
+                if (isNoise) {
+                    presetName = "chip noise";
+                }
+                else {
+                    switch (channelIndex) {
+                        case 0:
+                            presetName = "square wave";
+                            break;
+                        case 1:
+                            presetName = "triangle wave";
+                            break;
+                        case 2:
+                            presetName = "synth kick";
+                            break;
+                        default:
+                            presetName = "square wave";
+                            break;
+                    }
+                }
+                const presetValue = EditorConfig.nameToPresetValue(presetName);
                 const preset = EditorConfig.valueToPreset(presetValue);
                 instrument.fromJsonObject(preset.settings, isNoise, isMod, song.rhythm == 0 || song.rhythm == 2, song.rhythm >= 2, 1);
                 instrument.preset = presetValue;
@@ -49043,7 +49061,7 @@ You should be redirected to the song at:<br /><br />
             this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
             this._echoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
             this._echoDelayRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-            this._rhythmInput = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });
+            this._rhythmInput = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });
             this._rhythmActionSelect = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
             this._rhythmActionOption = option({ value: "toggleRhythm" }, "Disable Note Divisions");
             this._favoriteRhythmOption = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");

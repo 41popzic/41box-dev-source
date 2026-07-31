@@ -891,7 +891,7 @@ export class SongEditor {
     private readonly _echoSustainRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
     private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
     private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });    
+    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });    
     private readonly _rhythmActionSelect: HTMLSelectElement = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
     private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Note Divisions");
     private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
