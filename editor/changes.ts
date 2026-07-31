@@ -4340,7 +4340,7 @@ export class ChangePitchBend extends ChangePins {
 export class ChangePatternRhythm extends ChangeSequence {
     constructor(doc: SongDocument, pattern: Pattern) {
         super();
-        const minDivision: number = Config.partsPerBeat / Config.rhythms[doc.song.rhythm].stepsPerBeat;
+        const minDivision: number = Math.round(Config.partsPerBeat / Config.rhythms[doc.song.rhythm].stepsPerBeat);
 
         const changeRhythm: (oldTime: number) => number = function (oldTime: number): number {
             let thresholds: number[] | null = Config.rhythms[doc.song.rhythm].roundUpThresholds;

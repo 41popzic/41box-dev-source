@@ -236,18 +236,27 @@ export class PatternEditor {
     }
 
     private _getMinDivision(): number {
-        if (!this.rhythmEnabled)
-            return 1;
-
         if (this.controlMode && this._mouseHorizontal)
             return 1;
 
-        return Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+        if (!this.rhythmEnabled)
+            return 1;
+
+        return Math.round(
+            Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat
+        );
     }
 
     private _snapToMinDivision(input: number): number {
-        const minDivision: number = this._getMinDivision();
-        return Math.floor(input / minDivision) * minDivision;
+        const stepsPerBeat = Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+
+        const step = Math.round(
+            input * stepsPerBeat / Config.partsPerBeat
+        );
+
+        return Math.round(
+            step * Config.partsPerBeat / stepsPerBeat
+        );
     }
 
     private _updateCursorStatus(): void {
@@ -447,7 +456,7 @@ export class PatternEditor {
                 while (division < maxDivision && Config.partsPerBeat % division != 0) {
                     division++;
                 }
-                this._cursor.start += Math.floor(modMouse / division) * division;
+                this._cursor.start += this._snapToMinDivision(modMouse);
             }
             this._cursor.end = this._cursor.start + defaultLength;
             let forceStart: number = 0;

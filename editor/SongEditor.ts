@@ -887,9 +887,13 @@ export class SongEditor {
     private readonly _echoSustainRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
     private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
     private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "240", style: "width: 5em;" });    
+    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });    
     private readonly _rhythmActionSelect: HTMLSelectElement = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
-    private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Rhythm");
+    private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Note Divisions");
+    private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
+    private readonly _rhythmDisabledLabel: HTMLSpanElement = span({ style: ` position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; color: #d77777; font-style: italic; `}, "(disabled)");
+    private _favoriteRhythms: number[] = [];
+    private readonly _favoriteRhythmGroup = optgroup({ label: "Favorites"});
     //private readonly _phaserMixSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserMix(this.doc, oldValue, newValue), false);
     //private readonly _phaserMixRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("Phaser:")), this._phaserMixSlider.container);
     //private readonly _phaserFreqSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFreqRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserFreq(this.doc, oldValue, newValue), false);
@@ -1387,9 +1391,9 @@ export class SongEditor {
                 ),
             ),
             div({ class: "selectRow" },
-                span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm")}, "Note Divisions: "),
+                span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm")}, "Note Divs: "),
                 //span({ style: "display: flex;" },
-                this._rhythmInput, this._rhythmActionSelect
+                div({ style: "position: relative; display: inline-block;"}, this._rhythmInput, this._rhythmDisabledLabel), this._rhythmActionSelect
                 //),
             ),
             div({ class: "selectRow" },
@@ -1510,10 +1514,33 @@ export class SongEditor {
 
         this._rhythmActionSelect.appendChild(
             optgroup({ label: "Edit" },
-                option({ value: "forceRhythm" }, "Snap Notes to Rhythm"),
+                option({ value: "forceRhythm" }, "Quantize Selected Patterns"),
+                option({ value: "forceRhythmAll"}, "Quantize All Notes"),
+                this._favoriteRhythmOption,
                 this._rhythmActionOption,
             )
+            
         );
+        const commonDivisions = [ 3, 4, 6, 8, 12, 24, 32];
+
+        const commonGroup = optgroup({ label: "Main Divisions" });
+
+        for (const rhythm of Config.rhythms) {
+            if (commonDivisions.includes(rhythm.stepsPerBeat)) {
+                commonGroup.appendChild(
+                    option(
+                        { value: `setRhythm:${rhythm.stepsPerBeat}` },
+                        rhythm.name
+                    )
+                );
+            }
+        }
+        
+        this._rhythmActionSelect.appendChild(this._favoriteRhythmGroup);
+
+        this._refreshFavoriteRhythms();
+
+        this._rhythmActionSelect.appendChild(commonGroup);
 
         //this._snapButton.onclick = () => this.doc.selection.forceRhythm(); // This was mainly a test
 
@@ -1694,6 +1721,7 @@ export class SongEditor {
         this._keySelect.addEventListener("change", this._whenSetKey);
         this._octaveStepper.addEventListener("change", this._whenSetOctave);
         this._rhythmInput.addEventListener("change", this._whenSetRhythmInput);
+        this._rhythmInput.addEventListener("input", this._whenSetRhythmInput)
         this._rhythmActionSelect.addEventListener("change", this._whenRhythmAction);
         //this._pitchedPresetSelect.addEventListener("change", this._whenSetPitchedPreset);
         //this._drumPresetSelect.addEventListener("change", this._whenSetDrumPreset);
@@ -1939,6 +1967,75 @@ export class SongEditor {
 
             this._unisonSelect.appendChild(group);
         }
+
+        const savedFavorites = localStorage.getItem("41box.favoriteRhythms");
+
+        if (savedFavorites != null) {
+            try {
+                this._favoriteRhythms = JSON.parse(savedFavorites);
+            } catch {
+                this._favoriteRhythms = [];
+            }
+        }
+    }
+
+    private _saveFavoriteRhythms(): void {
+        localStorage.setItem(
+            "41box.favoriteRhythms",
+            JSON.stringify(this._favoriteRhythms)
+        );
+    }
+
+    private _addFavoriteRhythm(stepsPerBeat: number): void {
+        if (this._favoriteRhythms.includes(stepsPerBeat)) return;
+
+        this._favoriteRhythms.push(stepsPerBeat);
+        this._favoriteRhythms.sort((a, b) => a - b);
+
+        this._saveFavoriteRhythms();
+    }
+
+    private _removeFavoriteRhythm(stepsPerBeat: number): void {
+        this._favoriteRhythms =
+            this._favoriteRhythms.filter(step => step != stepsPerBeat);
+
+        this._saveFavoriteRhythms();
+    }
+
+    private _isFavoriteRhythm(stepsPerBeat: number): boolean {
+        return this._favoriteRhythms.includes(stepsPerBeat);
+    }
+
+    private _refreshFavoriteRhythms(): void {
+        this._favoriteRhythmGroup.replaceChildren();
+
+        if (this._favoriteRhythms.length > 0) {
+            for (const rhythm of Config.rhythms) {
+                if (!this._favoriteRhythms.includes(rhythm.stepsPerBeat)) continue;
+
+                this._favoriteRhythmGroup.appendChild(
+                    option(
+                        { value: `setRhythm:${rhythm.stepsPerBeat}` },
+                        `★ ${rhythm.name}`
+                    )
+                );
+            }
+        }
+
+        this._favoriteRhythmGroup.hidden =
+            this._favoriteRhythms.length == 0;
+
+        this._updateFavoriteRhythmButton();
+    }
+
+    private _updateFavoriteRhythmButton(): void {
+        const stepsPerBeat =
+            Config.rhythms[this.doc.song.rhythm].stepsPerBeat;
+
+        this._favoriteRhythmOption.textContent =
+            this._isFavoriteRhythm(stepsPerBeat)
+                ? "Remove Current Division from Favorites"
+                : "Add Current Division to Favorites";
     }
 
     private _whenSampleLoadingStatusClicked = (): void => {
@@ -2502,6 +2599,7 @@ export class SongEditor {
 
         this._piano.container.style.display = prefs.showLetters ? "" : "none";
         this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
+        this._refreshFavoriteRhythms();
         this._barScrollBar.container.style.display = this.doc.song.barCount > this.doc.trackVisibleBars ? "" : "none";
         this._volumeBarBox.style.display = this.doc.prefs.displayVolumeBar ? "" : "none";
         this._globalOscscopeContainer.style.display = this.doc.prefs.showOscilloscope ? "" : "none";
@@ -4486,6 +4584,7 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 13: // enter/return
+                if (document.activeElement == this._rhythmInput) return;
                 this.doc.synth.loopBarStart = -1;
                 this.doc.synth.loopBarEnd = -1;
                 this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
@@ -4503,6 +4602,7 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 8: // backspace/delete
+                if (document.activeElement == this._rhythmInput) return;
                 this.doc.synth.loopBarStart = -1;
                 this.doc.synth.loopBarEnd = -1;
                 this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
@@ -4992,6 +5092,7 @@ export class SongEditor {
             case 55: // 7
             case 56: // 8
             case 57: // 9
+                if (document.activeElement == this._rhythmInput) return;
                 const numberPressed: number = event.keyCode - 48;
                 if (canPlayNotes) break;
                 this.doc.selection.nextDigit(numberPressed + "", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
@@ -5305,25 +5406,77 @@ export class SongEditor {
             }
         }
 
-        this._rhythmInput.value = Config.rhythms[closestIndex].stepsPerBeat.toString();
+        //this._rhythmInput.value = Config.rhythms[closestIndex].stepsPerBeat.toString(); // immediately sets rhythm to closest available, which doesn't allow some rhythms
 
         this.doc.record(new ChangeRhythm(this.doc, closestIndex));
     }
 
     private _whenRhythmAction = (): void => {
+        if (this._rhythmActionSelect.value.startsWith("setRhythm:")) {
+            const stepsPerBeat = Number(
+                this._rhythmActionSelect.value.substring("setRhythm:".length)
+            );
+
+            this._rhythmInput.value = stepsPerBeat.toString();
+            this._whenSetRhythmInput();
+
+            this._rhythmActionSelect.selectedIndex = 0;
+            return;
+        }
         switch (this._rhythmActionSelect.value) {
             case "forceRhythm":
-                this.doc.selection.forceRhythm();
-            break;
+                if (this._patternEditor.rhythmEnabled) {
+                    this.doc.selection.forceRhythm();
+                }
+                break;
 
-        };
-        if (this._rhythmActionOption.value == "toggleRhythm") {
-            this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
+            case "forceRhythmAll":
+                if (this._patternEditor.rhythmEnabled) {
+                    this.doc.selection.forceRhythmAllPatterns();
+                }
+                break;
 
-            this._rhythmActionOption.textContent =
-            this._patternEditor.rhythmEnabled
-                ? "Disable Rhythm"
-                : "Enable Rhythm";
+            case "toggleRhythm":
+                this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
+
+                if (this._patternEditor.rhythmEnabled) {
+                    this._rhythmInput.disabled = false;
+
+                    this._rhythmDisabledLabel.style.display = "none";
+                    this._rhythmInput.style.color = "";
+
+                    this._rhythmInput.style.removeProperty("appearance");
+                    this._rhythmInput.style.removeProperty("-moz-appearance");
+                } else {
+                    this._rhythmInput.disabled = true;
+
+                    this._rhythmDisabledLabel.style.display = "block";
+                    this._rhythmDisabledLabel.style.color = "#c77";
+                    this._rhythmInput.style.color = "transparent";
+
+                    this._rhythmInput.style.setProperty("appearance", "textfield");
+                    this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
+                }
+
+                this._rhythmActionOption.textContent =
+                    this._patternEditor.rhythmEnabled
+                        ? "Disable Note Divisions"
+                        : "Enable Note Divisions";
+                break;
+
+            case "toggleFavoriteRhythm": {
+                const stepsPerBeat =
+                    Config.rhythms[this.doc.song.rhythm].stepsPerBeat;
+
+                if (this._isFavoriteRhythm(stepsPerBeat)) {
+                    this._removeFavoriteRhythm(stepsPerBeat);
+                } else {
+                    this._addFavoriteRhythm(stepsPerBeat);
+                }
+
+                this._refreshFavoriteRhythms();
+                break;
+            }
         }
 
         this._rhythmActionSelect.selectedIndex = 0;

@@ -243,7 +243,8 @@ const enum SongTagCode {
     arpeggioSpeed = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
     harmonics = CharCode.H, // added in BeepBox URL version 7
     stringSustain = CharCode.I, // added in BeepBox URL version 9
-    //	                    = CharCode.J,
+    //rhythmEnabled = CharCode.J, // added in 41Box 1.3
+    //                      = CharCode.J,
     //	                    = CharCode.K,
     pan = CharCode.L, // added between 8 and 9, DEPRECATED
     customChipWave = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
@@ -2401,7 +2402,13 @@ export class Instrument {
             this.fadeIn = Synth.secondsToFadeInSetting(+instrumentObject["fadeInSeconds"]);
         }
         if (instrumentObject["fadeOutTicks"] != undefined) {
-            this.fadeOut = Synth.ticksToFadeOutSetting(+instrumentObject["fadeOutTicks"]);
+            let fadeOutTicks = +instrumentObject["fadeOutTicks"];
+
+            if (jsonFormat !== "41box") {
+                fadeOutTicks *= Config.partsPerBeat / 24;
+            }
+
+            this.fadeOut = Synth.ticksToFadeOutSetting(fadeOutTicks);
         }
 
         {
@@ -3224,6 +3231,7 @@ export class Song {
     public barCount: number;
     public patternsPerChannel: number;
     public rhythm: number;
+    //public rhythmEnabled: boolean;
     public layeredInstruments: boolean;
     public patternInstruments: boolean;
     public loopStart: number;
@@ -3497,6 +3505,7 @@ export class Song {
         this.barCount = 16;
         this.patternsPerChannel = 8;
         this.rhythm = 3;
+        //this.rhythmEnabled = true;
         this.layeredInstruments = false;
         this.patternInstruments = false;
         this.eqFilter.reset();
@@ -3581,6 +3590,7 @@ export class Song {
         buffer.push(SongTagCode.barCount, base64IntToCharCode[(this.barCount - 1) >> 6], base64IntToCharCode[(this.barCount - 1) & 0x3f]);
         buffer.push(SongTagCode.patternCount, base64IntToCharCode[(this.patternsPerChannel - 1) >> 6], base64IntToCharCode[(this.patternsPerChannel - 1) & 0x3f]);
         buffer.push(SongTagCode.rhythm, base64IntToCharCode[this.rhythm]);
+        //buffer.push(SongTagCode.rhythmEnabled, base64IntToCharCode[this.rhythmEnabled ? 1 : 0]);
 
         // Push limiter settings, but only if they aren't the default!
         buffer.push(SongTagCode.limiterSettings);
@@ -4677,6 +4687,9 @@ export class Song {
                     this.rhythm = clamp(0, Config.rhythms.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
+            /*case SongTagCode.rhythmEnabled: {
+                this.rhythmEnabled = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] != 0;
+            } break;*/
             case SongTagCode.channelOctave: {
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -5089,7 +5102,7 @@ export class Song {
                         const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                         const instrument: Instrument = this.channels[channelIndex].instruments[0];
                         instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                         instrument.transition = Config.transitions.dictionary[settings.transition].index;
                         if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                             // Enable transition if it was used.
@@ -5100,7 +5113,7 @@ export class Song {
                             for (const instrument of this.channels[channelIndex].instruments) {
                                 const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                 instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                 instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                 if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                     // Enable transition if it was used.
@@ -5112,7 +5125,7 @@ export class Song {
                         const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                         const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                         instrument.transition = Config.transitions.dictionary[settings.transition].index;
                         if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                             // Enable transition if it was used.
@@ -5122,7 +5135,7 @@ export class Song {
                         const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                         const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                        instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                         instrument.transition = Config.transitions.dictionary[settings.transition].index;
 
                         // Read tie-note 

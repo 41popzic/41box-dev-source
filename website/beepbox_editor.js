@@ -496,7 +496,7 @@ var beepbox = (function (exports) {
     Config.attackVal = 0;
     Config.releaseVal = 0.25;
     Config.willReloadForCustomSamples = false;
-    Config.jsonFormat = "slarmoosbox";
+    Config.jsonFormat = "41box";
     Config.scales = toNameMap([
         { group: "Standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
         { group: "Standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
@@ -580,18 +580,32 @@ var beepbox = (function (exports) {
         { name: "÷4", stepsPerBeat: 4, roundUpThresholds: [30, 90, 170, 210] },
         { name: "÷5", stepsPerBeat: 5, roundUpThresholds: null },
         { name: "÷6", stepsPerBeat: 6, roundUpThresholds: null },
+        { name: "÷7", stepsPerBeat: 7, roundUpThresholds: [17, 52, 86, 120, 154, 189, 223] },
         { name: "÷8", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷9", stepsPerBeat: 9, roundUpThresholds: null },
         { name: "÷10", stepsPerBeat: 10, roundUpThresholds: null },
+        { name: "÷11", stepsPerBeat: 11, roundUpThresholds: null },
         { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷13", stepsPerBeat: 13, roundUpThresholds: null },
+        { name: "÷14", stepsPerBeat: 14, roundUpThresholds: null },
         { name: "÷15", stepsPerBeat: 15, roundUpThresholds: null },
         { name: "÷16", stepsPerBeat: 16, roundUpThresholds: null },
+        { name: "÷17", stepsPerBeat: 17, roundUpThresholds: null },
+        { name: "÷18", stepsPerBeat: 18, roundUpThresholds: null },
+        { name: "÷19", stepsPerBeat: 19, roundUpThresholds: null },
         { name: "÷20", stepsPerBeat: 20, roundUpThresholds: null },
+        { name: "÷21", stepsPerBeat: 21, roundUpThresholds: null },
+        { name: "÷22", stepsPerBeat: 22, roundUpThresholds: null },
+        { name: "÷23", stepsPerBeat: 23, roundUpThresholds: null },
         { name: "÷24", stepsPerBeat: 24, roundUpThresholds: null },
+        { name: "÷25", stepsPerBeat: 25, roundUpThresholds: null },
+        { name: "÷26", stepsPerBeat: 26, roundUpThresholds: null },
+        { name: "÷27", stepsPerBeat: 27, roundUpThresholds: null },
+        { name: "÷28", stepsPerBeat: 28, roundUpThresholds: null },
+        { name: "÷29", stepsPerBeat: 29, roundUpThresholds: null },
         { name: "÷30", stepsPerBeat: 30, roundUpThresholds: null },
-        { name: "÷40", stepsPerBeat: 40, roundUpThresholds: null },
-        { name: "÷48", stepsPerBeat: 48, roundUpThresholds: null },
-        { name: "÷60", stepsPerBeat: 60, roundUpThresholds: null },
-        { name: "÷80", stepsPerBeat: 80, roundUpThresholds: null },
+        { name: "÷31", stepsPerBeat: 31, roundUpThresholds: null },
+        { name: "÷32", stepsPerBeat: 32, roundUpThresholds: null },
         { name: "÷120", stepsPerBeat: 120, roundUpThresholds: null },
         { name: "÷240", stepsPerBeat: 240, roundUpThresholds: null },
     ]);
@@ -14460,7 +14474,11 @@ li.select2-results__option[role=group] > strong:hover {
                 this.fadeIn = Synth.secondsToFadeInSetting(+instrumentObject["fadeInSeconds"]);
             }
             if (instrumentObject["fadeOutTicks"] != undefined) {
-                this.fadeOut = Synth.ticksToFadeOutSetting(+instrumentObject["fadeOutTicks"]);
+                let fadeOutTicks = +instrumentObject["fadeOutTicks"];
+                if (jsonFormat !== "41box") {
+                    fadeOutTicks *= Config.partsPerBeat / 24;
+                }
+                this.fadeOut = Synth.ticksToFadeOutSetting(fadeOutTicks);
             }
             {
                 const chordProperty = instrumentObject["chord"];
@@ -16924,7 +16942,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[channelIndex].instruments[0];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                         instrument.effects |= 1 << 10;
@@ -16935,7 +16953,7 @@ li.select2-results__option[role=group] > strong:hover {
                                         for (const instrument of this.channels[channelIndex].instruments) {
                                             const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                             instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                            instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                            instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                             instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                             if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                                 instrument.effects |= 1 << 10;
@@ -16947,7 +16965,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                         instrument.effects |= 1 << 10;
@@ -16957,7 +16975,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] > 0) {
                                         instrument.legacyTieOver = true;
@@ -31295,7 +31313,7 @@ li.select2-results__option[role=group] > strong:hover {
     class ChangePatternRhythm extends ChangeSequence {
         constructor(doc, pattern) {
             super();
-            const minDivision = Config.partsPerBeat / Config.rhythms[doc.song.rhythm].stepsPerBeat;
+            const minDivision = Math.round(Config.partsPerBeat / Config.rhythms[doc.song.rhythm].stepsPerBeat);
             const changeRhythm = function (oldTime) {
                 let thresholds = Config.rhythms[doc.song.rhythm].roundUpThresholds;
                 if (thresholds != null) {
@@ -34290,6 +34308,16 @@ li.select2-results__option[role=group] > strong:hover {
                 }
             }
             this._doc.notifier.changed();
+        }
+        forceRhythmAllPatterns() {
+            const group = new ChangeGroup();
+            for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                const channel = this._doc.song.channels[channelIndex];
+                for (const pattern of channel.patterns) {
+                    group.append(new ChangePatternRhythm(this._doc, pattern));
+                }
+            }
+            this._doc.record(group);
         }
         forceRhythm() {
             const group = new ChangeGroup();
@@ -38862,15 +38890,6 @@ You should be redirected to the song at:<br /><br />
 
     const { button: button$h, p: p$8, div: div$h, h2: h2$g, input: input$b, select: select$a, option: option$a } = HTML;
     class ImportPrompt {
-        _distanceToFadeOutTable(value) {
-            let best = Infinity;
-            for (const t of Config.fadeOutTicks) {
-                const dist = Math.abs(t - value);
-                if (dist < best)
-                    best = dist;
-            }
-            return best;
-        }
         constructor(_doc) {
             this._doc = _doc;
             this._fileInput = input$b({ type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi" });
@@ -38895,7 +38914,6 @@ You should be redirected to the song at:<br /><br />
                         this._doc.prompt = null;
                         this._doc.goBackToStart();
                         this._doc.record(new ChangeSong(this._doc, reader.result, this._modeImportSelect.value), true, true);
-                        this.scaleTickUnits();
                     });
                     reader.readAsText(file);
                 }
@@ -38905,41 +38923,12 @@ You should be redirected to the song at:<br /><br />
                         this._doc.prompt = null;
                         this._doc.goBackToStart();
                         this._parseMidiFile(reader.result);
-                        this.scaleTickUnits();
                     });
                     reader.readAsArrayBuffer(file);
                 }
                 else {
                     console.error("Unrecognized file extension.");
                     this._close();
-                }
-            };
-            this.scaleTickUnits = () => {
-                for (const channel of this._doc.song.channels) {
-                    for (const instrument of channel.instruments) {
-                        const indexShift = -1;
-                        const oldIndex = Math.max(0, Math.min(Config.fadeOutTicks.length - 1, instrument.fadeOut));
-                        const oldTicks = Config.fadeOutTicks[oldIndex];
-                        const scaledPos = oldTicks * 10;
-                        const scaledNeg = oldTicks * -10;
-                        const usePositive = this._distanceToFadeOutTable(scaledPos) <
-                            this._distanceToFadeOutTable(scaledNeg);
-                        const scaledTicks = usePositive ? scaledPos : scaledNeg;
-                        let closestIndex = 0;
-                        let closestDistance = Number.MAX_VALUE;
-                        const MAX_REASONABLE_DISTANCE = 20;
-                        for (let i = 0; i < Config.fadeOutTicks.length; i++) {
-                            const candidate = Config.fadeOutTicks[i];
-                            const distance = Math.abs(candidate - scaledTicks);
-                            if (distance < closestDistance) {
-                                closestDistance = distance;
-                                closestIndex = i + indexShift;
-                            }
-                        }
-                        if (closestDistance <= MAX_REASONABLE_DISTANCE) {
-                            instrument.fadeOut = closestIndex;
-                        }
-                    }
                 }
             };
             this._fileInput.select();
@@ -42606,15 +42595,16 @@ You should be redirected to the song at:<br /><br />
             return Config.partsPerBeat;
         }
         _getMinDivision() {
-            if (!this.rhythmEnabled)
-                return 1;
             if (this.controlMode && this._mouseHorizontal)
                 return 1;
-            return Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+            if (!this.rhythmEnabled)
+                return 1;
+            return Math.round(Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat);
         }
         _snapToMinDivision(input) {
-            const minDivision = this._getMinDivision();
-            return Math.floor(input / minDivision) * minDivision;
+            const stepsPerBeat = Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+            const step = Math.round(input * stepsPerBeat / Config.partsPerBeat);
+            return Math.round(step * Config.partsPerBeat / stepsPerBeat);
         }
         _updateCursorStatus() {
             this._cursor = new PatternCursor();
@@ -42796,7 +42786,7 @@ You should be redirected to the song at:<br /><br />
                     while (division < maxDivision && Config.partsPerBeat % division != 0) {
                         division++;
                     }
-                    this._cursor.start += Math.floor(modMouse / division) * division;
+                    this._cursor.start += this._snapToMinDivision(modMouse);
                 }
                 this._cursor.end = this._cursor.start + defaultLength;
                 let forceStart = 0;
@@ -48689,9 +48679,13 @@ You should be redirected to the song at:<br /><br />
             this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
             this._echoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
             this._echoDelayRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-            this._rhythmInput = input({ type: "number", min: "1", max: "240", style: "width: 5em;" });
+            this._rhythmInput = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });
             this._rhythmActionSelect = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
-            this._rhythmActionOption = option({ value: "toggleRhythm" }, "Disable Rhythm");
+            this._rhythmActionOption = option({ value: "toggleRhythm" }, "Disable Note Divisions");
+            this._favoriteRhythmOption = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
+            this._rhythmDisabledLabel = span({ style: ` position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; color: #d77777; font-style: italic; ` }, "(disabled)");
+            this._favoriteRhythms = [];
+            this._favoriteRhythmGroup = optgroup({ label: "Favorites" });
             this._pitchedPresetSelect = buildPresetOptions(false, "pitchPresetSelect");
             this._drumPresetSelect = buildPresetOptions(true, "drumPresetSelect");
             this._algorithmSelect = buildOptions(select(), Config.algorithms.map(algorithm => algorithm.name));
@@ -48921,7 +48915,7 @@ You should be redirected to the song at:<br /><br />
             this._sampleLoadingBar = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
             this._sampleLoadingBarContainer = div({ style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
             this._sampleLoadingStatusContainer = div({ style: "cursor: pointer;" }, div({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Sample Loading Status"), div({ class: "selectRow", style: "height: 6px; margin-bottom: 0.5em;" }, this._sampleLoadingBarContainer));
-            this._songSettingsArea = div({ class: "song-settings-area" }, div({ class: "editor-controls" }, div({ class: "editor-song-settings" }, div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" }, div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" }, this._usedPatternIndicator)), div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" }, this._usedInstrumentIndicator)), "Song Settings", div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator))), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "), div({ class: "selectContainer" }, this._scaleSelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "), div({ class: "selectContainer" }, this._keySelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "), this._octaveStepper), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "), span({ style: "display: flex;" }, this._tempoSlider.container, this._tempoStepper)), div({ class: "selectRow" }, span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm") }, "Note Divisions: "), this._rhythmInput, this._rhythmActionSelect), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("songeq") }, span("Song EQ:")), this._songEqFilterZoom, this._songEqFilterEditor.container), this._sampleLoadingStatusContainer));
+            this._songSettingsArea = div({ class: "song-settings-area" }, div({ class: "editor-controls" }, div({ class: "editor-song-settings" }, div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" }, div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" }, this._usedPatternIndicator)), div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" }, this._usedInstrumentIndicator)), "Song Settings", div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator))), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "), div({ class: "selectContainer" }, this._scaleSelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "), div({ class: "selectContainer" }, this._keySelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "), this._octaveStepper), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "), span({ style: "display: flex;" }, this._tempoSlider.container, this._tempoStepper)), div({ class: "selectRow" }, span({ class: "tip", style: "white-space: nowrap;", onclick: () => this._openPrompt("rhythm") }, "Note Divs: "), div({ style: "position: relative; display: inline-block;" }, this._rhythmInput, this._rhythmDisabledLabel), this._rhythmActionSelect), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("songeq") }, span("Song EQ:")), this._songEqFilterZoom, this._songEqFilterEditor.container), this._sampleLoadingStatusContainer));
             this._instrumentSettingsArea = div({ class: "instrument-settings-area" }, this._instrumentSettingsGroup, this._modulatorGroup);
             this._settingsArea = div({ class: "settings-area noSelection" }, div({ class: "version-area" }, div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText};` }, this._songTitleInputBox.input)), div({ class: "play-pause-area" }, this._volumeBarBox, div({ class: "playback-bar-controls" }, this._playButton, this._pauseButton, this._recordButton, this._stopButton, this._prevBarButton, this._nextBarButton), div({ class: "playback-volume-controls" }, span({ class: "volume-speaker" }), this._volumeSlider.container), this._globalOscscopeContainer), this._menuArea, this._songSettingsArea, this._instrumentSettingsArea);
             this.mainLayer = div({ class: "beepboxEditor", tabIndex: "0" }, this._patternArea, this._trackArea, this._settingsArea, this._promptContainer);
@@ -49001,6 +48995,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 this._piano.container.style.display = prefs.showLetters ? "" : "none";
                 this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
+                this._refreshFavoriteRhythms();
                 this._barScrollBar.container.style.display = this.doc.song.barCount > this.doc.trackVisibleBars ? "" : "none";
                 this._volumeBarBox.style.display = this.doc.prefs.displayVolumeBar ? "" : "none";
                 this._globalOscscopeContainer.style.display = this.doc.prefs.showOscilloscope ? "" : "none";
@@ -50582,6 +50577,8 @@ You should be redirected to the song at:<br /><br />
                         event.preventDefault();
                         break;
                     case 13:
+                        if (document.activeElement == this._rhythmInput)
+                            return;
                         this.doc.synth.loopBarStart = -1;
                         this.doc.synth.loopBarEnd = -1;
                         this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
@@ -50600,6 +50597,8 @@ You should be redirected to the song at:<br /><br />
                         event.preventDefault();
                         break;
                     case 8:
+                        if (document.activeElement == this._rhythmInput)
+                            return;
                         this.doc.synth.loopBarStart = -1;
                         this.doc.synth.loopBarEnd = -1;
                         this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
@@ -51087,6 +51086,8 @@ You should be redirected to the song at:<br /><br />
                     case 55:
                     case 56:
                     case 57:
+                        if (document.activeElement == this._rhythmInput)
+                            return;
                         const numberPressed = event.keyCode - 48;
                         if (canPlayNotes)
                             break;
@@ -51288,21 +51289,60 @@ You should be redirected to the song at:<br /><br />
                         closestIndex = i;
                     }
                 }
-                this._rhythmInput.value = Config.rhythms[closestIndex].stepsPerBeat.toString();
                 this.doc.record(new ChangeRhythm(this.doc, closestIndex));
             };
             this._whenRhythmAction = () => {
+                if (this._rhythmActionSelect.value.startsWith("setRhythm:")) {
+                    const stepsPerBeat = Number(this._rhythmActionSelect.value.substring("setRhythm:".length));
+                    this._rhythmInput.value = stepsPerBeat.toString();
+                    this._whenSetRhythmInput();
+                    this._rhythmActionSelect.selectedIndex = 0;
+                    return;
+                }
                 switch (this._rhythmActionSelect.value) {
                     case "forceRhythm":
-                        this.doc.selection.forceRhythm();
+                        if (this._patternEditor.rhythmEnabled) {
+                            this.doc.selection.forceRhythm();
+                        }
                         break;
-                }
-                if (this._rhythmActionOption.value == "toggleRhythm") {
-                    this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
-                    this._rhythmActionOption.textContent =
-                        this._patternEditor.rhythmEnabled
-                            ? "Disable Rhythm"
-                            : "Enable Rhythm";
+                    case "forceRhythmAll":
+                        if (this._patternEditor.rhythmEnabled) {
+                            this.doc.selection.forceRhythmAllPatterns();
+                        }
+                        break;
+                    case "toggleRhythm":
+                        this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
+                        if (this._patternEditor.rhythmEnabled) {
+                            this._rhythmInput.disabled = false;
+                            this._rhythmDisabledLabel.style.display = "none";
+                            this._rhythmInput.style.color = "";
+                            this._rhythmInput.style.removeProperty("appearance");
+                            this._rhythmInput.style.removeProperty("-moz-appearance");
+                        }
+                        else {
+                            this._rhythmInput.disabled = true;
+                            this._rhythmDisabledLabel.style.display = "block";
+                            this._rhythmDisabledLabel.style.color = "#c77";
+                            this._rhythmInput.style.color = "transparent";
+                            this._rhythmInput.style.setProperty("appearance", "textfield");
+                            this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
+                        }
+                        this._rhythmActionOption.textContent =
+                            this._patternEditor.rhythmEnabled
+                                ? "Disable Note Divisions"
+                                : "Enable Note Divisions";
+                        break;
+                    case "toggleFavoriteRhythm": {
+                        const stepsPerBeat = Config.rhythms[this.doc.song.rhythm].stepsPerBeat;
+                        if (this._isFavoriteRhythm(stepsPerBeat)) {
+                            this._removeFavoriteRhythm(stepsPerBeat);
+                        }
+                        else {
+                            this._addFavoriteRhythm(stepsPerBeat);
+                        }
+                        this._refreshFavoriteRhythms();
+                        break;
+                    }
                 }
                 this._rhythmActionSelect.selectedIndex = 0;
             };
@@ -51749,7 +51789,17 @@ You should be redirected to the song at:<br /><br />
             this._scaleSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceScale" }, "Snap Notes To Scale"), option({ value: "customize" }, "Edit Custom Scale")));
             this._keySelect.appendChild(optgroup({ label: "Edit" }, option({ value: "detectKey" }, "Detect Key")));
             this._rhythmActionSelect.appendChild(option({ value: "", disabled: true, selected: true, hidden: true, }, "▼"));
-            this._rhythmActionSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceRhythm" }, "Snap Notes to Rhythm"), this._rhythmActionOption));
+            this._rhythmActionSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceRhythm" }, "Quantize Selected Patterns"), option({ value: "forceRhythmAll" }, "Quantize All Notes"), this._favoriteRhythmOption, this._rhythmActionOption));
+            const commonDivisions = [3, 4, 6, 8, 12, 24, 32];
+            const commonGroup = optgroup({ label: "Main Divisions" });
+            for (const rhythm of Config.rhythms) {
+                if (commonDivisions.includes(rhythm.stepsPerBeat)) {
+                    commonGroup.appendChild(option({ value: `setRhythm:${rhythm.stepsPerBeat}` }, rhythm.name));
+                }
+            }
+            this._rhythmActionSelect.appendChild(this._favoriteRhythmGroup);
+            this._refreshFavoriteRhythms();
+            this._rhythmActionSelect.appendChild(commonGroup);
             this._vibratoSelect.appendChild(option({ hidden: true, value: 5 }, "custom"));
             this._unisonSelect.appendChild(option({ hidden: true, value: Config.unisons.length }, "custom"));
             this._showModSliders = new Array(Config.modulators.length);
@@ -51869,6 +51919,7 @@ You should be redirected to the song at:<br /><br />
             this._keySelect.addEventListener("change", this._whenSetKey);
             this._octaveStepper.addEventListener("change", this._whenSetOctave);
             this._rhythmInput.addEventListener("change", this._whenSetRhythmInput);
+            this._rhythmInput.addEventListener("input", this._whenSetRhythmInput);
             this._rhythmActionSelect.addEventListener("change", this._whenRhythmAction);
             this._algorithmSelect.addEventListener("change", this._whenSetAlgorithm);
             this._instrumentsButtonBar.addEventListener("click", this._whenSelectInstrument);
@@ -52082,6 +52133,53 @@ You should be redirected to the song at:<br /><br />
                 }
                 this._unisonSelect.appendChild(group);
             }
+            const savedFavorites = localStorage.getItem("41box.favoriteRhythms");
+            if (savedFavorites != null) {
+                try {
+                    this._favoriteRhythms = JSON.parse(savedFavorites);
+                }
+                catch (_a) {
+                    this._favoriteRhythms = [];
+                }
+            }
+        }
+        _saveFavoriteRhythms() {
+            localStorage.setItem("41box.favoriteRhythms", JSON.stringify(this._favoriteRhythms));
+        }
+        _addFavoriteRhythm(stepsPerBeat) {
+            if (this._favoriteRhythms.includes(stepsPerBeat))
+                return;
+            this._favoriteRhythms.push(stepsPerBeat);
+            this._favoriteRhythms.sort((a, b) => a - b);
+            this._saveFavoriteRhythms();
+        }
+        _removeFavoriteRhythm(stepsPerBeat) {
+            this._favoriteRhythms =
+                this._favoriteRhythms.filter(step => step != stepsPerBeat);
+            this._saveFavoriteRhythms();
+        }
+        _isFavoriteRhythm(stepsPerBeat) {
+            return this._favoriteRhythms.includes(stepsPerBeat);
+        }
+        _refreshFavoriteRhythms() {
+            this._favoriteRhythmGroup.replaceChildren();
+            if (this._favoriteRhythms.length > 0) {
+                for (const rhythm of Config.rhythms) {
+                    if (!this._favoriteRhythms.includes(rhythm.stepsPerBeat))
+                        continue;
+                    this._favoriteRhythmGroup.appendChild(option({ value: `setRhythm:${rhythm.stepsPerBeat}` }, `★ ${rhythm.name}`));
+                }
+            }
+            this._favoriteRhythmGroup.hidden =
+                this._favoriteRhythms.length == 0;
+            this._updateFavoriteRhythmButton();
+        }
+        _updateFavoriteRhythmButton() {
+            const stepsPerBeat = Config.rhythms[this.doc.song.rhythm].stepsPerBeat;
+            this._favoriteRhythmOption.textContent =
+                this._isFavoriteRhythm(stepsPerBeat)
+                    ? "Remove Current Division from Favorites"
+                    : "Add Current Division to Favorites";
         }
         _updateSampleLoadingBar(_e) {
             const e = _e;

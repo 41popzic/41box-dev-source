@@ -482,7 +482,7 @@ var beepbox = (function (exports) {
     Config.attackVal = 0;
     Config.releaseVal = 0.25;
     Config.willReloadForCustomSamples = false;
-    Config.jsonFormat = "slarmoosbox";
+    Config.jsonFormat = "41box";
     Config.scales = toNameMap([
         { group: "Standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
         { group: "Standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
@@ -566,18 +566,32 @@ var beepbox = (function (exports) {
         { name: "÷4", stepsPerBeat: 4, roundUpThresholds: [30, 90, 170, 210] },
         { name: "÷5", stepsPerBeat: 5, roundUpThresholds: null },
         { name: "÷6", stepsPerBeat: 6, roundUpThresholds: null },
+        { name: "÷7", stepsPerBeat: 7, roundUpThresholds: [17, 52, 86, 120, 154, 189, 223] },
         { name: "÷8", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷9", stepsPerBeat: 9, roundUpThresholds: null },
         { name: "÷10", stepsPerBeat: 10, roundUpThresholds: null },
+        { name: "÷11", stepsPerBeat: 11, roundUpThresholds: null },
         { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷13", stepsPerBeat: 13, roundUpThresholds: null },
+        { name: "÷14", stepsPerBeat: 14, roundUpThresholds: null },
         { name: "÷15", stepsPerBeat: 15, roundUpThresholds: null },
         { name: "÷16", stepsPerBeat: 16, roundUpThresholds: null },
+        { name: "÷17", stepsPerBeat: 17, roundUpThresholds: null },
+        { name: "÷18", stepsPerBeat: 18, roundUpThresholds: null },
+        { name: "÷19", stepsPerBeat: 19, roundUpThresholds: null },
         { name: "÷20", stepsPerBeat: 20, roundUpThresholds: null },
+        { name: "÷21", stepsPerBeat: 21, roundUpThresholds: null },
+        { name: "÷22", stepsPerBeat: 22, roundUpThresholds: null },
+        { name: "÷23", stepsPerBeat: 23, roundUpThresholds: null },
         { name: "÷24", stepsPerBeat: 24, roundUpThresholds: null },
+        { name: "÷25", stepsPerBeat: 25, roundUpThresholds: null },
+        { name: "÷26", stepsPerBeat: 26, roundUpThresholds: null },
+        { name: "÷27", stepsPerBeat: 27, roundUpThresholds: null },
+        { name: "÷28", stepsPerBeat: 28, roundUpThresholds: null },
+        { name: "÷29", stepsPerBeat: 29, roundUpThresholds: null },
         { name: "÷30", stepsPerBeat: 30, roundUpThresholds: null },
-        { name: "÷40", stepsPerBeat: 40, roundUpThresholds: null },
-        { name: "÷48", stepsPerBeat: 48, roundUpThresholds: null },
-        { name: "÷60", stepsPerBeat: 60, roundUpThresholds: null },
-        { name: "÷80", stepsPerBeat: 80, roundUpThresholds: null },
+        { name: "÷31", stepsPerBeat: 31, roundUpThresholds: null },
+        { name: "÷32", stepsPerBeat: 32, roundUpThresholds: null },
         { name: "÷120", stepsPerBeat: 120, roundUpThresholds: null },
         { name: "÷240", stepsPerBeat: 240, roundUpThresholds: null },
     ]);
@@ -12567,7 +12581,11 @@ var beepbox = (function (exports) {
                 this.fadeIn = Synth.secondsToFadeInSetting(+instrumentObject["fadeInSeconds"]);
             }
             if (instrumentObject["fadeOutTicks"] != undefined) {
-                this.fadeOut = Synth.ticksToFadeOutSetting(+instrumentObject["fadeOutTicks"]);
+                let fadeOutTicks = +instrumentObject["fadeOutTicks"];
+                if (jsonFormat !== "41box") {
+                    fadeOutTicks *= Config.partsPerBeat / 24;
+                }
+                this.fadeOut = Synth.ticksToFadeOutSetting(fadeOutTicks);
             }
             {
                 const chordProperty = instrumentObject["chord"];
@@ -15031,7 +15049,7 @@ var beepbox = (function (exports) {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[channelIndex].instruments[0];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                         instrument.effects |= 1 << 10;
@@ -15042,7 +15060,7 @@ var beepbox = (function (exports) {
                                         for (const instrument of this.channels[channelIndex].instruments) {
                                             const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                             instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                            instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                            instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                             instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                             if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                                 instrument.effects |= 1 << 10;
@@ -15054,7 +15072,7 @@ var beepbox = (function (exports) {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (instrument.transition != Config.transitions.dictionary["normal"].index) {
                                         instrument.effects |= 1 << 10;
@@ -15064,7 +15082,7 @@ var beepbox = (function (exports) {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
-                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks);
+                                    instrument.fadeOut = Synth.ticksToFadeOutSetting(settings.fadeOutTicks * (Config.partsPerBeat / 24));
                                     instrument.transition = Config.transitions.dictionary[settings.transition].index;
                                     if (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] > 0) {
                                         instrument.legacyTieOver = true;

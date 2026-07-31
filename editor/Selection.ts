@@ -752,6 +752,20 @@ export class Selection {
         this._doc.notifier.changed();
     }
 
+    public forceRhythmAllPatterns(): void {
+        const group: ChangeGroup = new ChangeGroup();
+
+        for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+            const channel = this._doc.song.channels[channelIndex];
+
+            for (const pattern of channel.patterns) {
+                group.append(new ChangePatternRhythm(this._doc, pattern));
+            }
+        }
+
+        this._doc.record(group);
+    }
+
     public forceRhythm(): void {
         const group: ChangeGroup = new ChangeGroup();
 
