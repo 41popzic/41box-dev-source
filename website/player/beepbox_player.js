@@ -8418,11 +8418,11 @@ var beepbox = (function (exports) {
 }`,
         "41box": `
 @font-face {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-style: normal;
   font-weight: 100 900;
-  font-display: block;
-  src: url('https://rsms.me/inter/font-files/InterVariable.woff2?4_1') format("woff2");
+  font-display: swap;
+  src: url("https://rsms.me/inter/font-files/InterVariable.woff2") format("woff2-variations");
 }
 		:root {
 			--page-margin: #010003;
@@ -8535,13 +8535,13 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
 
-			  font-family: Inter, Courier !important;
-  letter-spacing: 0;
-  line-height: 1.3;
-  /*font-weight: 300;
-  font-variation-settings: "wght" 300, "opsz" 32;
-  font-feature-settings: "case", "dlig", "frac", "dnom" 0, "numr" 0, "subs" 0, "sups" 0, "tnum" 0, "zero" 0, "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0, "ss08" 0, "cv01" 0, "cv02", "cv03", "cv04", "cv05" 0, "cv06" 0, "cv07", "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0, "cv12" 0, "cv13" 0, "cpsp" 0, "c2sc" 0, "salt" 0, "aalt" 0, "calt" 0, "ccmp", "locl", "kern";
-*/
+			font-family: Arial, sans-serif !important;
+			letter-spacing: 0;
+			line-height: 1.3;
+			/*font-weight: 300;
+			font-variation-settings: "wght" 300, "opsz" 32;
+			font-feature-settings: "case", "dlig", "frac", "dnom" 0, "numr" 0, "subs" 0, "sups" 0, "tnum" 0, "zero" 0, "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0, "ss08" 0, "cv01" 0, "cv02", "cv03", "cv04", "cv05" 0, "cv06" 0, "cv07", "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0, "cv12" 0, "cv13" 0, "cpsp" 0, "c2sc" 0, "salt" 0, "aalt" 0, "calt" 0, "ccmp", "locl", "kern";
+			*/
 		}`,
         "inter-energized": `
 @font-face {
@@ -8665,7 +8665,7 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #808080;
 			--disabled-note-secondary: #666666;
 
-			  font-family: Inter, Courier !important;
+			  font-family: Arial, sans-serif !important;
   letter-spacing: 0;
   line-height: 1.3;
   /*font-weight: 300;
@@ -8790,7 +8790,7 @@ var beepbox = (function (exports) {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #aaa;
 
-			  font-family: Inter, Courier !important;
+			  font-family: Arial, sans-serif !important;
   letter-spacing: 0;
   line-height: 1.3;
   /*font-weight: 300;
@@ -8916,7 +8916,7 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
 
-			  font-family: Inter, Courier !important;
+			  font-family: Arial, sans-serif !important;
   letter-spacing: 0;
   line-height: 1.3;
   /*font-weight: 300;
@@ -9046,7 +9046,7 @@ var beepbox = (function (exports) {
 					--disabled-note-primary:    #536e5c;
 					--disabled-note-secondary:  #395440;
 
-			  font-family: Inter, Courier !important;
+			  font-family: Arial, sans-serif !important;
   letter-spacing: 0;
   line-height: 1.3;
   /*font-weight: 300;
@@ -9175,7 +9175,7 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #828282;
 			--disabled-note-secondary: #4f4f4f;
 
-			  font-family: Inter, Courier !important;
+			  font-family: Arial, sans-serif !important;
   letter-spacing: 0;
   line-height: 1.3;
   /*font-weight: 300;
