@@ -1460,7 +1460,7 @@ export class EnvelopeSettings {
 
         let envelope: Envelope = Config.envelopes.dictionary["none"];
         let isTremolo2: Boolean = false;
-        if (format == "slarmoosbox") {
+        if ((format == "slarmoosbox") || (format == "41box")) {
             if (envelopeObject["envelope"] == "tremolo2") {
                 envelope = Config.newEnvelopes[EnvelopeType.lfo];
                 isTremolo2 = true;
@@ -5357,7 +5357,7 @@ export class Song {
                 } else {
                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    const unisonLength = ((beforeFive || !fromSlarmoosBox) && !from41Box) ? 27 : Config.unisons.length; //27 was the old length before I added >2 voice presets
+                    const unisonLength = ((beforeFive || !fromSlarmoosBox) || !from41Box) ? 27 : Config.unisons.length; //27 was the old length before I added >2 voice presets
                     
                     if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                         // if (instrument.unison == Config.unisons.length) {
@@ -6910,7 +6910,7 @@ export class Song {
         const result: any = {
             "name": this.title,
             "format": Song._format,
-            "version": Song._latestSlarmoosBoxVersion,
+            "version": Song._latest41BoxVersion,
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,

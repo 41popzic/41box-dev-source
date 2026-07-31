@@ -72,6 +72,7 @@ export class LoopEditor {
         this.container.addEventListener("touchcancel", this._whenTouchReleased);
         this._loop.setAttribute("stroke-dasharray", "0");
         this._barLoop.setAttribute("stroke-dasharray", "0");
+        this._animateLoopAccent();
     }
 
     private _updateCursorStatus(): void {
@@ -358,5 +359,23 @@ export class LoopEditor {
         }
 
         this._updatePreview();
+    }
+
+    private _animateLoopAccent = (): void => {
+        if (this._doc.prefs.colorTheme == "41box") {
+            const hue = (performance.now() / 15) % 360;
+
+            this._loop.setAttribute(
+                "stroke",
+                `hsl(${hue}, 100%, 60%)`
+            );
+        } else {
+            this._loop.setAttribute(
+                "stroke",
+                ColorConfig.loopAccent
+            );
+        }
+
+        requestAnimationFrame(this._animateLoopAccent);
     }
 }

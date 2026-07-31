@@ -61,7 +61,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "dark competition" }, "BeepBox Competition Dark"),
 			option({ value: "jummbox classic" }, "JummBox Classic"),
 			option({ value: "jummbox light" }, "JummBox Light"), 
-			option({ value: "modbox classic" }, "Modbox"),
+			//option({ value: "modbox classic" }, "Modbox"),
 			option({ value: "sandbox classic" }, "Sandbox"),
 			option({ value: "harrybox" }, "Haileybox"),
 			option({ value: "brucebox" }, "Brucebox"),

@@ -3792,7 +3792,7 @@ var beepbox = (function (exports) {
             this.target = target.index;
             let envelope = Config.envelopes.dictionary["none"];
             let isTremolo2 = false;
-            if (format == "slarmoosbox") {
+            if ((format == "slarmoosbox") || (format == "41box")) {
                 if (envelopeObject["envelope"] == "tremolo2") {
                     envelope = Config.newEnvelopes[8];
                     isTremolo2 = true;
@@ -7325,7 +7325,7 @@ var beepbox = (function (exports) {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                const unisonLength = ((beforeFive || !fromSlarmoosBox) && !from41Box) ? 27 : Config.unisons.length;
+                                const unisonLength = ((beforeFive || !fromSlarmoosBox) || !from41Box) ? 27 : Config.unisons.length;
                                 if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                                     instrument.unison = Config.unisons.length;
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -8803,7 +8803,7 @@ var beepbox = (function (exports) {
             const result = {
                 "name": this.title,
                 "format": Song._format,
-                "version": Song._latestSlarmoosBoxVersion,
+                "version": Song._latest41BoxVersion,
                 "scale": Config.scales[this.scale].name,
                 "customScale": this.scaleCustom,
                 "key": Config.keys[this.key].name,
