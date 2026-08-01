@@ -821,6 +821,7 @@ export class SongEditor {
         option({ value: "showThird" }, 'Highlight "Third" Note'),
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "advancedColorScheme"}, "Advanced Color Scheme (ModBox)"),
+        option({ value: "rainbowLoop" }, "Rainbow Song Loop" ),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
@@ -834,7 +835,6 @@ export class SongEditor {
         option({ value: "showDescription" }, "Show Description"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
-        option({ value: "rainbowLoop" }, "Toggle Rainbow Loop..." ),
 	    option({ value: "customTheme" }, "Custom Theme... (ADVANCED)"),
         ),
     );
@@ -5898,6 +5898,14 @@ export class SongEditor {
             case "advancedColorScheme":
                 this.doc.prefs.advancedColorScheme = !this.doc.prefs.advancedColorScheme;
                 break;        
+            case "rainbowLoop":
+                this.doc.prefs.rainbowLoop = !this.doc.prefs.rainbowLoop;
+                window.localStorage.setItem(
+                    "rainbowLoop",
+                    this.doc.prefs.rainbowLoop.toString()
+                );
+                this.doc.notifier.changed();
+                break;
             case "notesOutsideScale":
                 this.doc.prefs.notesOutsideScale = !this.doc.prefs.notesOutsideScale;
                 break;
@@ -5931,14 +5939,6 @@ export class SongEditor {
                 break;
             case "colorTheme":
                 this._openPrompt("theme");
-                break;
-            case "rainbowLoop":
-                this.doc.prefs.rainbowLoop = !this.doc.prefs.rainbowLoop;
-                window.localStorage.setItem(
-                    "rainbowLoop",
-                    this.doc.prefs.rainbowLoop.toString()
-                );
-                this.doc.notifier.changed();
                 break;
             case "customTheme":
                 this._openPrompt("customTheme");

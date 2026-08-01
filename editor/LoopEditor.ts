@@ -74,6 +74,7 @@ export class LoopEditor {
         this._barLoop.setAttribute("stroke-dasharray", "0");
         this._loopGradient.setAttribute("spreadMethod", "repeat");
         this._loopGradient.setAttribute("gradientUnits", "userSpaceOnUse");
+        //this._loopGradient.setAttribute("gradientUnits", "objectBoundingBox");
         this._loopGradient.setAttribute("x1", "-200");
         this._loopGradient.setAttribute("x2", "200");
         this._loopGradient.appendChild(SVG.stop({
@@ -415,7 +416,9 @@ export class LoopEditor {
 
             const barDuration = (60 / bpm) * beatsPerBar;
 
-            const cycle = (performance.now() / 1000) / barDuration;
+            const cycleOffset = this._doc.synth.playing ? 0.5 : 0;
+
+            const cycle = ((performance.now() / 1000) / barDuration) + cycleOffset;
 
             this._loopGradient.setAttribute(
                 "gradientTransform",
@@ -426,6 +429,7 @@ export class LoopEditor {
                 "stroke",
                 "url(#loopRainbowGradient)"
             );
+            //this._loopGradient.setAttribute("gradientUnits", "objectBoundingBox");
         } else {
             this._loop.setAttribute(
                 "stroke",
