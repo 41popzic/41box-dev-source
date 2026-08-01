@@ -3021,6 +3021,7 @@ export class ColorConfig {
 		--pitch-background: #353654;
 		--tonic: #716fe3;
 		--fifth-note: #76469b;
+		--third-note: #534488; 
 		--white-piano-key: #abbce3;
 		--black-piano-key: #2f235e;
 		--track-editor-bg-pitch: #3a3b5c;

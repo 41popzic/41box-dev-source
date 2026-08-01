@@ -5847,6 +5847,7 @@ var beepbox = (function (exports) {
 		--pitch-background: #353654;
 		--tonic: #716fe3;
 		--fifth-note: #76469b;
+		--third-note: #534488; 
 		--white-piano-key: #abbce3;
 		--black-piano-key: #2f235e;
 		--track-editor-bg-pitch: #3a3b5c;
@@ -49468,7 +49469,6 @@ You should be redirected to the song at:<br /><br />
             group: "BeepBox Themes",
             items: [
                 { id: "dark classic", name: "BeepBox Dark" },
-                { id: "light classic", name: "BeepBox Light" },
                 { id: "dark competition", name: "BeepBox Competition Dark" },
             ],
         },
@@ -49488,9 +49488,7 @@ You should be redirected to the song at:<br /><br />
                 { id: "moonlight", name: "Moonlight" },
                 { id: "portal", name: "Portal" },
                 { id: "fusion", name: "Fusion" },
-                { id: "inverse", name: "Inverse" },
                 { id: "nebula", name: "Nebula" },
-                { id: "roe light", name: "Roe Light" },
                 { id: "amoled dark", name: "High Contrast Dark" },
                 { id: "energized", name: "Energized" },
                 { id: "neapolitan", name: "Neapolitan" },
@@ -49530,13 +49528,12 @@ You should be redirected to the song at:<br /><br />
             group: "Mod Themes",
             items: [
                 { id: "jummbox classic", name: "JummBox Classic" },
-                { id: "jummbox light", name: "JummBox Light" },
                 { id: "sandbox classic", name: "Sandbox" },
                 { id: "harrybox", name: "Haileybox" },
-                { id: "brucebox", name: "Brucebox" },
                 { id: "shitbox 3.0", name: "Shitbox 1.0/3.0" },
                 { id: "shitbox 2.0", name: "Shitbox 2.0" },
                 { id: "nerdbox", name: "Nerdbox" },
+                { id: "brucebox", name: "Brucebox" },
                 { id: "zefbox", name: "Zefbox" },
                 { id: "cardboardbox classic", name: "Cardboardbox" },
                 { id: "blubox classic", name: "Blubox" },
@@ -49550,16 +49547,23 @@ You should be redirected to the song at:<br /><br />
                 { id: "midbox", name: "Midbox" },
                 { id: "dogebox2", name: "DogeBox2" },
                 { id: "abyssbox classic", name: "AbyssBox Classic" },
-                { id: "abyssbox light", name: "AbyssBox Light" },
                 { id: "slarmoosbox", name: "Slarmoo's Box" },
                 { id: "nepbox", name: "Nepbox" },
                 { id: "nepbox laffey", name: "Nepbox Laffey" },
                 { id: "ultrabox dark", name: "UltraBox" },
                 { id: "voxonium", name: "Voxonium" },
-                { id: "nepbox laffey", name: "Nepbox Laffey" },
                 { id: "axobox", name: "AxoBox" },
                 { id: "lemmbox dark", name: "LemmBox" },
                 { id: "fmbox", name: "FMBox" },
+            ]
+        },
+        { group: "Light Themes",
+            items: [
+                { id: "inverse", name: "Inverse" },
+                { id: "roe light", name: "Roe Light" },
+                { id: "jummbox light", name: "JummBox Light" },
+                { id: "abyssbox light", name: "AbyssBox Light" },
+                { id: "light classic", name: "BeepBox Light" },
             ]
         }
     ];
@@ -49672,29 +49676,45 @@ You should be redirected to the song at:<br /><br />
         _makeThemeList() {
             const themeContainer = HTML.div();
             for (const group of themes) {
+                const groupContainer = HTML.div();
+                let expanded = false;
+                const arrow = HTML.div("▶");
                 const heading = HTML.div({
                     style: `
-						font-weight: bold;
-						font-style: italic;
-						text-align: left;
-						font-size: 13px;
-						font-weight: bold;
-						padding: 4px 8px 4px 10px;
-						user-select: none;
-					`
-                }, group.group);
-                themeContainer.appendChild(heading);
+				display:flex;
+				align-items:center;
+				cursor:pointer;
+				font-style:italic;
+				font-weight:bold;
+				font-size:13px;
+
+				padding:4px 8px 4px 10px;
+				
+				background:rgba(0, 0, 0, 0.15);
+
+				user-select:none;
+			`
+                }, arrow, div$6({ style: "margin-left:6px;" }, group.group));
+                heading.addEventListener("mouseenter", () => {
+                    heading.style.background = "rgba(128, 128, 128, 0.25)";
+                });
+                heading.addEventListener("mouseleave", () => {
+                    heading.style.background = "rgba(0, 0, 0, 0.15)";
+                });
+                const itemsContainer = HTML.div({
+                    style: "display:none;"
+                });
                 for (const theme of group.items) {
                     const item = HTML.div({
                         class: "themeItem",
                         style: `
-							font-weight: normal;
-							font-size: 13px;
-							padding: 4px 8px 4px 40px;
-							text-align: left;
-							cursor: pointer;
-							user-select: none;
-						`
+					font-weight: normal;
+					font-size: 13px;
+					padding: 4px 8px 4px 40px;
+					text-align: left;
+					cursor: pointer;
+					user-select: none;
+				`
                     }, theme.name);
                     if (theme.id === this._selectedTheme) {
                         item.classList.add("selected");
@@ -49723,8 +49743,16 @@ You should be redirected to the song at:<br /><br />
                             .forEach(el => el.classList.remove("selected"));
                         item.classList.add("selected");
                     });
-                    themeContainer.appendChild(item);
+                    itemsContainer.appendChild(item);
                 }
+                heading.addEventListener("click", () => {
+                    expanded = !expanded;
+                    itemsContainer.style.display = expanded ? "" : "none";
+                    arrow.textContent = expanded ? "▼" : "▶";
+                });
+                groupContainer.appendChild(heading);
+                groupContainer.appendChild(itemsContainer);
+                themeContainer.appendChild(groupContainer);
             }
             return themeContainer;
         }

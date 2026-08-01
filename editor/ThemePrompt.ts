@@ -32,7 +32,6 @@ const themes: ThemeGroup[] = [
         group: "BeepBox Themes",
         items: [
             { id: "dark classic", name: "BeepBox Dark" },
-            { id: "light classic", name: "BeepBox Light" },
             { id: "dark competition", name: "BeepBox Competition Dark" },
         ],
     },
@@ -52,9 +51,7 @@ const themes: ThemeGroup[] = [
             { id: "moonlight", name: "Moonlight" },
             { id: "portal", name: "Portal" },
             { id: "fusion", name: "Fusion" },
-            { id: "inverse", name: "Inverse" },
             { id: "nebula", name: "Nebula" },
-            { id: "roe light", name: "Roe Light" },
             { id: "amoled dark", name: "High Contrast Dark" },
             { id: "energized", name: "Energized" },
             { id: "neapolitan", name: "Neapolitan" },
@@ -94,13 +91,12 @@ const themes: ThemeGroup[] = [
 		group: "Mod Themes",
 		items: [
             { id: "jummbox classic", name: "JummBox Classic" },
-			{ id: "jummbox light", name: "JummBox Light"},
 			{ id: "sandbox classic", name: "Sandbox"},
 			{ id: "harrybox", name: "Haileybox"},
-			{ id: "brucebox", name: "Brucebox"},
 			{ id: "shitbox 3.0", name: "Shitbox 1.0/3.0"},
 			{ id: "shitbox 2.0", name: "Shitbox 2.0"},
 			{ id: "nerdbox", name: "Nerdbox"},
+			{ id: "brucebox", name: "Brucebox"},
 			{ id: "zefbox", name: "Zefbox"},
 			{ id: "cardboardbox classic", name: "Cardboardbox"},
 			{ id: "blubox classic", name: "Blubox"},
@@ -114,125 +110,29 @@ const themes: ThemeGroup[] = [
 			{ id: "midbox", name: "Midbox"},
 			{ id: "dogebox2", name: "DogeBox2"},
 			{ id: "abyssbox classic", name: "AbyssBox Classic"},
-			{ id: "abyssbox light", name: "AbyssBox Light"},
 			{ id: "slarmoosbox", name: "Slarmoo's Box"},
 			{ id: "nepbox", name: "Nepbox"},
 			{ id: "nepbox laffey", name: "Nepbox Laffey"},
 			{ id: "ultrabox dark", name: "UltraBox"},
 			{ id: "voxonium", name: "Voxonium"},
-			{ id: "nepbox laffey", name: "Nepbox Laffey"},
+			//{ id: "nepbox laffey", name: "Nepbox Laffey"},
 			{ id: "axobox", name: "AxoBox"},
 			{ id: "lemmbox dark", name: "LemmBox"},
 			{ id: "fmbox", name: "FMBox"},
+		]
+	},
+	{	group: "Light Themes",
+		items: [
+            { id: "inverse", name: "Inverse" },
+            { id: "roe light", name: "Roe Light" },
+			{ id: "jummbox light", name: "JummBox Light"},
+			{ id: "abyssbox light", name: "AbyssBox Light"},
+            { id: "light classic", name: "BeepBox Light" },
 		]
 	}
 ];
 
 export class ThemePrompt implements Prompt {
-
-	
-	/*private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
-		optgroup({ label: "41Box Regular Themes"},
-			option({ value: "41box"}, "41Box Regular"),
-		),
-		optgroup({ label: "41Box Inter Themes"},
-			option({ value: "inter-energized"}, "Inter Energized"),
-			option({ value: "inter-nebula"}, "Inter Nebula"),
-			option({ value: "inter-autumn"}, "Inter Autumn"),	
-			option({ value: "inter-forest"}, "Inter Forest"),
-			option({ value: "inter-moonlight"}, "Inter Moonlight"),
-
-		),
-		optgroup({ label: "BeepBox Themes" },
-			option({ value: "dark classic" }, "BeepBox Dark"),
-			option({ value: "light classic" }, "BeepBox Light"),
-			option({ value: "dark competition" }, "BeepBox Competition Dark"),
-		),
-		optgroup({ label: "JummBox Themes" },
-			option({ value: "forest" }, "Forest"),
-			option({ value: "canyon" }, "Canyon"),
-			option({ value: "midnight" }, "Midnight"),
-			option({ value: "beachcombing" }, "Beachcombing"),
-			option({ value: "violet verdant" }, "Violet Verdant"),
-			option({ value: "sunset" }, "Sunset"),
-			option({ value: "autumn" }, "Autumn"),
-			option({ value: "fruit" }, "Shadowfruit"),
-			option({ value: "toxic" }, "Toxic"),
-			option({ value: "roe" }, "Roe"),
-			option({ value: "moonlight" }, "Moonlight"),
-			option({ value: "portal" }, "Portal"),
-			option({ value: "fusion" }, "Fusion"),
-			option({ value: "inverse" }, "Inverse"),
-			option({ value: "nebula" }, "Nebula"),
-			option({ value: "roe light" }, "Roe Light"),
-			option({ value: "amoled dark" }, "High Contrast Dark"),
-			option({ value: "energized" }, "Energized"),
-			option({ value: "neapolitan" }, "Neapolitan"),
-			option({ value: "poly" }, "Poly"),
-			option({ value: "blutonium" }, "Blutonium"),
-			option({ value: "greyscale" }, "Greyscale"),
-			option({ value: "slushie" }, "Slushie"),
-		),
-		optgroup({ label: "ModBox Themes" },
-			option({ value: "modbox classic" }, "Modbox"),
-			option({ value: "modbox 2" }, "Modbox 2.0"),
-			option({ value: "modbox artic" }, "Artic"),
-			option({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"),
-			option({ value: "modbox ocean" }, "Ocean"),
-			option({ value: "modbox rainbow" }, "Rainbow [!]"),
-			option({ value: "modbox float" }, "Float [!]"),	
-			option({ value: "modbox windows" }, "Windows"),
-			option({ value: "modbox grassland" }, "Grassland"),
-			option({ value: "modbox dessert" }, "Dessert"),
-			option({ value: "modbox kahoot" }, "Kahootiest"),
-			option({ value: "modbox bitbeam" }, "Beam to the Bit [!]"),
-			option({ value: "modbox egg" }, "Pretty Egg"), 
-			option({ value: "modbox pony" }, "Poniryoshka"), 
-			option({ value: "modbox gameboy" }, "Gameboy [!]"),	
-			option({ value: "modbox woodkid" }, "Woodkid [!]"),	
-			option({ value: "modbox midnight" }, "Midnight [!]"),	
-			option({ value: "modbox snedbox" }, "Snedbox"),
-			option({ value: "modbox unnamed" }, "unnamed [!]"),
-			option({ value: "modbox halloween" }, "Halloween [!]"),
-			option({ value: "modbox frozen" }, "FrozenOver❄️ [!]"),
-		),
-		optgroup({ label: "Mod Themes" },
-			option({ value: "jummbox classic" }, "JummBox Classic"),
-			option({ value: "jummbox light" }, "JummBox Light"), 
-			option({ value: "sandbox classic" }, "Sandbox"),
-			option({ value: "harrybox" }, "Haileybox"),
-			option({ value: "brucebox" }, "Brucebox"),
-			option({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"),
-			option({ value: "shitbox 2.0" }, "Shitbox 2.0"),
-			option({ value: "nerdbox" }, "NerdBox"),
-			option({ value: "zefbox" }, "Zefbox"),
-			option({ value: "cardboardbox classic" }, "Cardboardbox"),
-			option({ value: "blubox classic" }, "Blubox"),
-			option({ value: "dogebox classic" }, "Dogebox"),
-			option({ value: "wackybox" }, "Wackybox"),
-			option({ value: "todbox dark mode" }, "Todbox Dark Mode"),
-			option({ value: "mainbox 1.0" }, "Mainbox"),
-			option({ value: "microbox" }, "MicroBox"),
-			option({ value: "paandorasbox" }, "PaandorasBox"),
-			option({ value: "foxbox" }, "FoxBox"),
-			option({ value: "midbox" }, "Midbox"),
-			option({ value: "dogebox2" }, "Dogebox2"),
-			option({ value: "abyssbox classic"}, "AbyssBox Classic"),
-			option({ value: "abyssbox light"}, "AbyssBox Light"),
-			option({ value: "slarmoosbox" }, "Slarmoo's Box"),
-			option({ value: "nepbox" }, "Nepbox"),
-			option({ value: "nepbox laffey" }, "Nepbox Laffey"),
-			option({ value: "ultrabox dark" }, "UltraBox"),
-			option({ value: "voxonium" }, "Voxonium"),
-			option({ value: "axobox"}, "AxoBox"),
-			option({ value: "lemmbox dark"}, "LemmBox"),
-			option({ value: "fmbox" }, "FMBox"),
-		),
-		optgroup({ label: "Misc" },
-			option({ value: "azur lane" }, "Azur Lane"),
-			option({ value: "custom" }, "Custom")
-		),
-	);*/
 	private _selectedTheme: string;
 
 	private readonly _themeList = this._makeThemeList();
@@ -392,38 +292,60 @@ export class ThemePrompt implements Prompt {
 		const themeContainer = HTML.div();
 
 		for (const group of themes) {
-			const heading = HTML.div(
-				{
-					style: `
-						font-weight: bold;
-						font-style: italic;
-						text-align: left;
-						font-size: 13px;
-						font-weight: bold;
-						padding: 4px 8px 4px 10px;
-						user-select: none;
-					`
-				},
-				group.group
-			);
 
-			themeContainer.appendChild(heading);
+    const groupContainer = HTML.div();
 
-			for (const theme of group.items) {
-				const item = HTML.div(
+    let expanded = false;
+
+    const arrow = HTML.div("▶");
+
+    const heading = HTML.div(
+			{
+			style: `
+				display:flex;
+				align-items:center;
+				cursor:pointer;
+				font-style:italic;
+				font-weight:bold;
+				font-size:13px;
+
+				padding:4px 8px 4px 10px;
+				
+				background:rgba(0, 0, 0, 0.15);
+
+				user-select:none;
+			`
+		},
+		arrow,
+		div({ style: "margin-left:6px;" }, group.group));
+
+	heading.addEventListener("mouseenter", () => {
+		heading.style.background = "rgba(128, 128, 128, 0.25)";
+	});
+
+	heading.addEventListener("mouseleave", () => {
+		heading.style.background = "rgba(0, 0, 0, 0.15)";
+	});
+
+    const itemsContainer = HTML.div({
+        style: "display:none;"
+    });
+
+    for (const theme of group.items) {
+
+        const item = HTML.div(
 					{
-						class: "themeItem",
-						style: `
-							font-weight: normal;
-							font-size: 13px;
-							padding: 4px 8px 4px 40px;
-							text-align: left;
-							cursor: pointer;
-							user-select: none;
-						`
-					},
-					theme.name
-				);
+				class: "themeItem",
+				style: `
+					font-weight: normal;
+					font-size: 13px;
+					padding: 4px 8px 4px 40px;
+					text-align: left;
+					cursor: pointer;
+					user-select: none;
+				`
+			},
+			theme.name);
 
 				if (theme.id === this._selectedTheme) {
 					item.classList.add("selected");
@@ -464,13 +386,22 @@ export class ThemePrompt implements Prompt {
 					item.classList.add("selected");
 				});
 
-				themeContainer.appendChild(item);
-			}
-		}
+        itemsContainer.appendChild(item);
+    }
+
+    heading.addEventListener("click", () => {
+        expanded = !expanded;
+        itemsContainer.style.display = expanded ? "" : "none";
+        arrow.textContent = expanded ? "▼" : "▶";
+    });
+
+    groupContainer.appendChild(heading);
+    groupContainer.appendChild(itemsContainer);
+
+    themeContainer.appendChild(groupContainer);
+}
 		
 
 		return themeContainer;
 	}
 }
-
-//}
