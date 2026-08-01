@@ -48,29 +48,29 @@ export class ExportPrompt implements Prompt {
     private totalChunks: number;
     private currentChunk: number;
     private outputStarted: boolean = false;
-    private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: Config.jsonFormat + "-Song", maxlength: 250, "autofocus": "autofocus" });
+    private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: Config.jsonFormat + "_song", maxlength: 250, "autofocus": "autofocus" });
     private readonly _computedSamplesLabel: HTMLDivElement = div({ style: "width: 10em;" }, new Text("0:00"));
     private readonly _enableIntro: HTMLInputElement = input({ type: "checkbox" });
     private readonly _loopDropDown: HTMLInputElement = input({ style: "width: 2em;", type: "number", min: "1", max: "4", step: "1" });
     private readonly _enableOutro: HTMLInputElement = input({ type: "checkbox" });
     private readonly _formatSelect: HTMLSelectElement = select({ style: "width: 100%;" },
-        option({ value: "wav" }, "Export to .wav file."),
-        option({ value: "mp3" }, "Export to .mp3 file."),
-        //option({ value: "ogg" }, "Export to .ogg file."),
-        option({ value: "midi" }, "Export to .mid file."),
-        option({ value: "json" }, "Export to .json file."),
-        option({ value: "html" }, "Export to .html file."),
+        option({ value: "wav" }, "Export as .wav"),
+        option({ value: "mp3" }, "Export as .mp3"),
+        //option({ value: "ogg" }, "Export as .ogg"),
+        option({ value: "midi" }, "Export as .mid"),
+        option({ value: "json" }, "Export as .json"),
+        option({ value: "html" }, "Export as .html"),
     );
     private readonly _removeWhitespace: HTMLInputElement = input({ type: "checkbox" });
     private readonly _removeWhitespaceDiv: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
     "Remove Whitespace: ", this._removeWhitespace);
-    private readonly _oggWarning: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" },
+    private readonly _oggWarning: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
     "Warning: .ogg files aren't supported on as many devices as mp3 or wav. IOS is an example of this, exporting is still possible, but playback is not."); 
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
     private readonly _outputProgressBar: HTMLDivElement = div({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
     private readonly _outputProgressLabel: HTMLDivElement = div({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
-    private readonly _outputProgressContainer: HTMLDivElement = div({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1;` },
+    private readonly _outputProgressContainer: HTMLDivElement = div({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1; margin-bottom: 14px;` },
         this._outputProgressBar,
         this._outputProgressLabel,
     );
@@ -86,38 +86,44 @@ export class ExportPrompt implements Prompt {
         0x51, // spiky -> sawtooth wave
     ];
 
-    public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 200px;" },
-        h2("Export Options"),
-        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" },
+    public _exportPrompt: HTMLDivElement = div({},
+        div({class:"promptTitle",style:"margin-bottom: 14px;"}, h2({class:"exportExt",style:"text-align: inherit;"}, ""), h2({class:"exportTitle"},"Export Options")),
+        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
             "File name:",
             this._fileName,
         ),
-        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" },
+        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
             "Length:",
             this._computedSamplesLabel,
         ),
-        div({ style: "display: table; width: 100%;" },
+        div({ style: "display: table; width: 100%; margin-bottom: 14px;" },
             div({ style: "display: table-row;" },
                 div({ style: "display: table-cell;" }, "Intro:"),
                 div({ style: "display: table-cell;" }, "Loop Count:"),
                 div({ style: "display: table-cell;" }, "Outro:"),
             ),
-            div({ style: "display: table-row;" },
+            div({ style: "display: table-row; margin-bottom: 14px;" },
                 div({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro),
                 div({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown),
                 div({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro),
             ),
         ),
-        div({ class: "selectContainer", style: "width: 100%;" }, this._formatSelect),
+        div({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect),
         this._removeWhitespaceDiv,
         this._oggWarning,
-        div({ style: "text-align: left;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."),
+        div({ style: "text-align: left; margin-bottom: 14px;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."),
         this._outputProgressContainer,
-        div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+        div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-bottom: 14px;" },
             this._exportButton,
         ),
         this._cancelButton,
     );
+
+
+    public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 200px;" },
+    this._exportPrompt,
+    );
+
 
     constructor(private _doc: SongDocument) {
         this._loopDropDown.value = "1";

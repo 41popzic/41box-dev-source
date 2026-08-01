@@ -110,7 +110,7 @@ const themes: ThemeGroup[] = [
 			{ id: "midbox", name: "Midbox"},
 			{ id: "dogebox2", name: "DogeBox2"},
 			{ id: "abyssbox classic", name: "AbyssBox Classic"},
-			{ id: "Abyssbox Piano", name: "AbyssBox Piano"},
+			{ id: "piano abyss", name: "AbyssBox Piano"},
 			{ id: "slarmoosbox", name: "Slarmoo's Box"},
 			{ id: "nepbox", name: "Nepbox"},
 			{ id: "nepbox laffey", name: "Nepbox Laffey"},
@@ -197,6 +197,7 @@ export class ThemePrompt implements Prompt {
 		this._themeList
 	);
 
+	private _previewFrame: number | null = null;
 	private _dropdownOpen = false;
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
@@ -321,7 +322,7 @@ export class ThemePrompt implements Prompt {
 		div({ style: "margin-left:6px;" }, group.group));
 
 	heading.addEventListener("mouseenter", () => {
-		heading.style.background = "rgba(128, 128, 128, 0.25)";
+		heading.style.background = "rgba(70, 120, 255, 0.5)";
 	});
 
 	heading.addEventListener("mouseleave", () => {
@@ -354,17 +355,29 @@ export class ThemePrompt implements Prompt {
 
 				item.addEventListener("mouseenter", () => {
 					this._themeButtonText.textContent = theme.name;
-					item.style.background = "rgba(128, 128, 128, 0.25)";
+					item.style.background = "rgba(70, 120, 255, 0.5)";
 
-					requestAnimationFrame(() => {
+					if (this._previewFrame != null) {
+						cancelAnimationFrame(this._previewFrame);
+					}
+
+					this._previewFrame = requestAnimationFrame(() => {
 						ColorConfig.setTheme(theme.id);
+						this._previewFrame = null;
 					});
 				});
 
 				item.addEventListener("mouseout", () => {
 					item.style.background = "";
 
-					const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+					if (this._previewFrame != null) {
+						cancelAnimationFrame(this._previewFrame);
+						this._previewFrame = null;
+					}
+
+					const selectedTheme = themes
+						.flatMap(group => group.items)
+						.find(t => t.id === this._selectedTheme);
 
 					this._themeButtonText.textContent =
 						selectedTheme?.name ?? this._selectedTheme;

@@ -10681,7 +10681,7 @@ var beepbox = (function (exports) {
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
 				}`,
-        "AbyssBox Piano": ` 
+        "piano abyss": ` 
 						:root {		
 			--page-margin: #450320; 		
 			--editor-background: #450320; 		

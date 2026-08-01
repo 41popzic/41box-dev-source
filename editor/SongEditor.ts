@@ -765,8 +765,7 @@ export class SongEditor {
     private readonly _fileMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "File"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
         option({ value: "new" }, "+ New Blank Song (⇧`)"),
-        option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"),
-        option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"),
+        option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S)"),
         option({ value: "copyUrl" }, "⎘ Copy Song URL"),
         option({ value: "shareUrl" }, "⤳ Share Song URL"),
         option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."),
@@ -4899,7 +4898,7 @@ export class SongEditor {
                     event.preventDefault();
                     location.reload();
                 } else if (event.ctrlKey || event.metaKey) {
-                    this._openPrompt("export");
+                    this._openPrompt("import");
                     event.preventDefault();
                 } else if (this.doc.prefs.enableChannelMuting) {
                     // JummBox deviation: I like shift+s as just another mute toggle personally.
@@ -4915,10 +4914,6 @@ export class SongEditor {
                 break;
             case 79: // o
                 if (canPlayNotes) break;
-                if (event.ctrlKey || event.metaKey) {
-                    this._openPrompt("import");
-                    event.preventDefault();
-                }
                 break;
             case 86: // v
                 if (canPlayNotes) break;

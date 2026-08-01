@@ -8287,7 +8287,7 @@ export class ColorConfig {
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
 				}`,
-				"AbyssBox Piano": ` 
+				"piano abyss": ` 
 						:root {		
 			--page-margin: #450320; 		
 			--editor-background: #450320; 		
@@ -11393,6 +11393,232 @@ export class ColorConfig {
     }
 
     private static readonly _styleElement: HTMLStyleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
+
+	/*public static _applyThemeColor(name: string): void {
+		let theme: string = this.themes[name];
+		if (theme == undefined) theme = ColorConfig.defaultTheme;
+		this._styleElement.textContent = theme;
+
+		// for getComputed
+		let valuesToAdd: string = ":root{";
+
+		if (getComputedStyle(this._styleElement).getPropertyValue("--oscilloscope-line-L") == "") valuesToAdd += "--oscilloscope-line-L:var(--primary-text,white);";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--oscilloscope-line-R") == "") valuesToAdd += "--oscilloscope-line-R:var(--text-selection,rgba(119,68,255,0.99));";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--text-enabled-icon") == "") valuesToAdd += "--text-enabled-icon:✓ ;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--text-disabled-icon") == "") valuesToAdd += "--text-disabled-icon:　;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--text-spacing-icon") == "") valuesToAdd += "--text-spacing-icon:　;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--note-flash") == "") valuesToAdd += "--note-flash:#ffffff;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--note-flash-secondary") == "") valuesToAdd += "--note-flash-secondary:#ffffff77;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit") == "") valuesToAdd += "--pitch-channel-limit:" + Config.pitchChannelCountMax + ";";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit") == "") valuesToAdd += "--noise-channel-limit:" + Config.noiseChannelCountMax + ";";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit") == "") valuesToAdd += "--mod-channel-limit:" + Config.modChannelCountMax + ";";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit") == "") valuesToAdd += "--formula-pitch-channel-limit:360;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit") == "") valuesToAdd += "--formula-noise-channel-limit:360;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-limit") == "") valuesToAdd += "--formula-mod-channel-limit:360;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--editor-background") == "") valuesToAdd += "--editor-background:black;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--ui-widget-background") == "") valuesToAdd += "--ui-widget-background:#444;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--loop-accent") == "") valuesToAdd += "--loop-accent:#74f;";
+		// if (getComputedStyle(this._styleElement).getPropertyValue("--link-accent") == "") valuesToAdd += "--link-accent:#9c64f7;";
+		// if (getComputedStyle(this._styleElement).getPropertyValue("--mod-title") == "") valuesToAdd += "--mod-title:var(--link-accent);";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--box-selection-fill") == "") valuesToAdd += "--box-selection-fill:rgba(255,255,255,0.2);";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--primary-text") == "") valuesToAdd += "--primary-text:white;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--inverted-text") == "") valuesToAdd += "--inverted-text:black;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch") == "") valuesToAdd += "--track-editor-bg-pitch:#444;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch-dim") == "") valuesToAdd += "--track-editor-bg-pitch-dim:#333;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise") == "") valuesToAdd += "--track-editor-bg-noise:#444;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim") == "") valuesToAdd += "--track-editor-bg-noise-dim:#333;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod") == "") valuesToAdd += "--track-editor-bg-mod:#234;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod-dim") == "") valuesToAdd += "--track-editor-bg-mod-dim:#123;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mute-button-normal") == "") valuesToAdd += "--mute-button-normal:#ffa033;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mute-button-mod") == "") valuesToAdd += "--mute-button-mod:#9a6bff;";
+
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-secondary-channel") == "") valuesToAdd += "--pitch1-secondary-channel:#0099A1;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-primary-channel") == "") valuesToAdd += "--pitch1-primary-channel:#25F3FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-secondary-note") == "") valuesToAdd += "--pitch1-secondary-note:#00BDC7;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-primary-note") == "") valuesToAdd += "--pitch1-primary-note:#92F9FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch2-secondary-channel") == "") valuesToAdd += "--pitch2-secondary-channel:#A1A100;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch2-primary-channel") == "") valuesToAdd += "--pitch2-primary-channel:#FFFF25;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch2-secondary-note") == "") valuesToAdd += "--pitch2-secondary-note:#C7C700;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch2-primary-note") == "") valuesToAdd += "--pitch2-primary-note:#FFFF92;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch3-secondary-channel") == "") valuesToAdd += "--pitch3-secondary-channel:#C75000;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch3-primary-channel") == "") valuesToAdd += "--pitch3-primary-channel:#FF9752;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch3-secondary-note") == "") valuesToAdd += "--pitch3-secondary-note:#FF771C;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch3-primary-note") == "") valuesToAdd += "--pitch3-primary-note:#FFCDAB;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch4-secondary-channel") == "") valuesToAdd += "--pitch4-secondary-channel:#00A100;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch4-primary-channel") == "") valuesToAdd += "--pitch4-primary-channel:#50FF50;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch4-secondary-note") == "") valuesToAdd += "--pitch4-secondary-note:#00C700;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch4-primary-note") == "") valuesToAdd += "--pitch4-primary-note:#A0FFA0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch5-secondary-channel") == "") valuesToAdd += "--pitch5-secondary-channel:#D020D0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch5-primary-channel") == "") valuesToAdd += "--pitch5-primary-channel:#FF90FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch5-secondary-note") == "") valuesToAdd += "--pitch5-secondary-note:#E040E0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch5-primary-note") == "") valuesToAdd += "--pitch5-primary-note:#FFC0FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch6-secondary-channel") == "") valuesToAdd += "--pitch6-secondary-channel:#7777B0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch6-primary-channel") == "") valuesToAdd += "--pitch6-primary-channel:#A0A0FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch6-secondary-note") == "") valuesToAdd += "--pitch6-secondary-note:#8888D0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch6-primary-note") == "") valuesToAdd += "--pitch6-primary-note:#D0D0FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch7-secondary-channel") == "") valuesToAdd += "--pitch7-secondary-channel:#8AA100;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch7-primary-channel") == "") valuesToAdd += "--pitch7-primary-channel:#DEFF25;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch7-secondary-note") == "") valuesToAdd += "--pitch7-secondary-note:#AAC700;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch7-primary-note") == "") valuesToAdd += "--pitch7-primary-note:#E6FF92;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch8-secondary-channel") == "") valuesToAdd += "--pitch8-secondary-channel:#DF0019;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch8-primary-channel") == "") valuesToAdd += "--pitch8-primary-channel:#FF98A4;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch8-secondary-note") == "") valuesToAdd += "--pitch8-secondary-note:#FF4E63;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch8-primary-note") == "") valuesToAdd += "--pitch8-primary-note:#FFB2BB;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch9-secondary-channel") == "") valuesToAdd += "--pitch9-secondary-channel:#00A170;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch9-primary-channel") == "") valuesToAdd += "--pitch9-primary-channel:#50FFC9;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch9-secondary-note") == "") valuesToAdd += "--pitch9-secondary-note:#00C78A;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch9-primary-note") == "") valuesToAdd += "--pitch9-primary-note:#83FFD9;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch10-secondary-channel") == "") valuesToAdd += "--pitch10-secondary-channel:#A11FFF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch10-primary-channel") == "") valuesToAdd += "--pitch10-primary-channel:#CE8BFF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch10-secondary-note") == "") valuesToAdd += "--pitch10-secondary-note:#B757FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch10-primary-note") == "") valuesToAdd += "--pitch10-primary-note:#DFACFF;";
+
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise1-secondary-channel") == "") valuesToAdd += "--noise1-secondary-channel:#6F6F6F;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise1-primary-channel") == "") valuesToAdd += "--noise1-primary-channel:#AAAAAA;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise1-secondary-note") == "") valuesToAdd += "--noise1-secondary-note:#A7A7A7;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise1-primary-note") == "") valuesToAdd += "--noise1-primary-note:#E0E0E0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise2-secondary-channel") == "") valuesToAdd += "--noise2-secondary-channel:#996633;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise2-primary-channel") == "") valuesToAdd += "--noise2-primary-channel:#DDAA77;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise2-secondary-note") == "") valuesToAdd += "--noise2-secondary-note:#CC9966;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise2-primary-note") == "") valuesToAdd += "--noise2-primary-note:#F0D0BB;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise3-secondary-channel") == "") valuesToAdd += "--noise3-secondary-channel:#4A6D8F;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise3-primary-channel") == "") valuesToAdd += "--noise3-primary-channel:#77AADD;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise3-secondary-note") == "") valuesToAdd += "--noise3-secondary-note:#6F9FCF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise3-primary-note") == "") valuesToAdd += "--noise3-primary-note:#BBD7FF;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise4-secondary-channel") == "") valuesToAdd += "--noise4-secondary-channel:#7A4F9A;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise4-primary-channel") == "") valuesToAdd += "--noise4-primary-channel:#AF82D2;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise4-secondary-note") == "") valuesToAdd += "--noise4-secondary-note:#9E71C1;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise4-primary-note") == "") valuesToAdd += "--noise4-primary-note:#D4C1EA;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise5-secondary-channel") == "") valuesToAdd += "--noise5-secondary-channel:#607837;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise5-primary-channel") == "") valuesToAdd += "--noise5-primary-channel:#A2BB77;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise5-secondary-note") == "") valuesToAdd += "--noise5-secondary-note:#91AA66;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise5-primary-note") == "") valuesToAdd += "--noise5-primary-note:#C5E2B2;";
+
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod1-secondary-channel") == "") valuesToAdd += "--mod1-secondary-channel:#339955;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod1-primary-channel") == "") valuesToAdd += "--mod1-primary-channel:#77fc55;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod1-secondary-note") == "") valuesToAdd += "--mod1-secondary-note:#77ff8a;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod1-primary-note") == "") valuesToAdd += "--mod1-primary-note:#cdffee;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod2-secondary-channel") == "") valuesToAdd += "--mod2-secondary-channel:#993355;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod2-primary-channel") == "") valuesToAdd += "--mod2-primary-channel:#f04960;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod2-secondary-note") == "") valuesToAdd += "--mod2-secondary-note:#f057a0;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod2-primary-note") == "") valuesToAdd += "--mod2-primary-note:#ffb8de;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod3-secondary-channel") == "") valuesToAdd += "--mod3-secondary-channel:#553399;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod3-primary-channel") == "") valuesToAdd += "--mod3-primary-channel:#8855fc;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod3-secondary-note") == "") valuesToAdd += "--mod3-secondary-note:#aa64ff;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod3-primary-note") == "") valuesToAdd += "--mod3-primary-note:#f8ddff;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod4-secondary-channel") == "") valuesToAdd += "--mod4-secondary-channel:#a86436;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod4-primary-channel") == "") valuesToAdd += "--mod4-primary-channel:#c8a825;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod4-secondary-note") == "") valuesToAdd += "--mod4-secondary-note:#e8ba46;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod4-primary-note") == "") valuesToAdd += "--mod4-primary-note:#fff6d3;";
+
+		valuesToAdd += "}";
+		this._styleElement.textContent = valuesToAdd + this._styleElement.textContent;
+
+        const themeColor = <HTMLMetaElement>document.querySelector("meta[name='theme-color']");
+        if (themeColor != null) {
+            themeColor.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue('--ui-widget-background'));
+        }
+
+        this.resetColors();
+
+        this.usesColorFormula = (getComputedStyle(this._styleElement).getPropertyValue("--use-color-formula").trim() == "true");
+
+		this.c_pitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit");
+		this.c_noiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit");
+		this.c_modLimit = +getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit");
+		this.c_colorFormulaPitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit");
+		this.c_colorFormulaNoiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit");
+		this.c_colorFormulaModLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-limit");
+
+		this.c_invertedText = getComputedStyle(this._styleElement).getPropertyValue("--inverted-text");
+		this.c_trackEditorBgNoiseDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim");
+		this.c_trackEditorBgNoise = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise");
+		this.c_trackEditorBgModDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod-dim");
+		this.c_trackEditorBgMod = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod");
+		this.c_trackEditorBgPitchDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch-dim");
+		this.c_trackEditorBgPitch = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch");
+
+        if (this.usesColorFormula) {
+            this.c_pitchSecondaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-hue");
+            this.c_pitchSecondaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-hue-scale");
+            this.c_pitchSecondaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-sat");
+            this.c_pitchSecondaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-sat-scale");
+            this.c_pitchSecondaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-lum");
+            this.c_pitchSecondaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-lum-scale");
+            this.c_pitchPrimaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-hue");
+            this.c_pitchPrimaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-hue-scale");
+            this.c_pitchPrimaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-sat");
+            this.c_pitchPrimaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-sat-scale");
+            this.c_pitchPrimaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-lum");
+            this.c_pitchPrimaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-lum-scale");
+            this.c_pitchSecondaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-hue");
+            this.c_pitchSecondaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-hue-scale");
+            this.c_pitchSecondaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-sat");
+            this.c_pitchSecondaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-sat-scale");
+            this.c_pitchSecondaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-lum");
+            this.c_pitchSecondaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-lum-scale");
+            this.c_pitchPrimaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-hue");
+            this.c_pitchPrimaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-hue-scale");
+            this.c_pitchPrimaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-sat");
+            this.c_pitchPrimaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-sat-scale");
+            this.c_pitchPrimaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-lum");
+            this.c_pitchPrimaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-lum-scale");
+
+            this.c_noiseSecondaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-hue");
+            this.c_noiseSecondaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-hue-scale");
+            this.c_noiseSecondaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-sat");
+            this.c_noiseSecondaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-sat-scale");
+            this.c_noiseSecondaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-lum");
+            this.c_noiseSecondaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-lum-scale");
+            this.c_noisePrimaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-hue");
+            this.c_noisePrimaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-hue-scale");
+            this.c_noisePrimaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-sat");
+            this.c_noisePrimaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-sat-scale");
+            this.c_noisePrimaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-lum");
+            this.c_noisePrimaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-lum-scale");
+            this.c_noiseSecondaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-hue");
+            this.c_noiseSecondaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-hue-scale");
+            this.c_noiseSecondaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-sat");
+            this.c_noiseSecondaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-sat-scale");
+            this.c_noiseSecondaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-lum");
+            this.c_noiseSecondaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-lum-scale");
+            this.c_noisePrimaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-hue");
+            this.c_noisePrimaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-hue-scale");
+            this.c_noisePrimaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-sat");
+            this.c_noisePrimaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-sat-scale");
+            this.c_noisePrimaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-lum");
+            this.c_noisePrimaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-lum-scale");
+
+            this.c_modSecondaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-hue");
+            this.c_modSecondaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-hue-scale");
+            this.c_modSecondaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-sat");
+            this.c_modSecondaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-sat-scale");
+            this.c_modSecondaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-lum");
+            this.c_modSecondaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-lum-scale");
+            this.c_modPrimaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-hue");
+            this.c_modPrimaryChannelHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-hue-scale");
+            this.c_modPrimaryChannelSat = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-sat");
+            this.c_modPrimaryChannelSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-sat-scale");
+            this.c_modPrimaryChannelLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-lum");
+            this.c_modPrimaryChannelLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-lum-scale");
+            this.c_modSecondaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-hue");
+            this.c_modSecondaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-hue-scale");
+            this.c_modSecondaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-sat");
+            this.c_modSecondaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-sat-scale");
+            this.c_modSecondaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-lum");
+            this.c_modSecondaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-lum-scale");
+            this.c_modPrimaryNoteHue = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-hue");
+            this.c_modPrimaryNoteHueScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-hue-scale");
+            this.c_modPrimaryNoteSat = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-sat");
+            this.c_modPrimaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-sat-scale");
+            this.c_modPrimaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum");
+            this.c_modPrimaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum-scale");
+
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override") != "") this.c_pitchChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override");
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override") != "") this.c_noiseChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override");
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override") != "") this.c_modChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override");
+        }
+	};*/
 
     public static setTheme(name: string): void {
 		let theme: string = this.themes[name];
