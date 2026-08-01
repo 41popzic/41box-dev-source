@@ -18128,7 +18128,13 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                const unisonLength = from41Box ? (beforeThree ? 51 : beforeFive ? 51 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
+                                const unisonLength = from41Box
+                                    ? (beforeThree ? 27
+                                        : beforeFour ? 49
+                                            : Config.unisons.length)
+                                    : fromSlarmoosBox
+                                        ? (beforeFive ? 27 : Config.unisons.length)
+                                        : Config.unisons.length;
                                 if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                                     instrument.unison = Config.unisons.length;
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
