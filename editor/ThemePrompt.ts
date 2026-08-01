@@ -6,10 +6,132 @@ import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 
 //namespace beepbox {
-const { button, div, h2, select, option, optgroup } = HTML;
+const { button, div, h2, /*select, option, optgroup*/ } = HTML;
+
+interface ThemeGroup {
+	group: string;
+	items: {
+		id: string;
+		name: string;
+	}[];
+}
+
+const themes: ThemeGroup[] = [
+    {
+		group: "41Box Themes",
+        items: [
+            { id: "41box", name: "Inter Toxic" },
+            { id: "inter-energized", name: "Inter Energized" },
+            { id: "inter-nebula", name: "Inter Nebula" },
+            { id: "inter-autumn", name: "Inter Autumn" },
+            { id: "inter-forest", name: "Inter Forest" },
+			{ id: "inter-moonlight", name: "Inter Moonlight" },
+        ]
+	},
+	{
+        group: "BeepBox Themes",
+        items: [
+            { id: "dark classic", name: "BeepBox Dark" },
+            { id: "light classic", name: "BeepBox Light" },
+            { id: "dark competition", name: "BeepBox Competition Dark" },
+        ],
+    },
+	{
+        group: "JummBox Themes",
+        items: [
+            { id: "forest", name: "Forest" },
+            { id: "canyon", name: "Canyon" },
+            { id: "midnight", name: "Midnight" },
+            { id: "beachcombing", name: "Beachcombing" },
+            { id: "violet verdant", name: "Violet Verdant" },
+            { id: "sunset", name: "Sunset" },
+            { id: "autumn", name: "Autumn" },
+            { id: "fruit", name: "Shadowfruit" },
+            { id: "toxic", name: "Toxic" },
+            { id: "roe", name: "Roe" },
+            { id: "moonlight", name: "Moonlight" },
+            { id: "portal", name: "Portal" },
+            { id: "fusion", name: "Fusion" },
+            { id: "inverse", name: "Inverse" },
+            { id: "nebula", name: "Nebula" },
+            { id: "roe light", name: "Roe Light" },
+            { id: "amoled dark", name: "High Contrast Dark" },
+            { id: "energized", name: "Energized" },
+            { id: "neapolitan", name: "Neapolitan" },
+            { id: "poly", name: "Poly" },
+            { id: "blutonium", name: "Blutonium" },
+            { id: "greyscale", name: "Greyscale" },
+            { id: "slushie", name: "Slushie" },
+        ],
+    },
+	{
+		group: "ModBox Themes",
+		items: [
+            { id: "modbox classic", name: "Modbox" },
+			{ id: "modbox 2", name: "Modbox 2.0"},
+			{ id: "modbox arctic", name: "Arctic"},
+			{ id: "modbox cinnamon", name: "Cinnamon Roll [!]"},
+			{ id: "modbox ocean", name: "Ocean"},
+			{ id: "modbox rainbow", name: "Rainbow [!]"},
+			{ id: "modbox float", name: "Float [!]"},
+			{ id: "modbox windows", name: "Windows"},
+			{ id: "modbox grassland", name: "Grassland"},
+			{ id: "modbox dessert", name: "Dessert"},
+			{ id: "modbox kahoot", name: "Kahootiest"},
+			{ id: "modbox bitbeam", name: "Beam to the Bit [!]"},
+			{ id: "modbox egg", name: "Pretty Egg"},
+			{ id: "modbox pony", name: "Poniryoshka"},
+			{ id: "modbox gameboy", name: "Gameboy [!]"},
+			{ id: "modbox woodkid", name: "Woodkid [!]"},
+			{ id: "modbox midnight", name: "Midnight [!]"},
+			{ id: "modbox snedbox", name: "Snedbox"},
+			{ id: "modbox unnamed", name: "unnamed [!]"},
+			{ id: "modbox halloween", name: "Halloween [!]"},
+			{ id: "modbox frozen", name: "FrozenOver❄️ [!]"}
+		]
+	},
+	{
+		group: "Mod Themes",
+		items: [
+            { id: "jummbox classic", name: "JummBox Classic" },
+			{ id: "jummbox light", name: "JummBox Light"},
+			{ id: "sandbox classic", name: "Sandbox"},
+			{ id: "harrybox", name: "Haileybox"},
+			{ id: "brucebox", name: "Brucebox"},
+			{ id: "shitbox 3.0", name: "Shitbox 1.0/3.0"},
+			{ id: "shitbox 2.0", name: "Shitbox 2.0"},
+			{ id: "nerdbox", name: "Nerdbox"},
+			{ id: "zefbox", name: "Zefbox"},
+			{ id: "cardboardbox classic", name: "Cardboardbox"},
+			{ id: "blubox classic", name: "Blubox"},
+			{ id: "dogebox classic", name: "Dogebox"},
+			{ id: "wackybox", name: "Wackybox"},
+			{ id: "todbox dark mode", name: "Todbox Dark Mode"},
+			{ id: "mainbox 1.0", name: "Mainbox"},
+			{ id: "microbox", name: "MicroBox"},
+			{ id: "paandorasbox", name: "PaandorasBox"},
+			{ id: "foxbox", name: "FoxBox"},
+			{ id: "midbox", name: "Midbox"},
+			{ id: "dogebox2", name: "DogeBox2"},
+			{ id: "abyssbox classic", name: "AbyssBox Classic"},
+			{ id: "abyssbox light", name: "AbyssBox Light"},
+			{ id: "slarmoosbox", name: "Slarmoo's Box"},
+			{ id: "nepbox", name: "Nepbox"},
+			{ id: "nepbox laffey", name: "Nepbox Laffey"},
+			{ id: "ultrabox dark", name: "UltraBox"},
+			{ id: "voxonium", name: "Voxonium"},
+			{ id: "nepbox laffey", name: "Nepbox Laffey"},
+			{ id: "axobox", name: "AxoBox"},
+			{ id: "lemmbox dark", name: "LemmBox"},
+			{ id: "fmbox", name: "FMBox"},
+		]
+	}
+];
 
 export class ThemePrompt implements Prompt {
-	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
+
+	
+	/*private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
 		optgroup({ label: "41Box Regular Themes"},
 			option({ value: "41box"}, "41Box Regular"),
 		),
@@ -53,15 +175,30 @@ export class ThemePrompt implements Prompt {
 		),
 		optgroup({ label: "ModBox Themes" },
 			option({ value: "modbox classic" }, "Modbox"),
-			option({ value: "modbox rainbow" }, "Modbox Rainbow"),
+			option({ value: "modbox 2" }, "Modbox 2.0"),
+			option({ value: "modbox artic" }, "Artic"),
+			option({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"),
+			option({ value: "modbox ocean" }, "Ocean"),
+			option({ value: "modbox rainbow" }, "Rainbow [!]"),
+			option({ value: "modbox float" }, "Float [!]"),	
+			option({ value: "modbox windows" }, "Windows"),
+			option({ value: "modbox grassland" }, "Grassland"),
+			option({ value: "modbox dessert" }, "Dessert"),
+			option({ value: "modbox kahoot" }, "Kahootiest"),
+			option({ value: "modbox bitbeam" }, "Beam to the Bit [!]"),
+			option({ value: "modbox egg" }, "Pretty Egg"), 
+			option({ value: "modbox pony" }, "Poniryoshka"), 
+			option({ value: "modbox gameboy" }, "Gameboy [!]"),	
+			option({ value: "modbox woodkid" }, "Woodkid [!]"),	
+			option({ value: "modbox midnight" }, "Midnight [!]"),	
+			option({ value: "modbox snedbox" }, "Snedbox"),
+			option({ value: "modbox unnamed" }, "unnamed [!]"),
+			option({ value: "modbox halloween" }, "Halloween [!]"),
+			option({ value: "modbox frozen" }, "FrozenOver❄️ [!]"),
 		),
 		optgroup({ label: "Mod Themes" },
-			//option({ value: "dark classic" }, "BeepBox Dark"),
-			//option({ value: "light classic" }, "BeepBox Light"),
-			option({ value: "dark competition" }, "BeepBox Competition Dark"),
 			option({ value: "jummbox classic" }, "JummBox Classic"),
 			option({ value: "jummbox light" }, "JummBox Light"), 
-			//option({ value: "modbox classic" }, "Modbox"),
 			option({ value: "sandbox classic" }, "Sandbox"),
 			option({ value: "harrybox" }, "Haileybox"),
 			option({ value: "brucebox" }, "Brucebox"),
@@ -84,6 +221,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "abyssbox light"}, "AbyssBox Light"),
 			option({ value: "slarmoosbox" }, "Slarmoo's Box"),
 			option({ value: "nepbox" }, "Nepbox"),
+			option({ value: "nepbox laffey" }, "Nepbox Laffey"),
 			option({ value: "ultrabox dark" }, "UltraBox"),
 			option({ value: "voxonium" }, "Voxonium"),
 			option({ value: "axobox"}, "AxoBox"),
@@ -94,45 +232,129 @@ export class ThemePrompt implements Prompt {
 			option({ value: "azur lane" }, "Azur Lane"),
 			option({ value: "custom" }, "Custom")
 		),
+	);*/
+	private _selectedTheme: string;
+
+	private readonly _themeList = this._makeThemeList();
+	private readonly _themeButtonText = div(
+		{
+			class: "themeButtonText"
+		},
+		"41Box Classic"
 	);
+	private readonly _themeButton = button(
+		{
+			class: "themeDropdownButton",
+			style: `
+				width:100%;
+				display:flex;
+				justify-content:space-between;
+				align-items:center;
+				padding:6px 10px;
+				box-sizing:border-box;
+			`
+		},
+		this._themeButtonText,
+		div(
+			{
+				class: "themeButtonArrows",
+				style: `
+					display:flex;
+					flex-direction:column;
+					align-items:center;
+					justify-content:center;
+					line-height:11px;
+					font-size:9px;
+					margin-right:0px;
+				`
+			},
+			div("▲"),
+			div("▼")
+		)
+	);
+
+	private readonly _themeMenu = div(
+		{
+			class: "themeDropdownMenu",
+			style: `
+				display:none;
+				position:absolute;
+				top:100%;
+				left:0;
+				width:100%;
+				max-height:300px;
+				overflow-y:auto;
+
+				background:${ColorConfig.uiWidgetBackground};
+				border:1px solid ${ColorConfig.uiWidgetFocus};
+				border-radius:4px;
+
+				box-sizing:border-box;
+				z-index:100;
+			`
+		},
+		this._themeList
+	);
+
+	private _dropdownOpen = false;
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
-
 	public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 220px;" },
 		h2("Set Theme"),
 		div({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
-			div({ class: "selectContainer", style: "width: 100%;" }, this._themeSelect),
-		),
+			div({ style: "position:relative; width:100%;" }, this._themeButton, this._themeMenu)),
 		div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
 			this._okayButton,
 		),
 		this._cancelButton,
 	);
 	private readonly lastTheme: string | null = window.localStorage.getItem("colorTheme")
+	private readonly _originalTheme = this._doc.prefs.colorTheme;
 
 	constructor(private _doc: SongDocument) {
-		if (this.lastTheme != null) {
-			this._themeSelect.value = this.lastTheme;
-		}
+		this._selectedTheme = this.lastTheme ?? ColorConfig.defaultTheme;
+
+		const currentTheme = themes
+			.flatMap(group => group.items)
+			.find(theme => theme.id === this._selectedTheme);
+
+		this._themeButtonText.textContent = currentTheme?.name ?? this._selectedTheme;
+
 		this._okayButton.addEventListener("click", this._saveChanges);
 		this._cancelButton.addEventListener("click", this._close);
 		this.container.addEventListener("keydown", this._whenKeyPressed);
-		this._themeSelect.addEventListener("change", this._previewTheme);
+
+		this._themeButton.addEventListener("click", () => {
+			this._dropdownOpen = !this._dropdownOpen;
+			this._themeMenu.style.display = this._dropdownOpen ? "" : "none";
+		});
+
+		document.addEventListener("mousedown", this._clickOutside);
+
+		this._themeMenu.addEventListener("mouseleave", () => {
+			ColorConfig.setTheme(this._selectedTheme);
+
+			const selectedTheme = themes
+				.flatMap(group => group.items)
+				.find(t => t.id === this._selectedTheme);
+
+			this._themeButtonText.textContent =
+				selectedTheme?.name ?? this._selectedTheme;
+		});
 	}
+	
 
 	private _close = (): void => {
-		if (this.lastTheme != null) {
-			ColorConfig.setTheme(this.lastTheme);
-		} else {
-			ColorConfig.setTheme(ColorConfig.defaultTheme);
-		}
+		ColorConfig.setTheme(this._originalTheme);
 		this._doc.undo();
-	}
+	};
 
 	public cleanUp = (): void => {
 		this._okayButton.removeEventListener("click", this._saveChanges);
 		this._cancelButton.removeEventListener("click", this._close);
 		this.container.removeEventListener("keydown", this._whenKeyPressed);
+
+		document.removeEventListener("mousedown", this._clickOutside);
 	}
 
 	private _whenKeyPressed = (event: KeyboardEvent): void => {
@@ -142,15 +364,113 @@ export class ThemePrompt implements Prompt {
 	}
 
 	private _saveChanges = (): void => {
-		window.localStorage.setItem("colorTheme", this._themeSelect.value);
+		ColorConfig.setTheme(this._selectedTheme);
+
+		window.localStorage.setItem("colorTheme", this._selectedTheme);
+		this._doc.prefs.colorTheme = this._selectedTheme;
 		this._doc.prompt = null;
-		this._doc.prefs.colorTheme = this._themeSelect.value;
 		this._doc.undo();
 	}
 
-	private _previewTheme = (): void => {
-		ColorConfig.setTheme(this._themeSelect.value);
-		this._doc.notifier.changed();
+	private _clickOutside = (event: MouseEvent): void => {
+		if (!this.container.contains(event.target as Node)) {
+			this._dropdownOpen = false;
+			this._themeMenu.style.display = "none";
+		}
+	};
+
+	/*private _withOpacity(color: string, opacity: number): string {
+		const hex = color.replace("#", "");
+		const r = parseInt(hex.substring(0, 2), 16);
+		const g = parseInt(hex.substring(2, 4), 16);
+		const b = parseInt(hex.substring(4, 6), 16);
+
+		return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+	}*/
+	
+	private _makeThemeList(): HTMLElement {
+		const themeContainer = HTML.div();
+
+		for (const group of themes) {
+			const heading = HTML.div(
+				{
+					style: `
+						font-weight: bold;
+						font-style: italic;
+						text-align: left;
+						font-size: 13px;
+						font-weight: bold;
+						padding: 4px 8px 4px 10px;
+						user-select: none;
+					`
+				},
+				group.group
+			);
+
+			themeContainer.appendChild(heading);
+
+			for (const theme of group.items) {
+				const item = HTML.div(
+					{
+						class: "themeItem",
+						style: `
+							font-weight: normal;
+							font-size: 13px;
+							padding: 4px 8px 4px 40px;
+							text-align: left;
+							cursor: pointer;
+							user-select: none;
+						`
+					},
+					theme.name
+				);
+
+				if (theme.id === this._selectedTheme) {
+					item.classList.add("selected");
+				}
+
+				item.addEventListener("mouseenter", () => {
+					this._themeButtonText.textContent = theme.name;
+					item.style.background = "rgba(128, 128, 128, 0.25)";
+
+					requestAnimationFrame(() => {
+						ColorConfig.setTheme(theme.id);
+					});
+				});
+
+				item.addEventListener("mouseout", () => {
+					item.style.background = "";
+
+					const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+
+					this._themeButtonText.textContent =
+						selectedTheme?.name ?? this._selectedTheme;
+				});
+
+				item.addEventListener("click", () => {
+					this._themeButtonText.textContent = theme.name;
+
+					this._themeMenu.style.display = "none";
+
+					this._dropdownOpen = false;
+
+					this._selectedTheme = theme.id;
+
+					ColorConfig.setTheme(theme.id);
+
+					themeContainer.querySelectorAll(".themeItem")
+						.forEach(el => el.classList.remove("selected"));
+
+					item.classList.add("selected");
+				});
+
+				themeContainer.appendChild(item);
+			}
+		}
+		
+
+		return themeContainer;
 	}
 }
+
 //}

@@ -64,6 +64,8 @@ export class ExportPrompt implements Prompt {
     private readonly _removeWhitespace: HTMLInputElement = input({ type: "checkbox" });
     private readonly _removeWhitespaceDiv: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
     "Remove Whitespace: ", this._removeWhitespace);
+    private readonly _oggWarning: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" },
+    "Warning: .ogg files aren't supported on as many devices as mp3 or wav. IOS is an example of this, exporting is still possible, but playback is not."); 
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
     private readonly _outputProgressBar: HTMLDivElement = div({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
@@ -108,6 +110,7 @@ export class ExportPrompt implements Prompt {
         ),
         div({ class: "selectContainer", style: "width: 100%;" }, this._formatSelect),
         this._removeWhitespaceDiv,
+        this._oggWarning,
         div({ style: "text-align: left;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."),
         this._outputProgressContainer,
         div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
@@ -149,6 +152,13 @@ export class ExportPrompt implements Prompt {
         } else {
             this._removeWhitespaceDiv.style.display = "none";
         }
+
+        if (this._formatSelect.value == "ogg") {
+            this._oggWarning.style.display = "block";
+        } else {
+            this._oggWarning.style.display = "none";
+        }
+
 
         this._fileName.select();
         setTimeout(() => this._fileName.focus());
@@ -241,6 +251,10 @@ export class ExportPrompt implements Prompt {
                 this.outputStarted = true;
                 this._exportTo("mp3");
                 break;
+            case "ogg":
+                this.outputStarted = true;
+                this._exportTo("ogg");
+                break;    
             case "midi":
                 this.outputStarted = true;
                 this._exportToMidi();
@@ -297,6 +311,9 @@ export class ExportPrompt implements Prompt {
             else if (this.thenExportTo == "mp3") {
                 this._exportToMp3Finish();
             }
+            else if (this.thenExportTo == "ogg") {
+                this._exportToOgg();
+            }
             else {
                 throw new Error("Unrecognized file export type chosen!");
             }
@@ -319,6 +336,9 @@ export class ExportPrompt implements Prompt {
         }
         else if (type == "mp3") {
             this.synth.samplesPerSecond = 44100; // Use consumer CD standard sample rate for .mp3 export.
+        }
+        else if (type == "ogg") {
+            this.synth.samplesPerSecond = 44100; // Wikipedia says ogg typically uses 44.1 kHz.
         }
         else {
             throw new Error("Unrecognized file export type chosen!");
@@ -451,6 +471,26 @@ export class ExportPrompt implements Prompt {
             document.head.appendChild(script);
         }
     }
+
+    private _exportToOgg(): void {
+        const whenEncoderIsAvailable = (): void => {
+        const libopusEncoder: any = (<any>window)["opus-encdec"]; // go credit mmig you bitch
+        console.log("Is libopusEcoder? "+libopusEncoder);
+
+            
+
+        }
+        if ("opus-encdec" in window) {
+            whenEncoderIsAvailable();
+        } else {
+            var script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40/dist/libopus-encoder.js";
+            script.onload = whenEncoderIsAvailable;
+            document.head.appendChild(script);
+            console.log("Perhaps the other one failed? "+script);
+        }
+    }
+
 
     private _exportToMidi(): void {
         const song: Song = this._doc.song;
