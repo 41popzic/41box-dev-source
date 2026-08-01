@@ -55904,16 +55904,8 @@ You should be redirected to the song at:<br /><br />
             this._keySelect.appendChild(optgroup({ label: "Edit" }, option({ value: "detectKey" }, "Detect Key")));
             this._rhythmActionSelect.appendChild(option({ value: "", disabled: true, selected: true, hidden: true, }, "▼"));
             this._rhythmActionSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceRhythm" }, "Quantize Selected Patterns"), option({ value: "forceRhythmAll" }, "Quantize All Notes"), this._favoriteRhythmOption, this._rhythmActionOption));
-            const commonDivisions = [3, 4, 6, 8, 24, 32];
-            const commonGroup = optgroup({ label: "Quick-Find" });
-            for (const rhythm of Config.rhythms) {
-                if (commonDivisions.includes(rhythm.stepsPerBeat)) {
-                    commonGroup.appendChild(option({ value: `setRhythm:${rhythm.stepsPerBeat}` }, rhythm.name));
-                }
-            }
             this._rhythmActionSelect.appendChild(this._favoriteRhythmGroup);
             this._refreshFavoriteRhythms();
-            this._rhythmActionSelect.appendChild(commonGroup);
             this._vibratoSelect.appendChild(option({ hidden: true, value: 5 }, "custom"));
             this._unisonSelect.appendChild(option({ hidden: true, value: Config.unisons.length }, "custom"));
             this._showModSliders = new Array(Config.modulators.length);

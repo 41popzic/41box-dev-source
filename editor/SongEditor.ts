@@ -1527,11 +1527,11 @@ export class SongEditor {
             )
             
         );
-        const commonDivisions = [ 3, 4, 6, 8, 24, 32];
+        //const commonDivisions = [ 3, 4, 6, 8, 24, 32];
 
-        const commonGroup = optgroup({ label: "Quick-Find" });
+        //const commonGroup = optgroup({ label: "Quick-Find" });
 
-        for (const rhythm of Config.rhythms) {
+        /*for (const rhythm of Config.rhythms) {
             if (commonDivisions.includes(rhythm.stepsPerBeat)) {
                 commonGroup.appendChild(
                     option(
@@ -1540,13 +1540,13 @@ export class SongEditor {
                     )
                 );
             }
-        }
+        }*/
         
         this._rhythmActionSelect.appendChild(this._favoriteRhythmGroup);
 
         this._refreshFavoriteRhythms();
 
-        this._rhythmActionSelect.appendChild(commonGroup);
+        //this._rhythmActionSelect.appendChild(commonGroup);
 
         //this._snapButton.onclick = () => this.doc.selection.forceRhythm(); // This was mainly a test
 
