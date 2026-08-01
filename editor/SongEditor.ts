@@ -821,7 +821,7 @@ export class SongEditor {
         option({ value: "showThird" }, 'Highlight "Third" Note'),
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "advancedColorScheme"}, "Advanced Color Scheme (ModBox)"),
-        option({ value: "rainbowLoop" }, "Rainbow Song Loop" ),
+        option({ value: "rainbowLoop" }, "Rainbowify Loop Accent" ),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
@@ -2682,6 +2682,7 @@ export class SongEditor {
             (prefs.showThird ? textOnIcon : textOffIcon) + 'Highlight "Third" Note',
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.advancedColorScheme ? textOnIcon : textOffIcon) + 'Advanced Color Scheme (ModBox)',
+            (prefs.rainbowLoop ? textOnIcon : textOffIcon) + 'Rainbowify Loop Accent',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
@@ -2695,7 +2696,6 @@ export class SongEditor {
             (prefs.showDescription ? textOnIcon : textOffIcon) + "Show Description",
             textSpacingIcon + "Set Layout...",
             textSpacingIcon + "Set Theme...",
-            textSpacingIcon + "Toggle Rainbow Loop...",
 	        textSpacingIcon + "Custom Theme...",
         ];
         // Technical dropdown
