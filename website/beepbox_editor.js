@@ -800,9 +800,7 @@ var beepbox = (function (exports) {
         { name: "block", voices: 9, spread: 6, offset: 6, expression: 0.15, sign: 0.8 },
         { name: "extraterrestrial", voices: 6, spread: 15.2, offset: -6, expression: 0.35, sign: 0.7 },
         { name: "bow", voices: 9, spread: 0.006, offset: 0, expression: 0.15, sign: 0.5 },
-        { name: "double octave", voices: 3, spread: 12, offset: 12, expression: 0.7, sign: 1.0 },
         { name: "triple octave", voices: 4, spread: 18, offset: 18, expression: 0.6, sign: 1.0 },
-        { name: "double fifth", voices: 3, spread: 7, offset: 7, expression: 0.7, sign: 1.0 },
         { name: "triple fifth", voices: 4, spread: 10.6, offset: 10.5, expression: 0.6, sign: 1.0 },
         { name: "vary", voices: 2, spread: 0.002, offset: 0.0, expression: 0.85, sign: 1.6 },
         { name: "hold", voices: 2, spread: 0.003, offset: 0.0, expression: 0.8, sign: -2.5 },
@@ -818,6 +816,8 @@ var beepbox = (function (exports) {
         { name: "deep shift", voices: 2, spread: 12.03, offset: -17.01, expression: 0.85, sign: 1.2 },
         { name: "buried", voices: 2, spread: 0.036, offset: -36.0, expression: 1.4, sign: 1.0 },
         { name: "corrupt", voices: 2, spread: 18.0, offset: 48.0, expression: 0.7, sign: 0.7 },
+        { name: "double octave", voices: 3, spread: 12, offset: 12, expression: 0.7, sign: 1.0 },
+        { name: "double fifth", voices: 3, spread: 7, offset: 7, expression: 0.7, sign: 1.0 },
     ]);
     Config.customUnisonIndex = 63;
     Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular",];
@@ -18128,7 +18128,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                const unisonLength = from41Box ? (beforeThree ? 49 : beforeFive ? 49 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
+                                const unisonLength = from41Box ? (beforeThree ? 51 : beforeFive ? 51 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
                                 if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                                     instrument.unison = Config.unisons.length;
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -53249,7 +53249,7 @@ You should be redirected to the song at:<br /><br />
                     unisons: [
                         "fourths",
                         "fifth",
-                        "double fifths",
+                        "double fifth",
                         "triple fifth",
                         "octave",
                         "double octave",

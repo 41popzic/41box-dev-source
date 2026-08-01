@@ -1255,9 +1255,7 @@ export class Config {
         { name: "extraterrestrial", voices: 6, spread: 15.2,     offset: -6,      expression: 0.35,  sign:  0.7 }, // slarmoo's box
         { name: "bow",              voices: 9, spread: 0.006,    offset:  0,      expression: 0.15,  sign:  0.5 }, // slarmoo's box
 
-        { name: "double octave",    voices: 3, spread: 12,       offset:  12,     expression: 0.7,   sign:  1.0 }, // jukebox 
         { name: "triple octave",    voices: 4, spread: 18,       offset:  18,     expression: 0.6,   sign:  1.0 }, // jukebox 
-        { name: "double fifth",     voices: 3, spread: 7,        offset:  7,      expression: 0.7,   sign:  1.0 }, // 41box
         { name: "triple fifth",     voices: 4, spread: 10.6,     offset:  10.5,   expression: 0.6,   sign:  1.0 }, // 41box
 
         { name: "vary",             voices: 2, spread: 0.002,    offset:  0.0,    expression: 0.85,  sign:  1.6 }, // midbox
@@ -1274,6 +1272,9 @@ export class Config {
         { name: "deep shift",       voices: 2, spread: 12.03,    offset: -17.01,  expression: 0.85,  sign:  1.2 }, // midbox
         { name: "buried",           voices: 2, spread: 0.036,    offset: -36.0,   expression: 1.4,   sign:  1.0 }, // midbox
         { name: "corrupt",          voices: 2, spread: 18.0,     offset:  48.0,   expression: 0.7,   sign:  0.7 }, // midbox
+
+        { name: "double octave",    voices: 3, spread: 12,       offset:  12,     expression: 0.7,   sign:  1.0 }, // jukebox 
+        { name: "double fifth",     voices: 3, spread: 7,        offset:  7,      expression: 0.7,   sign:  1.0 }, // 41box
 
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
