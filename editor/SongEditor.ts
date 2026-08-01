@@ -1909,8 +1909,10 @@ export class SongEditor {
                 unisons: [
                     "fourths",
                     "fifth",
+                    "double fifths",
                     "triple fifth",
                     "octave",
+                    "double octave",
                     "triple octave",
                     "fluctuate",
                     "weird octave",

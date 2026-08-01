@@ -800,8 +800,10 @@ var beepbox = (function (exports) {
         { name: "block", voices: 9, spread: 6, offset: 6, expression: 0.15, sign: 0.8 },
         { name: "extraterrestrial", voices: 6, spread: 15.2, offset: -6, expression: 0.35, sign: 0.7 },
         { name: "bow", voices: 9, spread: 0.006, offset: 0, expression: 0.15, sign: 0.5 },
-        { name: "triple octave", voices: 3, spread: 12, offset: 12, expression: 0.7, sign: 1.0 },
-        { name: "triple fifth", voices: 3, spread: 7.019, offset: 6.98, expression: 0.8, sign: 1.0 },
+        { name: "double octave", voices: 3, spread: 12, offset: 12, expression: 0.7, sign: 1.0 },
+        { name: "triple octave", voices: 4, spread: 18, offset: 18, expression: 0.6, sign: 1.0 },
+        { name: "double fifth", voices: 3, spread: 7, offset: 7, expression: 0.7, sign: 1.0 },
+        { name: "triple fifth", voices: 4, spread: 10.6, offset: 10.5, expression: 0.6, sign: 1.0 },
         { name: "vary", voices: 2, spread: 0.002, offset: 0.0, expression: 0.85, sign: 1.6 },
         { name: "hold", voices: 2, spread: 0.003, offset: 0.0, expression: 0.8, sign: -2.5 },
         { name: "weird octave", voices: 2, spread: 5.85, offset: 5.85, expression: 0.75, sign: 1.0 },
@@ -42100,7 +42102,7 @@ You should be redirected to the song at:<br /><br />
                     const bpm = this._doc.song.getBeatsPerMinute();
                     const beatsPerBar = this._doc.song.beatsPerBar;
                     const barDuration = (60 / bpm) * beatsPerBar;
-                    const cycleOffset = this._doc.synth.playing ? 0.5 : 0;
+                    const cycleOffset = this._doc.synth.playing ? 0 : 0;
                     const cycle = ((performance.now() / 1000) / barDuration) + cycleOffset;
                     this._loopGradient.setAttribute("gradientTransform", `translate(${(cycle % 1) * 400} 0)`);
                     this._loop.setAttribute("stroke", "url(#loopRainbowGradient)");
@@ -53247,8 +53249,10 @@ You should be redirected to the song at:<br /><br />
                     unisons: [
                         "fourths",
                         "fifth",
+                        "double fifths",
                         "triple fifth",
                         "octave",
+                        "double octave",
                         "triple octave",
                         "fluctuate",
                         "weird octave",

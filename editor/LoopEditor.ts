@@ -416,7 +416,7 @@ export class LoopEditor {
 
             const barDuration = (60 / bpm) * beatsPerBar;
 
-            const cycleOffset = this._doc.synth.playing ? 0.5 : 0;
+            const cycleOffset = this._doc.synth.playing ? 0 : 0; // I don't like offsets anymore
 
             const cycle = ((performance.now() / 1000) / barDuration) + cycleOffset;
 
