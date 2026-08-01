@@ -4603,17 +4603,17 @@ export function setDefaultInstruments(song: Song): void {
             let presetName: string;
 
             if (isNoise) {
-                presetName = "chip noise";
+                presetName = "chiseled noise";
             } else {
                 switch (channelIndex) {
                     case 0:
-                        presetName = "square wave";
+                        presetName = "chiptune piano";
                         break;
                     case 1:
-                        presetName = "triangle wave";
+                        presetName = "chippy lead";
                         break;
                     case 2:
-                        presetName = "synth kick";
+                        presetName = "bass kick";
                         break;
                     default:
                         presetName = "square wave";

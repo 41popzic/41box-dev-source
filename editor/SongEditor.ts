@@ -825,6 +825,7 @@ export class SongEditor {
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
+        option({ value: "oldModNotes" }, 'Use Old Mod Notes'),
         option({ value: "showChannels" }, "Show All Channels"),
         option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
         option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
@@ -2686,6 +2687,7 @@ export class SongEditor {
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
+            (prefs.oldModNotes ? textOnIcon : textOffIcon) + "Use Old Mod Notes",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
             (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
@@ -5933,6 +5935,9 @@ export class SongEditor {
                 break;
             case "notesFlashWhenPlayed":
                 this.doc.prefs.notesFlashWhenPlayed = !this.doc.prefs.notesFlashWhenPlayed;
+                break;
+            case "oldModNotes":
+                this.doc.prefs.oldModNotes = !this.doc.prefs.oldModNotes;
                 break;
             case "layout":
                 this._openPrompt("layout");
