@@ -4565,7 +4565,6 @@ export class SongEditor {
                                 this.doc.synth.loopBarStart = -1;
                                 this.doc.synth.loopBarEnd = -1;
                             }
-                        }
                             // Pressed while viewing a different bar than the current synth playhead.
                             if (this.doc.bar != Math.floor(this.doc.synth.playhead) && this.doc.synth.loopBarStart != -1) {
 
@@ -4576,6 +4575,8 @@ export class SongEditor {
                                 if (this.doc.prefs.autoFollow) {
                                     this.doc.selection.setChannelBar(this.doc.channel, Math.floor(this.doc.synth.playhead));
                                 }
+
+                            }
 
                             this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
                         }

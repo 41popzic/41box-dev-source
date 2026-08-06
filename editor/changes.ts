@@ -4602,18 +4602,22 @@ export function setDefaultInstruments(song: Song): void {
             const isMod: boolean = song.getChannelIsMod(channelIndex);
             let presetName: string;
 
-            if (isNoise) {
-                presetName = "chiseled noise";
-            } else {
+            {
                 switch (channelIndex) {
                     case 0:
-                        presetName = "chiptune piano";
+                        presetName = "chippy piano";
                         break;
                     case 1:
                         presetName = "chippy lead";
                         break;
                     case 2:
                         presetName = "bass kick";
+                        break;
+                    case 3:
+                        presetName = "chiseled noise";
+                        break;
+                    case 4:
+                        presetName = "colored noise";
                         break;
                     default:
                         presetName = "square wave";

@@ -454,11 +454,20 @@ export class PatternEditor {
                 }
             } else {
                 this._cursor.start = fullBeats * Config.partsPerBeat;
-                let division = Config.partsPerBeat % defaultLength == 0 ? defaultLength : Math.min(defaultLength, maxDivision);
+
+                let division = Config.partsPerBeat % defaultLength == 0
+                    ? defaultLength
+                    : Math.min(defaultLength, maxDivision);
+
                 while (division < maxDivision && Config.partsPerBeat % division != 0) {
                     division++;
                 }
-                this._cursor.start += this._snapToMinDivision(modMouse);
+
+                if (Config.partsPerBeat % defaultLength == 0) {
+                    this._cursor.start += Math.floor(modMouse / division) * division;
+                } else {
+                    this._cursor.start += this._snapToMinDivision(modMouse);
+                }
             }
             this._cursor.end = this._cursor.start + defaultLength;
             let forceStart: number = 0;

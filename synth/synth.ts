@@ -1640,6 +1640,7 @@ export class Instrument {
     public unisonSign: number = 1.0;
     public effects: number = 0;
     public chord: number = 1;
+    public strumParts: number = 10;
     public volume: number = 0;
     public pan: number = Config.panCenter;
     public panDelay: number = 0;
@@ -2091,13 +2092,9 @@ export class Instrument {
         }
         if (effectsIncludeChord(this.effects)) {
             instrumentObject["chord"] = this.getChord().name;
-            if (this.getChord().arpeggiates) {
-            if (this.getChord() === Config.chords.dictionary["arpeggio"]) {
-                instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
-                instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
-            }
-            }
-            if (this.getChord().name == "monophonic") instrumentObject["monoChordTone"] = this.monoChordTone;
+            instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
+            instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
+            if (Config.chords[this.chord].strumParts > 0) instrumentObject["strumParts"] = this.strumParts;
         }
         if (effectsIncludePitchShift(this.effects)) {
             instrumentObject["pitchShiftSemitones"] = this.pitchShift;
@@ -2436,6 +2433,9 @@ export class Instrument {
                     this.chord = Config.chords.dictionary["simultaneous"].index;
                 }
             }
+        }
+        if (instrumentObject["strumParts"] != undefined) {
+            this.strumParts = instrumentObject["strumParts"];
         }
 
         this.unison = Config.unisons.dictionary["none"].index; // default value.
@@ -11782,6 +11782,7 @@ if (playSong && !this.countInMetronome) {
                     const partsPerBar: Number = Config.partsPerBeat * song.beatsPerBar;
                     const transition: Transition = instrument.getTransition();
                     const chord: Chord = instrument.getChord();
+                    const useStrumSpeed: boolean = chord.strumParts > 0;
                     let forceContinueAtStart: boolean = false;
                     let forceContinueAtEnd: boolean = false;
                     let tonesInPrevNote: number = 0;
@@ -11901,7 +11902,8 @@ if (playSong && !this.countInMetronome) {
                                 noteEndPart = Math.min(Config.partsPerBeat * this.song!.beatsPerBar, noteEndPart + strumOffsetParts);
                             }
                             if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
-                                strumOffsetParts += chord.strumParts;
+                                // if (useStrumSpeed) strumOffsetParts += Config.strumSpeedScale[instrument.strumParts];
+                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
                             }
 
                             const atNoteStart: boolean = (Config.ticksPerPart * noteStartPart == currentTick);

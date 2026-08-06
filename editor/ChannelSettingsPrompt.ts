@@ -10,6 +10,9 @@ import { ChangePatternsPerChannel, ChangeInstrumentsFlags, ChangeChannelCount } 
 const { button, div, label, br, h2, input } = HTML;
 
 export class ChannelSettingsPrompt implements Prompt {
+    //private readonly _defaultEquaveDivisionsInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", type: "number", step: "1" });
+    //private readonly _defaultEquaveNumeratorInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", type: "number", step: "1" });
+    //private readonly _defaultEquaveDenominatorInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", type: "number", step: "1" });
     private readonly _patternsStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
     private readonly _pitchChannelStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
     private readonly _drumChannelStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
@@ -37,7 +40,19 @@ export class ChannelSettingsPrompt implements Prompt {
         label({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
             "Available patterns per channel:",
             this._patternsStepper,
+        ),/*
+        label({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
+            "Default channel tuning divisions:",
+            this._defaultEquaveDivisionsInputBox,
         ),
+        label({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
+            "Default channel equave numerator:",
+            this._defaultEquaveNumeratorInputBox,
+        ),
+        label({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
+            "Default channel equave denominator:",
+            this._defaultEquaveDenominatorInputBox,
+        ),*/
         label({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
             "Simultaneous instruments",
             br(),
@@ -57,6 +72,19 @@ export class ChannelSettingsPrompt implements Prompt {
     );
 
     constructor(private _doc: SongDocument) {
+
+        /*this._defaultEquaveDivisionsInputBox.value = this._doc.song.defaultEquaveDivisions + "";
+        this._defaultEquaveDivisionsInputBox.min = Config.equaveDivisionsMin + "";
+        this._defaultEquaveDivisionsInputBox.max = Config.equaveDivisionsMax + "";
+
+        this._defaultEquaveNumeratorInputBox.value = this._doc.song.defaultEquaveNumerator + "";
+        this._defaultEquaveNumeratorInputBox.min = 2 + "";
+        this._defaultEquaveNumeratorInputBox.max = Config.equaveNumeratorMax + "";
+
+        this._defaultEquaveDenominatorInputBox.value = this._doc.song.defaultEquaveDenominator + "";
+        this._defaultEquaveDenominatorInputBox.min = 1 + "";
+        this._defaultEquaveDenominatorInputBox.max = Config.equaveDenominatorMax + "";
+*/
         this._patternsStepper.value = this._doc.song.patternsPerChannel + "";
         this._patternsStepper.min = "1";
         this._patternsStepper.max = Config.barCountMax + "";
