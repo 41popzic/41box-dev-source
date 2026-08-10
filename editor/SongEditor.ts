@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, /*effectsIncludePhaser*/ } from "../synth/SynthConfig";
+import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, effectsIncludeFlanger, flangerRateValues/*effectsIncludePhaser*/ } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -47,7 +47,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, } from "./changes";
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
@@ -745,22 +745,34 @@ export class SongEditor {
     private readonly _prevBarButton: HTMLButtonElement = button({ class: "prevBarButton", type: "button", title: "Previous Bar (left bracket)" });
     private readonly _nextBarButton: HTMLButtonElement = button({ class: "nextBarButton", type: "button", title: "Next Bar (right bracket)" });
     private readonly _volumeSlider: Slider = new Slider(input({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "75", value: "50", step: "1" }), this.doc, null, false);
-    private readonly _outVolumeBarBg: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
-    private readonly _outVolumeBar: SVGRectElement = SVG.rect({ "pointer-events": "none", height: "50%", width: "0%", x: "5%", y: "25%", fill: "url('#volumeGrad2')" });
-    private readonly _outVolumeCap: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "2px", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetFocus });
+    private readonly _outVolumeBarBgL: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
+    private readonly _outVolumeBarBgR: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
+    private readonly _outVolumeBarL: SVGRectElement = SVG.rect({ "pointer-events": "none", height: "50%", width: "0%", x: "5%", y: "25%", fill: "url('#volumeGrad2')" });
+    private readonly _outVolumeBarR: SVGRectElement = SVG.rect({ "pointer-events": "none", height: "50%", width: "0%", x: "5%", y: "25%", fill: "url('#volumeGrad2')" });
+    private readonly _outVolumeCapL: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "2px", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetFocus });
+    private readonly _outVolumeCapR: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "2px", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetFocus });
     private readonly _stop1: SVGStopElement = SVG.stop({ "stop-color": "lime", offset: "60%" });
     private readonly _stop2: SVGStopElement = SVG.stop({ "stop-color": "orange", offset: "90%" });
     private readonly _stop3: SVGStopElement = SVG.stop({ "stop-color": "red", offset: "100%" });
     private readonly _gradient: SVGGradientElement = SVG.linearGradient({ id: "volumeGrad2", gradientUnits: "userSpaceOnUse" }, this._stop1, this._stop2, this._stop3);
     private readonly _defs: SVGDefsElement = SVG.defs({}, this._gradient);
-    private readonly _volumeBarContainer: SVGSVGElement = SVG.svg({ style: `touch-action: none; overflow: visible; margin: auto; max-width: 20vw;`, width: "160px", height: "100%", preserveAspectRatio: "none", viewBox: "0 0 160 12" },
+    private readonly _volumeBarContainerL: SVGSVGElement = SVG.svg({ style: `touch-action: none; overflow: visible; margin: auto; max-width: 20vw;`, width: "160px", height: "100%", preserveAspectRatio: "none", viewBox: "0 0 160 12" },
         this._defs,
-        this._outVolumeBarBg,
-        this._outVolumeBar,
-        this._outVolumeCap,
+        this._outVolumeBarBgL,
+        this._outVolumeBarL,
+        this._outVolumeCapL,
     );
-    private readonly _volumeBarBox: HTMLDivElement = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" },
-        this._volumeBarContainer,
+    private readonly _volumeBarContainerR: SVGSVGElement = SVG.svg({ style: `touch-action: none; overflow: visible; margin: auto; max-width: 20vw;`, width: "160px", height: "100%", preserveAspectRatio: "none", viewBox: "0 0 160 12" },
+        this._defs,
+        this._outVolumeBarBgR,
+        this._outVolumeBarR,
+        this._outVolumeCapR,
+    );
+    private readonly _volumeBarBoxL: HTMLDivElement = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" },
+        this._volumeBarContainerL,
+    );
+    private readonly _volumeBarBoxR: HTMLDivElement = div({ class: "playback-volume-bar", style: "height: 12px; margin-top: -5px; align-self: center;" },
+        this._volumeBarContainerR,
     );
     private readonly _fileMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "File"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
@@ -840,7 +852,7 @@ export class SongEditor {
     );
     private readonly _scaleSelect: HTMLSelectElement = select();
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
-    private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
+    private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
     private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
     private readonly _songEqFilterEditor: FilterEditor = new FilterEditor(this.doc, false, false, true);
@@ -892,7 +904,7 @@ export class SongEditor {
     private readonly _echoSustainRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
     private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
     private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });    
+    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });
     private readonly _rhythmActionSelect: HTMLSelectElement = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
     private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Subgrid");
     private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
@@ -907,6 +919,20 @@ export class SongEditor {
     //private readonly _phaserFeedbackRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFeedback") }, span(" Feedback:")), this._phaserFeedbackSlider.container);
     //private readonly _phaserStagesSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.phaserMinStages, max: Config.phaserMaxStages, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserStages(this.doc, oldValue, newValue), false);
     //private readonly _phaserStagesRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserStages") }, span(" Stages:")), this._phaserStagesSlider.container);
+    public readonly flangerRateNum: HTMLParagraphElement = div({ style: "font-size: 80%;", id: "flangerRateNum" });
+    public readonly flangerDelayNum: HTMLParagraphElement = div({ style: "font-size: 80%;", id: "flangerDelayNum" });
+    private readonly _flangerMixSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerMixRange - 1, value: 0, step: "1"}), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerMix(this.doc, oldValue, newValue), true);
+    private readonly _flangerMixRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerMix"),}, span("Flanger:")), this._flangerMixSlider.container );
+    private readonly _flangerDelaySlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDelayRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerDelay(this.doc, oldValue, newValue), false);
+    private readonly _flangerDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerDelay"),}, span("Delay:"), this.flangerDelayNum), this._flangerDelaySlider.container );
+    private readonly _flangerDepthSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDepthRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerDepth(this.doc, oldValue, newValue), false );
+    private readonly _flangerDepthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerDepth"),}, span("Depth:")), this._flangerDepthSlider.container );
+    private readonly _flangerRateSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0",  max: Config.flangerRateRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerRate(this.doc, oldValue, newValue), false );
+    private readonly _flangerRateRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerRate"),}, span("Rate:"), div({ style: `color: ${ColorConfig.secondaryText};` },this.flangerRateNum),), this._flangerRateSlider.container,  );
+    
+    private readonly _flangerFeedbackSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerFeedbackRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerFeedback(this.doc, oldValue, newValue), false );
+    private readonly _flangerFeedbackRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerFeedback"),}, span("Feedback:")), this._flangerFeedbackSlider.container );    
+    
     private readonly _pitchedPresetSelect: HTMLSelectElement = buildPresetOptions(false, "pitchPresetSelect");
     private readonly _drumPresetSelect: HTMLSelectElement = buildPresetOptions(true, "drumPresetSelect");
     private readonly _algorithmSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms.map(algorithm => algorithm.name));
@@ -938,7 +964,7 @@ export class SongEditor {
     // advloop addition
     // @TODO: Add a dropdown for these. Or maybe this checkbox is fine?
     private readonly _useChipWaveAdvancedLoopControlsBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
-    private readonly _chipWaveLoopModeSelect = buildOptions(select(), ["Loop", "Ping-Pong", "Play Once", "Play Loop Once"]);
+    private readonly _chipWaveLoopModeSelect = buildOptions(select(), ["loop", "ping-pong", "play once", "play loop once"]);
     private readonly _chipWaveLoopStartStepper = input({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
     private readonly _chipWaveLoopEndStepper = input({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
     private readonly _setChipWaveLoopEndToEndButton = button({ type: "button", style: "width: 1.5em; height: 1.5em; padding: 0; margin-left: 0.5em;" }, SVG.svg({ width: "16", height: "16", viewBox: "-13 -14 26 26", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.rect({ x: "4", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
@@ -964,8 +990,8 @@ export class SongEditor {
     private readonly _transitionDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._clicklessTransitionRow);
 
     private readonly _effectsSelect: HTMLSelectElement = select(option({ selected: true, disabled: true, hidden: false })); // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
-    private readonly _eqFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchEQFilterType(true) }, "simple");
-    private readonly _eqFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchEQFilterType(false) }, "advanced");
+    private readonly _eqFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchEQFilterType(true) }, "noob");
+    private readonly _eqFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchEQFilterType(false) }, "pro");
     private readonly _eqFilterTypeRow: HTMLElement = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "EQ Filt.Type:"), div({ class: "instrument-bar" }, this._eqFilterSimpleButton, this._eqFilterAdvancedButton));
     private readonly _eqFilterEditor: FilterEditor = new FilterEditor(this.doc);
     private readonly _eqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customEQFilterSettings") }, "+");
@@ -975,8 +1001,8 @@ export class SongEditor {
     private readonly _eqFilterSimplePeakSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEQFilterSimplePeak(this.doc, oldValue, newValue), false);
     private _eqFilterSimplePeakRow: HTMLDivElement = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._eqFilterSimplePeakSlider.container);
 
-    private readonly _noteFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchNoteFilterType(true) }, "simple");
-    private readonly _noteFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchNoteFilterType(false) }, "advanced");
+    private readonly _noteFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchNoteFilterType(true) }, "noob");
+    private readonly _noteFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchNoteFilterType(false) }, "pro");
     private readonly _noteFilterTypeRow: HTMLElement = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "Note Filt.Type:"), div({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
     private readonly _noteFilterEditor: FilterEditor = new FilterEditor(this.doc, true);
     private readonly _noteFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customNoteFilterSettings") }, "+");
@@ -1255,6 +1281,11 @@ export class SongEditor {
         //this._phaserFreqRow,
         //this._phaserFeedbackRow,    
         //this._phaserStagesRow,
+        this._flangerMixRow,
+        this._flangerDepthRow,
+        this._flangerDelayRow,
+        this._flangerRateRow,
+        this._flangerFeedbackRow,
         div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")),
             this._envelopeDropdown,
@@ -1382,12 +1413,12 @@ export class SongEditor {
             ),
             div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "),
-                div({ class: "selectContainer" }, this._keySelect),
+                this._octaveStepper, div({ class: "selectContainer" }, this._keySelect),
             ),
-            div({ class: "selectRow" },
+            /*div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "),
                 this._octaveStepper,
-            ),
+            ),*/
             div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "),
                 span({ style: "display: flex;" },
@@ -1419,7 +1450,8 @@ export class SongEditor {
             ),
         ),
         div({ class: "play-pause-area" },
-            this._volumeBarBox,
+            this._volumeBarBoxL,
+            this._volumeBarBoxR,
             div({ class: "playback-bar-controls" },
                 this._playButton,
                 this._pauseButton,
@@ -1482,9 +1514,12 @@ export class SongEditor {
     private _openPulseWidthDropdown: boolean = false;
     private _openUnisonDropdown: boolean = false; // i don't think this is used at all
 
-    private outVolumeHistoricTimer: number = 0;
-    private outVolumeHistoricCap: number = 0;
-    private lastOutVolumeCap: number = 0;
+    private outVolumeHistoricTimerL: number = 0;
+    private outVolumeHistoricTimerR: number = 0;
+    private outVolumeHistoricCapL: number = 0;
+    private outVolumeHistoricCapR: number = 0;
+    private lastOutVolumeCapL: number = 0;
+    private lastOutVolumeCapR: number = 0;
     public patternUsed: boolean = false;
     private _modRecTimeout: number = -1;
     
@@ -1785,8 +1820,10 @@ export class SongEditor {
         this._volumeSlider.container.style.setProperty("flex-grow", "1");
         this._volumeSlider.container.style.setProperty("display", "flex");
 
-        this._volumeBarContainer.style.setProperty("flex-grow", "1");
-        this._volumeBarContainer.style.setProperty("display", "flex");
+        this._volumeBarContainerL.style.setProperty("flex-grow", "1");
+        this._volumeBarContainerL.style.setProperty("display", "flex");
+        this._volumeBarContainerR.style.setProperty("flex-grow", "1");
+        this._volumeBarContainerR.style.setProperty("display", "flex");
 
         // Also, any slider with a multiplicative effect instead of a replacement effect gets a different mod color, and a round slider.
         this._volumeSlider.container.style.setProperty("--mod-color", ColorConfig.multiplicativeModSlider);
@@ -2608,7 +2645,8 @@ export class SongEditor {
         this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
         this._refreshFavoriteRhythms();
         this._barScrollBar.container.style.display = this.doc.song.barCount > this.doc.trackVisibleBars ? "" : "none";
-        this._volumeBarBox.style.display = this.doc.prefs.displayVolumeBar ? "" : "none";
+        this._volumeBarBoxL.style.display = this.doc.prefs.displayVolumeBar ? "" : "none";
+        this._volumeBarBoxR.style.display = this.doc.prefs.displayVolumeBar ? "" : "none";
         this._globalOscscopeContainer.style.display = this.doc.prefs.showOscilloscope ? "" : "none";
         this.doc.synth.oscEnabled = this.doc.prefs.showOscilloscope;
         this._sampleLoadingStatusContainer.style.display = this.doc.prefs.showSampleLoadingStatus ? "" : "none";
@@ -3209,6 +3247,31 @@ export class SongEditor {
                 this._echoDelayRow.style.display = "none";
             }
 
+            if (effectsIncludeFlanger(instrument.effects)) {
+                this._flangerMixRow.style.display = "";
+                this._flangerMixSlider.updateValue(instrument.flangerMix);
+                this._flangerDelayRow.style.display = "";
+                this._flangerDelaySlider.updateValue(instrument.flangerDelay);
+                this._flangerDepthRow.style.display = "";
+                this._flangerDepthSlider.updateValue(instrument.flangerDepth);
+                this._flangerRateRow.style.display = "";
+                this._flangerRateSlider.updateValue(instrument.flangerRate);
+                this._flangerFeedbackRow.style.display = "";
+                this._flangerFeedbackSlider.updateValue(instrument.flangerFeedback);
+
+                const rateIndex = Math.round( instrument.flangerRate / (Config.flangerRateRange - 1) * (flangerRateValues.length - 1));
+                this.flangerRateNum.innerHTML = " (" + prettyNumber(flangerRateValues[rateIndex]) + " Hz)";
+
+                const delayMs = (instrument.flangerDelay / (Config.flangerDelayRange - 1)) * 10;
+                this.flangerDelayNum.innerHTML = " (" + prettyNumber(delayMs) + " ms)";
+            } else {
+                this._flangerMixRow.style.display = "none";
+                this._flangerDelayRow.style.display = "none";
+                this._flangerRateRow.style.display = "none";
+                this._flangerDepthRow.style.display = "none";
+                this._flangerFeedbackRow.style.display = "none";
+            }
+
             if (effectsIncludeReverb(instrument.effects)) {
                 this._reverbRow.style.display = "";
                 this._reverbSlider.updateValue(instrument.reverb);
@@ -3523,6 +3586,7 @@ export class SongEditor {
                             anyInstrumentDistorts: boolean = false,
                             anyInstrumentBitcrushes: boolean = false,
                             anyInstrumentPans: boolean = false,
+                            anyInstrumentFlanger: boolean = false,
                             anyInstrumentChorus: boolean = false,
                             anyInstrumentEchoes: boolean = false,
                             anyInstrumentReverbs: boolean = false,
@@ -3537,6 +3601,7 @@ export class SongEditor {
                             allInstrumentDistorts: boolean = true,
                             allInstrumentBitcrushes: boolean = true,
                             allInstrumentPans: boolean = true,
+                            allInstrumentFlanger: boolean = false,
                             allInstrumentChorus: boolean = true,
                             allInstrumentEchoes: boolean = true,
                             allInstrumentReverbs: boolean = true,
@@ -3603,6 +3668,12 @@ export class SongEditor {
                             }
                             if (effectsIncludePanning(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentPans = true;
+                            }
+                            else {
+                                allInstrumentFlanger = false;
+                            }
+                            if (effectsIncludeFlanger(channel.instruments[instrumentIndex].effects)) {
+                                anyInstrumentFlanger = true;
                             }
                             else {
                                 allInstrumentPans = false;
@@ -3742,6 +3813,14 @@ export class SongEditor {
                         if (!allInstrumentPans) {
                             unusedSettingList.push("+ pan");
                             unusedSettingList.push("+ pan delay");
+                        }
+                        if (anyInstrumentFlanger) {
+                            settingList.push("flanger");
+                            settingList.push("flanger delay");
+                        }
+                        if (!allInstrumentFlanger) {
+                            unusedSettingList.push("+ flanger");
+                            unusedSettingList.push("+ flanger delay");
                         }
                         if (anyInstrumentChorus) {
                             settingList.push("chorus");
@@ -5184,7 +5263,8 @@ export class SongEditor {
     public togglePlay = (): void => {
         if (this.doc.synth.playing) {
             this.doc.performance.pause();
-            this.outVolumeHistoricCap = 0;
+            this.outVolumeHistoricCapL = 0;
+            this.outVolumeHistoricCapR = 0;
         } else {
             this.doc.synth.snapToBar();
             this.doc.performance.play();
@@ -5224,24 +5304,35 @@ export class SongEditor {
     }
 
     public _volumeUpdate = (): void => {
-        this.outVolumeHistoricTimer--;
-        if (this.outVolumeHistoricTimer <= 0) {
-            this.outVolumeHistoricCap -= 0.03;
+        this.outVolumeHistoricTimerL--;
+        this.outVolumeHistoricTimerR--;
+        if (this.outVolumeHistoricTimerL <= 0) {
+            this.outVolumeHistoricCapL -= 0.03;
         }
-        if (this.doc.song.outVolumeCap > this.outVolumeHistoricCap) {
-            this.outVolumeHistoricCap = this.doc.song.outVolumeCap;
-            this.outVolumeHistoricTimer = 50;
+        if (this.outVolumeHistoricTimerR <= 0) {
+            this.outVolumeHistoricCapR -= 0.03;
+        }
+        if (this.doc.song.outVolumeCapL > this.outVolumeHistoricCapL) {
+            this.outVolumeHistoricCapL = this.doc.song.outVolumeCapL;
+            this.outVolumeHistoricTimerL = 50;
+        }
+        if (this.doc.song.outVolumeCapR > this.outVolumeHistoricCapR) {
+            this.outVolumeHistoricCapR = this.doc.song.outVolumeCapR;
+            this.outVolumeHistoricTimerR = 50;
         }
 
-        if (this.doc.song.outVolumeCap != this.lastOutVolumeCap) {
-            this.lastOutVolumeCap = this.doc.song.outVolumeCap;
-            this._animateVolume(this.doc.song.outVolumeCap, this.outVolumeHistoricCap);
+        if (this.doc.song.outVolumeCapL != this.lastOutVolumeCapL || this.doc.song.outVolumeCapR != this.lastOutVolumeCapR) {
+            this.lastOutVolumeCapL = this.doc.song.outVolumeCapL;
+            this.lastOutVolumeCapR = this.doc.song.outVolumeCapR;
+            this._animateVolume(this.doc.song.outVolumeCapL, this.outVolumeHistoricCapL, this.doc.song.outVolumeCapR, this.outVolumeHistoricCapR);
         }
     }
 
-    private _animateVolume(outVolumeCap: number, historicOutCap: number): void {
-        this._outVolumeBar.setAttribute("width", "" + Math.min(144, outVolumeCap * 144));
-        this._outVolumeCap.setAttribute("x", "" + (8 + Math.min(144, historicOutCap * 144)));
+    private _animateVolume(outVolumeCapL: number, historicOutCapL: number, outVolumeCapR: number, historicOutCapR: number): void {
+        this._outVolumeBarL.setAttribute("width", "" + Math.min(144, outVolumeCapL * 144));
+        this._outVolumeBarR.setAttribute("width", "" + Math.min(144, outVolumeCapR * 144));
+        this._outVolumeCapL.setAttribute("x", "" + (8 + Math.min(144, historicOutCapL * 144)));
+        this._outVolumeCapR.setAttribute("x", "" + (8 + Math.min(144, historicOutCapR * 144)));
     }
 
     private _setVolumeSlider = (): void => {

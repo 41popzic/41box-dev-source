@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz, /*effectsIncludePhaser*/ } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz, flangerRateValues, /*effectsIncludePhaser*/ } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -243,7 +243,6 @@ const enum SongTagCode {
     arpeggioSpeed = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
     harmonics = CharCode.H, // added in BeepBox URL version 7
     stringSustain = CharCode.I, // added in BeepBox URL version 9
-    //rhythmEnabled = CharCode.J, // added in 41Box 1.3
     //                      = CharCode.J,
     //	                    = CharCode.K,
     pan = CharCode.L, // added between 8 and 9, DEPRECATED
@@ -262,7 +261,7 @@ const enum SongTagCode {
     //                      = CharCode.Y, 
     //	                    = CharCode.Z,
     //	                    = CharCode.NUM_0,
-    //	                    = CharCode.NUM_1,
+    //                      = CharCode.NUM_1,
     //	                    = CharCode.NUM_2,
     //	                    = CharCode.NUM_3,
     //	                    = CharCode.NUM_4,
@@ -1679,6 +1678,12 @@ export class Instrument {
     //public phaserFeedback: number = 0;
     //public phaserStages: number = 2;
 
+    public flangerDelay: number = 0;
+    public flangerDepth: number = 0;
+    public flangerRate: number = 0;
+    public flangerFeedback: number = 0;
+    public flangerMix: number = 0;
+
     public algorithm: number = 0;
     public feedbackType: number = 0;
     public algorithm6Op: number = 1;
@@ -1806,6 +1811,12 @@ export class Instrument {
         //this.phaserFeedback = 0;
         //this.phaserStages = 2;
         //this.phaserMix = Config.phaserMixRange - 1;
+
+        this.flangerDelay = 8;
+        this.flangerDepth = 12;
+        this.flangerRate = 2;
+        this.flangerFeedback = 13;
+        this.flangerMix = 26;
 
         this.pan = Config.panCenter;
         this.panDelay = 0;
@@ -2164,6 +2175,13 @@ export class Instrument {
         if (effectsIncludeEcho(this.effects)) {
             instrumentObject["echoSustain"] = Math.round(100 * this.echoSustain / (Config.echoSustainRange - 1));
             instrumentObject["echoDelayBeats"] = Math.round(1000 * (this.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat)) / 1000;
+        }
+        if (effectsIncludeFlanger(this.effects)) {
+            instrumentObject["flangerDelay"] = this.flangerDelay;
+            instrumentObject["flangerDepth"] = this.flangerDepth;
+            instrumentObject["flangerRate"] = this.flangerRate;
+            instrumentObject["flangerFeedback"] = this.flangerFeedback;
+            instrumentObject["flangerMix"] = Math.round(100  * this.flangerMix / (Config.flangerMixRange - 1));
         }
         if (effectsIncludeReverb(this.effects)) {
             instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
@@ -2603,7 +2621,21 @@ export class Instrument {
         if (instrumentObject["echoDelayBeats"] != undefined) {
             this.echoDelay = clamp(0, Config.echoDelayRange, Math.round((+instrumentObject["echoDelayBeats"]) * (Config.ticksPerPart * Config.partsPerBeat) / Config.echoDelayStepTicks - 1.0));
         }
-
+        if (instrumentObject["flangerDelay"] != undefined) {
+            this.flangerDelay = clamp(0, Config.flangerDelayRange,instrumentObject["flangerDelay"] | 0);
+        }
+        if (instrumentObject["flangerDepth"] != undefined) {
+            this.flangerDepth = clamp(0, Config.flangerDepthRange,instrumentObject["flangerDepth"] | 0);
+        }
+        if (instrumentObject["flangerRate"] != undefined) {
+            this.flangerRate = clamp(0, Config.flangerRateRange,instrumentObject["flangerRate"] | 0);
+        }
+        if (instrumentObject["flangerFeedback"] != undefined) {
+            this.flangerFeedback = clamp(0, Config.flangerFeedbackRange,instrumentObject["flangerFeedback"] | 0);
+        }
+        if (instrumentObject["flangerMix"] != undefined) {
+            this.flangerMix = clamp(0, Config.flangerMixRange,Math.round((Config.flangerMixRange - 1) * (instrumentObject["flangerMix"] | 0) / 100));
+        }
         if (!isNaN(instrumentObject["chorus"])) {
             this.chorus = clamp(0, Config.chorusRange, Math.round((Config.chorusRange - 1) * (instrumentObject["chorus"] | 0) / 100));
         }
@@ -3254,6 +3286,8 @@ export class Song {
     public masterGain: number = 1.0;
     public inVolumeCap: number = 0.0;
     public outVolumeCap: number = 0.0;
+    public outVolumeCapL: number = 0.0;
+    public outVolumeCapR: number = 0.0;
     public eqFilter: FilterSettings = new FilterSettings();
     public eqFilterType: boolean = false;
     public eqFilterSimpleCut: number = Config.filterSimpleCutRange - 1;
@@ -3801,6 +3835,13 @@ export class Song {
                 if (effectsIncludeEcho(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.echoSustain], base64IntToCharCode[instrument.echoDelay]);
                 }
+                if (effectsIncludeFlanger(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[instrument.flangerDelay]);
+                    buffer.push(base64IntToCharCode[instrument.flangerDepth]);
+                    buffer.push(base64IntToCharCode[instrument.flangerRate]);
+                    buffer.push(base64IntToCharCode[instrument.flangerFeedback]);
+                    buffer.push(base64IntToCharCode[instrument.flangerMix]);   
+                }
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
                 }
@@ -3827,7 +3868,6 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.phaserStages]);
                     buffer.push(base64IntToCharCode[instrument.phaserMix]);
                 }*/
-
                 if (instrument.type != InstrumentType.drumset) {
                     buffer.push(SongTagCode.fadeInOut, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
                     // Transition info follows transition song tag
@@ -5449,7 +5489,7 @@ const unisonLength =
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
                     // BeepBox currently uses three base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 15) throw new Error();
+                    if (EffectType.length > 16) throw new Error();
                     if (from41Box || (fromSlarmoosBox && !beforeFive)) {
                         instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     } else {
@@ -5588,6 +5628,13 @@ const unisonLength =
                     if (effectsIncludeEcho(instrument.effects)) {
                         instrument.echoSustain = clamp(0, Config.echoSustainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.echoDelay = clamp(0, Config.echoDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
+                    if (effectsIncludeFlanger(instrument.effects)) {
+                        instrument.flangerDelay = clamp(0, Config.flangerDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.flangerDepth = clamp(0, Config.flangerDepthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.flangerRate = clamp(0, Config.flangerRateRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.flangerFeedback = clamp(0, Config.flangerFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.flangerMix = clamp(0, Config.flangerMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
                     if (effectsIncludeReverb(instrument.effects)) {
                         if (fromBeepBox) {
@@ -8709,6 +8756,16 @@ class InstrumentState {
     //public phaserStages: number = 0;
     //public phaserStagesDelta: number = 0;
 
+    public flangerDelayLineL: Float32Array | null = null;
+    public flangerDelayLineR: Float32Array | null = null;
+    public flangerDelayPos: number = 0;
+    public flangerPhase: number = 0;
+    public flangerDepth: number = 0.004;
+    public flangerDelay: number = 0.001;
+    public flangerRate: number = 0.25;
+    public flangerFeedback: number = 1;
+    public flangerMix: number = 0;
+
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
     public readonly drumsetSpectrumWaves: SpectrumWaveState[] = [];
@@ -8745,6 +8802,18 @@ class InstrumentState {
         }
         if (effectsIncludeEcho(instrument.effects)) {
             this.allocateEchoBuffers(samplesPerTick, instrument.echoDelay);
+        }
+        if (effectsIncludeFlanger(instrument.effects)) {
+            const flangerDelayBufferSize = Synth.fittingPowerOfTwo(Math.ceil(synth.samplesPerSecond * 0.08));
+
+            if (
+                this.flangerDelayLineL == null ||
+                this.flangerDelayLineL.length != flangerDelayBufferSize
+            ) {
+                this.flangerDelayLineL = new Float32Array(flangerDelayBufferSize);
+                this.flangerDelayLineR = new Float32Array(flangerDelayBufferSize);
+                this.flangerDelayPos = 0;
+            }
         }
         if (effectsIncludeReverb(instrument.effects)) {
             // TODO: Make reverb delay line sample rate agnostic. Maybe just double buffer size for 96KHz? Adjust attenuation and shelf cutoff appropriately?
@@ -8837,9 +8906,20 @@ class InstrumentState {
         this.reverbShelfPrevInput1 = 0.0;
         this.reverbShelfPrevInput2 = 0.0;
         this.reverbShelfPrevInput3 = 0.0;
+        
         //if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
         //if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
+        
+        this.flangerDelayPos = 0;
+        this.flangerPhase = 0;
+        //this.flangerMix = 0;
 
+        if (this.flangerDelayLineL != null) {
+            for (let i = 0; i < this.flangerDelayLineL.length; i++) {
+                this.flangerDelayLineL[i] = 0.0;
+                this.flangerDelayLineR[i] = 0.0;
+            }
+        }
 
         this.volumeScale = 1.0;
         this.aliases = false;
@@ -8945,6 +9025,7 @@ class InstrumentState {
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
         //const usesPhaser: boolean = effectsIncludePhaser(this.effects);
+        const usesFlanger: boolean = effectsIncludeFlanger(this.effects);
 
         let granularChance: number = 0;
         if (usesGranular) { //has to happen before buffer allocation
@@ -9435,6 +9516,14 @@ class InstrumentState {
             this.phaserStages = phaserStagesStart;
             this.phaserStagesDelta = (phaserStagesEnd - phaserStagesStart) / roundedSamplesPerTick;
         }*/
+
+        if (usesFlanger) {
+            this.flangerDelay = (instrument.flangerDelay / (Config.flangerDelayRange - 1)) * 0.010;       
+            this.flangerDepth = instrument.flangerDepth       
+            this.flangerRate = instrument.flangerRate    
+            this.flangerFeedback = instrument.flangerFeedback
+            this.flangerMix = instrument.flangerMix / (Config.flangerMixRange - 1);
+        }
 
         if (usesReverb) {
             const reverbEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.reverb];
@@ -9934,6 +10023,8 @@ export class Synth {
     public panningDelayBufferMask: number;
     public chorusDelayBufferSize: number;
     public chorusDelayBufferMask: number;
+    public flangerDelayBufferSize: number;
+    public flangerDelayBufferMask: number;
     // TODO: reverb
 
     public song: Song | null = null;
@@ -10331,6 +10422,8 @@ export class Synth {
         this.panningDelayBufferMask = this.panningDelayBufferSize - 1;
         this.chorusDelayBufferSize = Synth.fittingPowerOfTwo(this.samplesPerSecond * Config.chorusMaxDelay);
         this.chorusDelayBufferMask = this.chorusDelayBufferSize - 1;
+        this.flangerDelayBufferSize = Synth.fittingPowerOfTwo(this.samplesPerSecond * 0.08);
+        this.flangerDelayBufferMask = this.flangerDelayBufferSize - 1;
     }
 
     private activateAudio(): void {
@@ -10385,6 +10478,8 @@ export class Synth {
         if (this.song != null) {
             this.song.inVolumeCap = 0.0;
             this.song.outVolumeCap = 0.0;
+            this.song.outVolumeCapL = 0.0;
+            this.song.outVolumeCapR = 0.0;
             this.song.tmpEqFilterStart = null;
             this.song.tmpEqFilterEnd = null;
             for (let channelIndex: number = 0; channelIndex < this.song.pitchChannelCount + this.song.noiseChannelCount; channelIndex++) {
@@ -10784,6 +10879,8 @@ export class Synth {
         const song: Song = this.song;
         this.song.inVolumeCap = 0.0 // Reset volume cap for this run
         this.song.outVolumeCap = 0.0;
+        this.song.outVolumeCapL = 0.0;
+        this.song.outVolumeCapR = 0.0;
 
         let samplesPerTick: number = this.getSamplesPerTick();
         let ended: boolean = false;
@@ -11113,6 +11210,8 @@ export class Synth {
                 outputDataR[i] = sampleR * limitedVolume;
 
                 this.song.outVolumeCap = (this.song.outVolumeCap > abs * limitedVolume ? this.song.outVolumeCap : abs * limitedVolume); // Analytics, spit out limited output volume
+                this.song.outVolumeCapL = (this.song.outVolumeCapL > absL * limitedVolume ? this.song.outVolumeCapL : absL * limitedVolume);
+                this.song.outVolumeCapR = (this.song.outVolumeCapR > absR * limitedVolume ? this.song.outVolumeCapR : absR * limitedVolume);
             }
 
             bufferIndex += runLength;
@@ -13997,6 +14096,7 @@ if (playSong && !this.countInMetronome) {
         const usesGranular: boolean = effectsIncludeGranular(instrumentState.effects);
         const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects);
         //const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects);
+        const usesFlanger = effectsIncludeFlanger(instrumentState.effects);
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
         signature = signature << 1; if (usesEqFilter) signature = signature | 1;
@@ -14007,8 +14107,10 @@ if (playSong && !this.countInMetronome) {
         signature = signature << 1; if (usesGranular) signature = signature | 1;
         signature = signature << 1; if (usesRingModulation) signature = signature | 1;
         //signature = signature << 1; if (usesPhaser) signature = signature | 1;
+        signature = signature << 1; if (usesFlanger) signature = signature | 1;
 
         let effectsFunction: Function = Synth.effectsFunctionCache[signature];
+        
         if (effectsFunction == undefined) {
             let effectsSource: string = "return (synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) => {";
 
@@ -14215,6 +14317,49 @@ if (playSong && !this.countInMetronome) {
 				const chorusTap3Delta = (chorusTap3End - chorusTap3Index) / runLength;
 				const chorusTap4Delta = (chorusTap4End - chorusTap4Index) / runLength;
 				const chorusTap5Delta = (chorusTap5End - chorusTap5Index) / runLength;`
+            }
+
+            if (usesFlanger) {
+                effectsSource += `
+                    
+                    const flangerMask = synth.flangerDelayBufferMask >>> 0;
+                    const flangerDelayLineL = instrumentState.flangerDelayLineL;
+                    const flangerDelayLineR = instrumentState.flangerDelayLineR;
+                    instrumentState.flangerDelayLineDirty = true;
+
+                    let flangerDelayPos = instrumentState.flangerDelayPos & flangerMask;
+                    let flangerPhase = instrumentState.flangerPhase;
+                    let flangerMix = +instrumentState.flangerMix;
+                    let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
+
+                    const flangerBaseDelay =
+                        synth.samplesPerSecond * instrumentState.flangerDelay;
+
+                    const flangerDepth =
+                        synth.samplesPerSecond *
+                        (instrumentState.flangerDepth / (Config.flangerDepthRange - 1)) *
+                        0.01;
+                    
+                    const flangerRateIndex = Math.round(
+                        instrumentState.flangerRate / (Config.flangerRateRange - 1) *
+                        (${flangerRateValues.length} - 1)
+                    );
+                    const flangerRate = ${JSON.stringify(flangerRateValues)}[flangerRateIndex];
+                    const flangerSamplesPerBeat =
+                        synth.getSamplesPerTick() *
+                        Config.partsPerBeat *
+                        Config.ticksPerPart;
+
+                    const flangerRateHz =
+                        flangerRate *
+                        synth.samplesPerSecond /
+                        flangerSamplesPerBeat;
+
+                    const flangerPhaseIncrement =
+                        Math.PI * 2.0 *
+                        flangerRateHz /
+                        synth.samplesPerSecond;
+                `;
             }
 
             if (usesEcho) {
@@ -14522,6 +14667,50 @@ if (playSong && !this.countInMetronome) {
 					chorusVoiceMult += chorusVoiceMultDelta;
 					chorusCombinedMult += chorusCombinedMultDelta;`
             }
+                if (usesFlanger) {
+                    effectsSource += `
+                        const flangerDelay = flangerBaseDelay + flangerDepth * (0.5 + 0.5 * Math.sin(flangerPhase));
+
+                        const flangerDelaySamples = flangerDelay;
+                        const flangerDelayIndex = flangerDelayPos - flangerDelaySamples;
+
+                        const flangerDelayIndexFloor = Math.floor(flangerDelayIndex);
+                        const flangerDelayRatio = flangerDelayIndex - flangerDelayIndexFloor;
+
+                        const flangerDelayIndexInt = flangerDelayIndexFloor;
+
+                        const flangerTapLA = flangerDelayLineL[flangerDelayIndexInt & flangerMask];
+
+                        const flangerTapLB = flangerDelayLineL[(flangerDelayIndexInt + 1) & flangerMask];
+
+                        const flangerTapRA = flangerDelayLineR[flangerDelayIndexInt & flangerMask];
+
+                        const flangerTapRB = flangerDelayLineR[(flangerDelayIndexInt + 1) & flangerMask];
+
+                        const flangerTapL = flangerTapLA + (flangerTapLB - flangerTapLA) * flangerDelayRatio;
+
+                        const flangerTapR = flangerTapRA + (flangerTapRB - flangerTapRA) * flangerDelayRatio;
+
+                        flangerDelayLineL[flangerDelayPos] =
+                            sampleL + flangerTapL * flangerFeedback;
+
+                        flangerDelayLineR[flangerDelayPos] =
+                            sampleR + flangerTapR * flangerFeedback;
+
+                        const dryGain = Math.cos(flangerMix * Math.PI * 0.5);
+                        const wetGain = Math.sin(flangerMix * Math.PI * 0.5);
+
+                        sampleL = sampleL * dryGain + flangerTapL * wetGain;
+                        sampleR = sampleR * dryGain + flangerTapR * wetGain;
+
+                        flangerDelayPos = (flangerDelayPos + 1) & flangerMask;
+
+                        flangerPhase += flangerPhaseIncrement;
+                        if (flangerPhase >= Math.PI * 2.0) {
+                            flangerPhase -= Math.PI * 2.0;
+                        }
+                    `
+                }
 
             if (usesEcho) {
                 effectsSource += `
@@ -14722,6 +14911,15 @@ if (playSong && !this.countInMetronome) {
 				instrumentState.chorusDelayPos = chorusDelayPos;
 				instrumentState.chorusVoiceMult = chorusVoiceMult;
 				instrumentState.chorusCombinedMult = chorusCombinedMult;`
+            }
+
+            if (usesFlanger) {
+                effectsSource += `
+                    Synth.sanitizeDelayLine(flangerDelayLineL, flangerDelayPos, flangerMask);
+                    Synth.sanitizeDelayLine(flangerDelayLineR, flangerDelayPos, flangerMask);
+                    instrumentState.flangerDelayPos = flangerDelayPos;
+                    instrumentState.flangerPhase = flangerPhase;
+                `
             }
 
             if (usesEcho) {

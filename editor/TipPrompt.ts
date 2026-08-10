@@ -51,9 +51,9 @@ export class TipPrompt implements Prompt {
 			} break;
 			case "rhythm": {
 				message = div(
-					h2("Note Divisions"),
-					p("This setting determines how beats are divided. The pattern editor helps you align notes to fractions of a beat based on this setting."),
-					p("If you've already placed some notes but they don't align with the selected rhythm, you can click the button beside the input to force the notes in the currently selected pattern(s) to align with the selected rhythm."),
+					h2("Subgrid"),
+					p("This setting determines how beats are divided. The pattern editor helps you align notes to an independent grid based on this setting."),
+					p("If you've already placed some notes but they don't align with the subgrid, you can either select the \"Quantize All Notes\" option or the \"Quantize Selected Patterns\" to align your notes with the current subgrid value."),
 				);
 			} break;
 			case "instrumentIndex": {
@@ -674,6 +674,36 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Grain Range"),
 					p(`This setting controls the range of randomization for grain sizes. `),
+				);
+			} break;
+			case "flangerMix": {
+				message = div(
+					h2("Flanger Mix"),
+					p(`This setting controls the wet/dry mix of the flanger effect. `),
+				);
+			} break;	
+			case "flangerDepth": {
+				message = div(
+					h2("Flanger Depth"),
+					p(`This setting controls the depth of the flanger. `),
+				);
+			} break;
+			case "flangerDelay": {
+				message = div(
+					h2("Flanger Delay"),
+					p(`This setting controls the delay of the flanger. `),
+				);
+			} break;
+			case "flangerRate": {
+				message = div(
+					h2("Flanger Rate"),
+					p(`This setting controls the rate of the flanger. `),
+				);
+			} break;
+			case "flangerFeedback": {
+				message = div(
+					h2("Flanger Feedback"),
+					p(`This setting controls the feedback of the flanger. `),
 				);
 			} break;
 			

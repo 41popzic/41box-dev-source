@@ -4605,10 +4605,10 @@ export function setDefaultInstruments(song: Song): void {
             {
                 switch (channelIndex) {
                     case 0:
-                        presetName = "chippy piano";
+                        presetName = "square wave";
                         break;
                     case 1:
-                        presetName = "chippy lead";
+                        presetName = "square wave";
                         break;
                     case 2:
                         presetName = "bass kick";
@@ -4871,6 +4871,63 @@ export class ChangeEchoSustain extends ChangeInstrumentSlider {
         super(doc);
         this._instrument.echoSustain = newValue;
         doc.synth.unsetMod(Config.modulators.dictionary["echo"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeFlangerDelay extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+
+        this._instrument.flangerDelay = newValue;
+
+        // Don't use this yet if you haven't added the modulator.
+        // doc.synth.unsetMod(...);
+
+        doc.notifier.changed();
+
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeFlangerDepth extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.flangerDepth = newValue;
+        //doc.synth.unsetMod(Config.modulators.dictionary["flanger depth"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeFlangerRate extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+
+        this._instrument.flangerRate = newValue;
+
+        doc.notifier.changed();
+
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeFlangerFeedback extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.flangerFeedback = newValue;
+        doc.synth.unsetMod(Config.modulators.dictionary["flanger feedback"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeFlangerMix extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.flangerMix = newValue;
+        //doc.synth.unsetMod(/* flanger mix mod index */);
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

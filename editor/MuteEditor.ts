@@ -12,7 +12,7 @@ import { SongEditor } from "./SongEditor";
 //namespace beepbox {
 export class MuteEditor {
 
-    private _cornerFiller: HTMLDivElement = HTML.div({ style: `background: ${ColorConfig.editorBackground}; position: sticky; bottom: 0; left: 0; width: 32px; height: 30px;` });
+    private _cornerFiller: HTMLDivElement = HTML.div({ style: `background: ${ColorConfig.editorBackground}; position: sticky; bottom: 0; left: 0; width: 30px; height: 30px;` });
 
     private readonly _buttons: HTMLDivElement[] = [];
     private readonly _channelCounts: HTMLDivElement[] = [];

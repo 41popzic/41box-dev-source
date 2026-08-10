@@ -19,7 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 SOFTWARE.
 */
-//who up 41ing their box yooo
+//who up 41ing their box yooo -popzic
+// shut up popzic - popzic
+//whar :< -popzic
 export interface Dictionary<T> {
     [K: string]: T;
 }
@@ -117,7 +119,8 @@ export const enum EffectType {
     noteRange, //placeholder for ultrabox 2.3 update
     ringModulation,
     granular,
-    //phaser,
+    flanger,   
+    //phaser, BAHAHA NO PHASER FOR Y'ALL
     length,
 }
 
@@ -157,10 +160,12 @@ export const enum EnvelopeComputeIndex {
     echoDelay,
     //Add more here
 
-    phaserFreq,
-    phaserMix,
-    phaserFeedback,
-    phaserStages,
+    //phaserFreq,
+    //phaserMix,
+    //phaserFeedback,
+    //phaserStages,
+
+
 
     length,
 }
@@ -975,6 +980,12 @@ export class Config {
     public static readonly phaserMaxFreq: number = 20000.0; 
     public static readonly phaserMinStages: number = 0; 
     public static readonly phaserMaxStages: number = 32; 
+    public static readonly flangerDelayRange = 24;
+    public static readonly flangerDepthRange = 32;
+    public static readonly flangerRateRange = 56;
+    public static readonly flangerFeedbackRange = 32;
+    public static readonly flangerMixRange = 51;
+    // haha no mins for you
     public static readonly beatsPerBarMin: number = 1;
     public static readonly beatsPerBarMax: number = 64;
     public static readonly barCountMin: number = 1;
@@ -1137,6 +1148,9 @@ export class Config {
         // based off an old mp3 in #modded-beepbox where someone tried to shorten the overdrive guitar into the size of other chip waves 
         // search "normie alert" in beepcord
         { name: "ultrabox shortened od guitar", expression: 0.5, samples: centerAndNormalizeWave([-0.82785, -0.67621, -0.40268, -0.43817, -0.45468, -0.22531, -0.18329, 0.24750, 0.71246, 0.52155, 0.56082, 0.48395, 0.33990, 0.46957, 0.27744, 0.42313, 0.47104, 0.18796, 0.12930, -0.13901, -0.07431, -0.16348, -0.74857, -0.73206, -0.35181, -0.26227, -0.41882, -0.27786, -0.19806, -0.19867, 0.18643, 0.24808, 0.08847, -0.06964, 0.06912, 0.20474, -0.05304, 0.29416, 0.31967, 0.14243, 0.27521, -0.23932, -0.14752, 0.12360, -0.26123, -0.26111, 0.06616, 0.26520, 0.08090, 0.15240, 0.16254, -0.12061, 0.04562, 0.00131, 0.04050, 0.08182, -0.21729, -0.17041, -0.16312, -0.08563, 0.06390, 0.05099, 0.05627, 0.02728, 0.00726, -0.13028, -0.05673, -0.14969, -0.17645, 0.35492, 0.16766, -0.00897, 0.24326, -0.00461, -0.04456, 0.01776, -0.04950, -0.01221, 0.02039, 0.07684, 0.13397, 0.39850, 0.35962, 0.13754, 0.42310, 0.27161, -0.17609, 0.03659, 0.10635, -0.21909, -0.22046, -0.20258, -0.40973, -0.40280, -0.40521, -0.66284]) },
+        { name: "41box quasi-sine-sine", expression: 0.5, samples: centerWave([1.0000, 1.0000, 1.0000, 0.9583, 1.0000, 0.9167, 1.0000, 0.7917, 0.0000, 0.5833, 0.0000, 0.2917, 0.0000, -0.0417, 0.0000, -0.3333, -1.0000, -0.5000, -1.0000, -0.6667, -1.0000, -0.7500, -1.0000, -0.8333, 0.0000, -0.9167, 0.0000, -0.9583, 0.0000, -1.0000, 0.0000, -1.0000, 1.0000, -1.0000, 1.0000, -1.0000, 1.0000, -0.9583, 1.0000, -0.8750, 0.0000, -0.7917, 0.0000, -0.7083, 0.0000, -0.5833, 0.0000, -0.4167, -1.0000, -0.2083, -1.0000, 0.1250, -1.0000, 0.4583, -1.0000, 0.7083, 0.0000, 0.8750, 0.0000, 0.9583, 0.0000, 1.0000, 0.0000, 1.0000,])},
+        { name: "41box overtone sine", expression: 0.5, samples: centerAndNormalizeWave([0.0000, -0.1667,  0.0000, -0.5000, 0.0000, -0.6667,  0.0000, -0.8333, 0.0000, -0.9167,  0.0000, -1.0000, 0.0000, -1.0000,  0.0000, -1.0000, 0.0000, -1.0000,  0.0000, -1.0000, 0.0000, -1.0000,  0.0000, -1.0000, 0.0000, -0.9167,  0.0000, -0.8333, 0.0000, -0.6667,  0.0000, -0.5000, 0.0000, -0.1667,  0.0000,  0.2083, 0.0000,  0.5000,  0.0000,  0.7083, 0.0000,  0.8750,  0.0000,  0.9583, 0.0000,  1.0000,  0.0000,  1.0000, 0.0000,  1.0000,  0.0000,  1.0000, 0.0000,  1.0000,  0.0000,  0.9583, 0.0000,  0.8750,  0.0000,  0.7083, 0.0000,  0.5000,  0.0000,  0.2083,])},
+        { name: "41box overtone sine 2", expression: 0.5, samples: centerWave([-1.0000, -0.1250, -1.0000, -0.2083, -0.9583, -0.2917, -0.8750, -0.3333, -0.7500, -0.3333, -0.5833, -0.2917, -0.3750, -0.2083, -0.1250, -0.0833, 0.1250,  0.0833,  0.3750,  0.2083, 0.5833,  0.2917,  0.7500,  0.3333, 0.8750,  0.3333,  0.9583,  0.2917, 1.0000,  0.2083,  1.0000,  0.0833, 1.0000, -0.0833,  1.0000, -0.2083, 0.9583, -0.2917,  0.8750, -0.3333, 0.7500, -0.3333,  0.5833, -0.2917, 0.3750, -0.2083,  0.1250, -0.0833, -0.1250,  0.0833, -0.3750,  0.2083, -0.5833,  0.2917, -0.7500,  0.3333, -0.8750,  0.3333, -0.9583,  0.2917, -1.0000,  0.2083, -1.0000,  0.0833,])},
     ]);
     public static chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
     public static rawRawChipWaves: DictionaryArray<ChipWave> = Config.rawChipWaves;
@@ -1281,8 +1295,8 @@ export class Config {
     
     public static readonly customUnisonIndex: number = 63; // not used
 
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", /*"phaser"*/];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, /*EffectType.phaser*/];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "flanger",/* "phaser"*/];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.flanger,/* EffectType.phaser*/];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -2253,6 +2267,65 @@ export function drawNoiseSpectrum(wave: Float32Array, waveLength: number, lowOct
     return combinedAmplitude;
 }
 
+export const flangerRateValues: ReadonlyArray<number> = [
+    0,        // 1
+    0.015625, // 2
+    0.03125,  // 3
+    0.046875, // 4
+    0.0625,   // 5
+    0.09375,  // 6
+    0.125,    // 7
+    0.1667,   // 8
+    0.2,      // 9
+    0.25,     // 10
+    0.33,     // 11
+    0.4,      // 12
+    0.5,      // 13
+    0.66,     // 14
+    0.75,     // nah i'm too lazy to do all of this
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.2,
+    1.3,
+    1.4,
+    1.5,
+    1.6,
+    1.7,
+    1.8,
+    1.9,
+    2,
+    2.1,
+    2.2,
+    2.3,
+    2.4,
+    2.5,
+    2.6,
+    2.7,
+    2.8,
+    2.9,
+    3,
+    3.1,
+    3.2,
+    3.3,
+    3.4,
+    3.5,
+    3.6,
+    3.7,
+    3.8,
+    3.9,
+    4,
+    4.15,
+    4.3,
+    4.5,
+    4.8,
+    5,
+    5.5,
+    6,
+    8,  // 56
+];
+
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {
     let arpeggioPattern: ReadonlyArray<number> = Config.arpeggioPatterns[pitchCount - 1];
     if (arpeggioPattern != null) {
@@ -2326,6 +2399,9 @@ export function effectsIncludeNoteRange(effects: number): boolean {
 //export function effectsIncludePhaser(effects: number): boolean {
 //	return (effects & (1 << EffectType.phaser)) != 0;
 //}
+export function effectsIncludeFlanger(effects: number): boolean {
+    return (effects & (1 << EffectType.flanger)) != 0;
+}
 export function calculateRingModHertz(sliderHz: number, sliderHzOffset: number = 0): number {
     //replaces the value 21 with 0
     if (sliderHz == 0) return 0;
