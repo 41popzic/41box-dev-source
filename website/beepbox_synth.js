@@ -1261,6 +1261,7 @@ var beepbox = (function (exports) {
         { name: "grainSize", computeIndex: 53, displayName: "grain size", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainRange", computeIndex: 54, displayName: "grain range", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: 55, displayName: "echo delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
+        { name: "flangerMix", computeIndex: 56, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15, compatibleInstruments: null },
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: _a.sineWave },
@@ -1401,6 +1402,8 @@ var beepbox = (function (exports) {
             promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
         { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: _a.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: 16, maxIndex: _a.maxEnvelopeCount - 1,
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
+        { name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: _a.flangerMixRange - 1, newNoteVol: Math.ceil((_a.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: 0,
+            promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -5529,6 +5532,7 @@ var beepbox = (function (exports) {
                         vol = this.tempo - Config.modulators[tempoIndex].convertRealFactor;
                     if (!Config.modulators[currentIndex].forSong && instrument.modInstruments[modCount] < this.channels[instrument.modChannels[modCount]].instruments.length) {
                         let chorusIndex = Config.modulators.dictionary["chorus"].index;
+                        let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
                         let reverbIndex = Config.modulators.dictionary["reverb"].index;
                         let panningIndex = Config.modulators.dictionary["pan"].index;
                         let panDelayIndex = Config.modulators.dictionary["pan delay"].index;
@@ -5593,6 +5597,9 @@ var beepbox = (function (exports) {
                                 break;
                             case echoIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoSustain - Config.modulators[echoIndex].convertRealFactor;
+                                break;
+                            case flangerMixIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].flangerMix - Config.modulators[flangerMixIndex].convertRealFactor;
                                 break;
                             case echoDelayIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoDelay - Config.modulators[echoDelayIndex].convertRealFactor;
@@ -9768,7 +9775,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 56;
+            const length = 57;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -10584,6 +10591,7 @@ var beepbox = (function (exports) {
             this.flangerRate = 0.25;
             this.flangerFeedback = 1;
             this.flangerMix = 0;
+            this.flangerMixDelta = 0;
             this.spectrumWave = new SpectrumWaveState();
             this.harmonicsWave = new HarmonicsWaveState();
             this.drumsetSpectrumWaves = [];
@@ -11042,6 +11050,21 @@ var beepbox = (function (exports) {
                 this.chorusCombinedMult = chorusCombinedMultStart;
                 this.chorusCombinedMultDelta = (chorusCombinedMultEnd - chorusCombinedMultStart) / roundedSamplesPerTick;
             }
+            if (usesFlanger) {
+                const flangerMixEnvelopeStart = envelopeStarts[56];
+                const flangerMixEnvelopeEnd = envelopeEnds[56];
+                let useFlangerMixStart = instrument.flangerMix;
+                let useFlangerMixEnd = instrument.flangerMix;
+                if (synth.isModActive(Config.modulators.dictionary["flanger mix"].index, channelIndex, instrumentIndex)) {
+                    useFlangerMixStart = synth.getModValue(Config.modulators.dictionary["flanger mix"].index, channelIndex, instrumentIndex, false);
+                    useFlangerMixEnd = synth.getModValue(Config.modulators.dictionary["flanger mix"].index, channelIndex, instrumentIndex, true);
+                }
+                const flangerMixStart = Math.min(1.0, flangerMixEnvelopeStart * useFlangerMixStart / (Config.flangerMixRange - 1));
+                const flangerMixEnd = Math.min(1.0, flangerMixEnvelopeEnd * useFlangerMixEnd / (Config.flangerMixRange - 1));
+                this.flangerMix = flangerMixStart;
+                this.flangerMixDelta =
+                    (flangerMixEnd - flangerMixStart) / roundedSamplesPerTick;
+            }
             if (usesRingModulation) {
                 let useRingModStart = instrument.ringModulation;
                 let useRingModEnd = instrument.ringModulation;
@@ -11134,7 +11157,6 @@ var beepbox = (function (exports) {
                 this.flangerDepth = instrument.flangerDepth;
                 this.flangerRate = instrument.flangerRate;
                 this.flangerFeedback = instrument.flangerFeedback;
-                this.flangerMix = instrument.flangerMix / (Config.flangerMixRange - 1);
             }
             if (usesReverb) {
                 const reverbEnvelopeStart = envelopeStarts[47];
@@ -15272,6 +15294,7 @@ var beepbox = (function (exports) {
                     let flangerDelayPos = instrumentState.flangerDelayPos & flangerMask;
                     let flangerPhase = instrumentState.flangerPhase;
                     let flangerMix = +instrumentState.flangerMix;
+                    const flangerMixDelta = +instrumentState.flangerMixDelta;
                     let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
 
                     const flangerBaseDelay =
@@ -15612,8 +15635,10 @@ var beepbox = (function (exports) {
 
                         sampleL = sampleL * dryGain + flangerTapL * wetGain;
                         sampleR = sampleR * dryGain + flangerTapR * wetGain;
-
-                        flangerDelayPos = (flangerDelayPos + 1) & flangerMask;
+                        
+                        flangerMix += flangerMixDelta;
+                        
+                        flangerDelayPos = (flangerDelayPos + 1) & flangerMask;  
 
                         flangerPhase += flangerPhaseIncrement;
                         if (flangerPhase >= Math.PI * 2.0) {
@@ -15795,10 +15820,11 @@ var beepbox = (function (exports) {
                 }
                 if (usesFlanger) {
                     effectsSource += `
-                    Synth.sanitizeDelayLine(flangerDelayLineL, flangerDelayPos, flangerMask);
-                    Synth.sanitizeDelayLine(flangerDelayLineR, flangerDelayPos, flangerMask);
-                    instrumentState.flangerDelayPos = flangerDelayPos;
-                    instrumentState.flangerPhase = flangerPhase;
+
+                Synth.sanitizeDelayLine(flangerDelayLineL, flangerDelayPos, flangerMask);
+                Synth.sanitizeDelayLine(flangerDelayLineR, flangerDelayPos, flangerMask);
+                instrumentState.flangerDelayPos = flangerDelayPos;
+                instrumentState.flangerPhase = flangerPhase;
                 `;
                 }
                 if (usesEcho) {

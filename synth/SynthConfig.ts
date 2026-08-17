@@ -165,7 +165,11 @@ export const enum EnvelopeComputeIndex {
     //phaserFeedback,
     //phaserStages,
 
-
+    //flangerFeedback,
+    //flangerDelay,
+    //flangerDepth,
+    //flangerRate,
+    flangerMix,
 
     length,
 }
@@ -1853,6 +1857,8 @@ export class Config {
         { name: "phaserFeedback", computeIndex: EnvelopeComputeIndex.phaserFeedback, displayName: "phaser feedback",  perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         */
+        { name: "flangerMix", computeIndex: EnvelopeComputeIndex.flangerMix, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.flanger, compatibleInstruments: null },
+
 
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
@@ -2008,7 +2014,9 @@ export class Config {
             promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: Config.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: this.maxEnvelopeCount-1,
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
- ]);
+        {name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: Config.flangerMixRange - 1, newNoteVol: Math.ceil((Config.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: EffectType.flanger, maxIndex: 0, 
+            promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"]},
+        ]);
 }
 
 function centerWave(wave: Array<number>): Float32Array {

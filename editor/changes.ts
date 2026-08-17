@@ -4879,14 +4879,9 @@ export class ChangeEchoSustain extends ChangeInstrumentSlider {
 export class ChangeFlangerDelay extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
-
         this._instrument.flangerDelay = newValue;
-
-        // Don't use this yet if you haven't added the modulator.
-        // doc.synth.unsetMod(...);
-
+        //doc.synth.unsetMod(Config.modulators.dictionary["flanger delay"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
-
         if (oldValue != newValue) this._didSomething();
     }
 }
@@ -4904,11 +4899,9 @@ export class ChangeFlangerDepth extends ChangeInstrumentSlider {
 export class ChangeFlangerRate extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
-
         this._instrument.flangerRate = newValue;
-
+        //doc.synth.unsetMod(Config.modulators.dictionary["flanger rate"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
-
         if (oldValue != newValue) this._didSomething();
     }
 }
@@ -4917,7 +4910,7 @@ export class ChangeFlangerFeedback extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.flangerFeedback = newValue;
-        doc.synth.unsetMod(Config.modulators.dictionary["flanger feedback"].index, doc.channel, doc.getCurrentInstrument());
+        //doc.synth.unsetMod(Config.modulators.dictionary["flanger feedback"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
@@ -4927,7 +4920,7 @@ export class ChangeFlangerMix extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.flangerMix = newValue;
-        //doc.synth.unsetMod(/* flanger mix mod index */);
+        doc.synth.unsetMod(Config.modulators.dictionary["flanger mix"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

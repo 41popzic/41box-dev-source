@@ -3322,6 +3322,7 @@ export class Song {
             //for effects and envelopes, use the user defined value of the selected instrument (or the default value if all or active is selected)
             if (!Config.modulators[currentIndex].forSong && instrument.modInstruments[modCount] < this.channels[instrument.modChannels[modCount]].instruments.length) {
                 let chorusIndex: number = Config.modulators.dictionary["chorus"].index;
+                let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
                 let reverbIndex: number = Config.modulators.dictionary["reverb"].index;
                 let panningIndex: number = Config.modulators.dictionary["pan"].index;
                 let panDelayIndex: number = Config.modulators.dictionary["pan delay"].index;
@@ -3387,6 +3388,9 @@ export class Song {
                         break;
                     case echoIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoSustain - Config.modulators[echoIndex].convertRealFactor;
+                        break;
+                    case flangerMixIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].flangerMix - Config.modulators[flangerMixIndex].convertRealFactor;
                         break;
                     case echoDelayIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoDelay - Config.modulators[echoDelayIndex].convertRealFactor;
@@ -8765,6 +8769,7 @@ class InstrumentState {
     public flangerRate: number = 0.25;
     public flangerFeedback: number = 1;
     public flangerMix: number = 0;
+    public flangerMixDelta: number = 0;
 
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
@@ -9336,6 +9341,43 @@ class InstrumentState {
             this.chorusCombinedMult = chorusCombinedMultStart;
             this.chorusCombinedMultDelta = (chorusCombinedMultEnd - chorusCombinedMultStart) / roundedSamplesPerTick;
         }
+      
+        if (usesFlanger) {
+            const flangerMixEnvelopeStart = envelopeStarts[EnvelopeComputeIndex.flangerMix];
+            const flangerMixEnvelopeEnd = envelopeEnds[EnvelopeComputeIndex.flangerMix];
+        
+            let useFlangerMixStart: number = instrument.flangerMix;
+            let useFlangerMixEnd: number = instrument.flangerMix;
+        
+            if (synth.isModActive(Config.modulators.dictionary["flanger mix"].index, channelIndex, instrumentIndex)) {
+                useFlangerMixStart = synth.getModValue(
+                    Config.modulators.dictionary["flanger mix"].index,
+                    channelIndex,
+                    instrumentIndex,
+                    false
+                );
+                useFlangerMixEnd = synth.getModValue(
+                    Config.modulators.dictionary["flanger mix"].index,
+                    channelIndex,
+                    instrumentIndex,
+                    true
+                );
+            }
+        
+            const flangerMixStart = Math.min(
+                1.0,
+                flangerMixEnvelopeStart * useFlangerMixStart / (Config.flangerMixRange - 1)
+            );
+        
+            const flangerMixEnd = Math.min(
+                1.0,
+                flangerMixEnvelopeEnd * useFlangerMixEnd / (Config.flangerMixRange - 1)
+            );
+        
+            this.flangerMix = flangerMixStart;
+            this.flangerMixDelta =
+                (flangerMixEnd - flangerMixStart) / roundedSamplesPerTick;
+        }
 
         if (usesRingModulation) {
             let useRingModStart: number = instrument.ringModulation;
@@ -9522,7 +9564,7 @@ class InstrumentState {
             this.flangerDepth = instrument.flangerDepth       
             this.flangerRate = instrument.flangerRate    
             this.flangerFeedback = instrument.flangerFeedback
-            this.flangerMix = instrument.flangerMix / (Config.flangerMixRange - 1);
+            //this.flangerMix = instrument.flangerMix / (Config.flangerMixRange - 1);
         }
 
         if (usesReverb) {
@@ -14330,6 +14372,7 @@ if (playSong && !this.countInMetronome) {
                     let flangerDelayPos = instrumentState.flangerDelayPos & flangerMask;
                     let flangerPhase = instrumentState.flangerPhase;
                     let flangerMix = +instrumentState.flangerMix;
+                    const flangerMixDelta = +instrumentState.flangerMixDelta;
                     let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
 
                     const flangerBaseDelay =
@@ -14702,8 +14745,10 @@ if (playSong && !this.countInMetronome) {
 
                         sampleL = sampleL * dryGain + flangerTapL * wetGain;
                         sampleR = sampleR * dryGain + flangerTapR * wetGain;
-
-                        flangerDelayPos = (flangerDelayPos + 1) & flangerMask;
+                        
+                        flangerMix += flangerMixDelta;
+                        
+                        flangerDelayPos = (flangerDelayPos + 1) & flangerMask;  
 
                         flangerPhase += flangerPhaseIncrement;
                         if (flangerPhase >= Math.PI * 2.0) {
@@ -14915,10 +14960,11 @@ if (playSong && !this.countInMetronome) {
 
             if (usesFlanger) {
                 effectsSource += `
-                    Synth.sanitizeDelayLine(flangerDelayLineL, flangerDelayPos, flangerMask);
-                    Synth.sanitizeDelayLine(flangerDelayLineR, flangerDelayPos, flangerMask);
-                    instrumentState.flangerDelayPos = flangerDelayPos;
-                    instrumentState.flangerPhase = flangerPhase;
+
+                Synth.sanitizeDelayLine(flangerDelayLineL, flangerDelayPos, flangerMask);
+                Synth.sanitizeDelayLine(flangerDelayLineR, flangerDelayPos, flangerMask);
+                instrumentState.flangerDelayPos = flangerDelayPos;
+                instrumentState.flangerPhase = flangerPhase;
                 `
             }
 

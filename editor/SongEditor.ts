@@ -2403,6 +2403,8 @@ export class SongEditor {
                 return this._pitchShiftSlider;
             case Config.modulators.dictionary["chorus"].index:
                 return this._chorusSlider;
+            case Config.modulators.dictionary["flanger mix"].index:
+                return this._flangerMixSlider;
             case Config.modulators.dictionary["echo"].index:
                 return this._echoSustainSlider;
             case Config.modulators.dictionary["echo delay"].index:
@@ -3670,13 +3672,13 @@ export class SongEditor {
                                 anyInstrumentPans = true;
                             }
                             else {
-                                allInstrumentFlanger = false;
+                                allInstrumentPans = false;
                             }
                             if (effectsIncludeFlanger(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentFlanger = true;
                             }
                             else {
-                                allInstrumentPans = false;
+                               allInstrumentFlanger = false;
                             }
                             if (effectsIncludeChorus(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentChorus = true;
@@ -3815,12 +3817,10 @@ export class SongEditor {
                             unusedSettingList.push("+ pan delay");
                         }
                         if (anyInstrumentFlanger) {
-                            settingList.push("flanger");
-                            settingList.push("flanger delay");
+                            settingList.push("flanger mix");
                         }
                         if (!allInstrumentFlanger) {
-                            unusedSettingList.push("+ flanger");
-                            unusedSettingList.push("+ flanger delay");
+                            unusedSettingList.push("+ flanger mix");
                         }
                         if (anyInstrumentChorus) {
                             settingList.push("chorus");

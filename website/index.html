@@ -109,7 +109,7 @@
             cursor: pointer;
             padding: 0;
             margin: 0;
-        } 
+        }
 
         /* wide screen */
 		@media (min-width: 711px) {
@@ -174,13 +174,13 @@
 
             <h1>
                 <font id="sbtitle">41Box</font>
-                
+
                 <script>
                 const sounds = [
                     "mixkit-cartoon-quick-splat-2890.wav",
                     "freesound_community-fart-83471.mp3"
                 ];
-                
+
                 const chance = 0.03; // 3% Chance
 
                 const title = document.getElementById("sbtitle");
@@ -196,7 +196,7 @@
                 <span id="plant" style="display: inline; color:#b48d29"></span>
                 <!-- <span id="plant" style="display: inline; color: var(--plant-color, var(--link-accent, #62a13b));"></span> -->
             </h1>
-            
+
             <p id="introduction">
                 41Box is a mod of Slarmoo's Box that intends to add unseen features on other mods.
             </p>
@@ -211,7 +211,7 @@
             </p>
             <p> If you've created a song you like, but it has corrupted because of 41Box's updates, change the URL domain to an older archived version of 41Box, as this will take you to the older version where the song is supported. (Just replace 41box-app with 41box-older_version!)</p>
     <div class="donation">
-        BeepBox is a passion project, and will always be free to use. If you find it valuable and have the means, please feel free to show your gratitude to the original creator of Beepbox here: 
+        BeepBox is a passion project, and will always be free to use. If you find it valuable and have the means, please feel free to show your gratitude to the original creator of Beepbox here:
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
             <input type="hidden" name="cmd" value="_donations" />
             <input type="hidden" name="business" value="QZJTX9GRYEV9N" />
@@ -231,7 +231,7 @@
                     <p>
                         You can add or remove notes by clicking on the gray rows at the top.
                         41Box automatically plays the notes out loud for you. Try it!
-		
+
                     </p>
                     <p>
                         Notes go into patterns, and you can edit one pattern at a time.
@@ -288,7 +288,7 @@
                             <li><b>Alt E</b>: open/close all envelope dropdowns</li>
                             <li><b>Alt F</b>: open/close all fm dropdowns</li>
                         </ul>
-                        If you have channel muting enabled: 
+                        If you have channel muting enabled:
                         <ul>
                             <li><b>S</b>: Solo/unsolo a channel</li>
                             <li><b>M</b> (or shift S): Mute/unmute a channel</li>
@@ -388,9 +388,9 @@
     <script type="text/javascript">
 
         // Randomize display of header
-        
+
         const plants = [
-        /*"🍂", "🌿", "🌺", "🍃", 
+        /*"🍂", "🌿", "🌺", "🍃",
         "🍄", "🍀🌷", "🌈🍂🍁🍀🌷🍄🐲🌈🍃🌺🍄",
         "🪱",
         "🐟",
@@ -465,7 +465,7 @@
             const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", "🎂", "🎉", "Happy Birthday!", "Anniversary"];
             document.getElementById("plant").innerHTML = "  " + birthdayPlants[(Math.floor(Math.random() * birthdayPlants.length))];
         }
-        
+
 
         if(Math.random() * 10000 < 1) {
             document.getElementById("plant").addEventListener("click", function (event) {
@@ -480,7 +480,7 @@
             document.getElementById("plant").addEventListener("mouseover", function (event) {
                 document.getElementById("plant").innerText = " 🌈🍂🍁🍀🌷🍄🐍🌈🍃🌺🍄";
             }, { once: true })
-        } 
+        }
 
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
             document.getElementById("introduction").innerHTML = "41Box is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then sketch a lil' tune, and press the play button!";
