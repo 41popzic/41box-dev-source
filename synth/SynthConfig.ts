@@ -158,7 +158,6 @@ export const enum EnvelopeComputeIndex {
     grainSize,
     grainRange,
     echoDelay,
-    //Add more here
 
     //phaserFreq,
     //phaserMix,
@@ -170,6 +169,8 @@ export const enum EnvelopeComputeIndex {
     //flangerDepth,
     //flangerRate,
     flangerMix,
+
+    //Add more here
 
     length,
 }
@@ -924,6 +925,7 @@ export class Config {
         { group: "Exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
         { group: "Exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
         { group: "Exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
+        { group: "Exotic", name: "Blues Phrygian", realName:"blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }, // Blues Phrygian, custom scale made for 41Box 1.3
         { group: "Hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
         { group: "Hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
         { group: "Hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true,false, false, true, false, true, false, false] }, // Blues Major
@@ -936,10 +938,9 @@ export class Config {
         // todbox
         { group: "Misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "Misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "Misc", name: "whatdafuck", realName:"buh", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
+        { group: "Misc", name: "buh", realName:"whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "Misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
     ]);
-    
     public static readonly keys: DictionaryArray<Key> = toNameMap([
         { name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.
         { name: "C♯", isWhiteKey: false, basePitch: 13 },
@@ -989,7 +990,6 @@ export class Config {
     public static readonly flangerRateRange = 56;
     public static readonly flangerFeedbackRange = 32;
     public static readonly flangerMixRange = 51;
-    // haha no mins for you
     public static readonly beatsPerBarMin: number = 1;
     public static readonly beatsPerBarMax: number = 64;
     public static readonly barCountMin: number = 1;

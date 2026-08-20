@@ -43,6 +43,7 @@ export class PatternEditor {
     private readonly _svgBackground: SVGRectElement;
     private _svgNoteContainer: SVGSVGElement;
     private readonly _svgPlayhead: SVGRectElement;
+    private readonly _svgBeathead: SVGRectElement;
     private readonly _selectionRect: SVGRectElement;
     private readonly _svgPreview: SVGPathElement;
     public modDragValueLabel: HTMLDivElement;
@@ -99,7 +100,6 @@ export class PatternEditor {
     private _cursor: PatternCursor = new PatternCursor();
     private _stashCursorPinVols: number[][] = [];
     private _pattern: Pattern | null = null;
-    private _playheadX: number = 0.0;
     private _octaveOffset: number = 0;
     private _renderedWidth: number = -1;
     private _renderedHeight: number = -1;
@@ -124,6 +124,7 @@ export class PatternEditor {
         this._svgBackground = SVG.rect({ x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
         this._svgNoteContainer = SVG.svg();
         this._svgPlayhead = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
+        this._svgBeathead = SVG.rect({ fill: ColorConfig.playhead, "fill-opacity": 0.10, stroke: ColorConfig.playhead, "stroke-opacity": 0.20, "stroke-width": 2, "pointer-events": "none", x: 0, y: 0});
         this._selectionRect = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden" });
         this._svgPreview = SVG.path({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": "2", "pointer-events": "none" });
         this.modDragValueLabel = HTML.div({ width: "90", "text-anchor": "start", contenteditable: "true", style: "display: flex, justify-content: center; align-items:center; position:absolute; pointer-events: none;", "dominant-baseline": "central", });
@@ -137,6 +138,7 @@ export class PatternEditor {
             this._selectionRect,
             this._svgNoteContainer,
             this._svgPreview,
+            this._svgBeathead,
             this._svgPlayhead,
         );
         this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
@@ -662,8 +664,9 @@ export class PatternEditor {
         const playheadBar: number = Math.floor(this._doc.synth.playhead);
         const noteFlashElements: NodeListOf<SVGPathElement> = this._svgNoteContainer.querySelectorAll('.note-flash');
 
-        if (this._doc.synth.playing && ((this._pattern != null && this._doc.song.getPattern(this._doc.channel, Math.floor(this._doc.synth.playhead)) == this._pattern) || Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset)) {
+        if (this._doc.synth.playing && Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset) {
             this._svgPlayhead.setAttribute("visibility", "visible");
+            this._svgBeathead.setAttribute("visibility", "visible");
             const modPlayhead: number = this._doc.synth.playhead - playheadBar;
 
             // note flash
@@ -679,14 +682,37 @@ export class PatternEditor {
                 }
             }
 
-            if (Math.abs(modPlayhead - this._playheadX) > 0.1) {
-                this._playheadX = modPlayhead;
-            } else {
-                this._playheadX += (modPlayhead - this._playheadX) * 0.2;
-            }
-            this._svgPlayhead.setAttribute("x", "" + prettyNumber(this._playheadX * this._editorWidth - 2));
+            const localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
+
+            this._svgPlayhead.style.willChange = "transform";
+            this._svgPlayhead.style.transform = `translateX(${localPlayhead * this._editorWidth - 2}px)`;
+
+            const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
+
+            const beatProgress = (localPlayhead * this._doc.song.beatsPerBar) % 1;
+
+            const fadeOpacity = 1 - beatProgress;
+
+            this._svgBeathead.setAttribute(
+                "fill-opacity",
+                String(0.10 * fadeOpacity)
+            );
+
+            this._svgBeathead.setAttribute(
+                "stroke-opacity",
+                String(0.20 * fadeOpacity)
+            );
+
+            this._svgBeathead.setAttribute("visibility", "visible");
+
+            const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
+
+            this._svgBeathead.style.willChange = "transform";
+            this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;
         } else {
             this._svgPlayhead.setAttribute("visibility", "hidden");
+
+            this._svgBeathead.setAttribute("visibility", "hidden");
 
             // dogeiscut: lazy fix boohoo
             for (var i = 0; i < noteFlashElements.length; i++) {
@@ -1881,16 +1907,41 @@ export class PatternEditor {
                 // a drag follows, so we couldn't add the note yet without being
                 // confusing.
 
-                const note: Note = new Note(this._cursor.pitch, this._cursor.start, this._cursor.end, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.channel));
+                const note: Note = new Note(
+                    this._cursor.pitch,
+                    this._cursor.start,
+                    this._cursor.end,
+                    Config.noteSizeMax,
+                    this._doc.song.getChannelIsNoise(this._doc.channel)
+                );
+
                 note.pins = [];
+
                 for (const oldPin of this._cursor.pins) {
                     note.pins.push(makeNotePin(0, oldPin.time, oldPin.size));
                 }
-                sequence.append(new ChangeEnsurePatternExists(this._doc, this._doc.channel, this._doc.bar));
-                const pattern: Pattern | null = this._doc.getCurrentPattern(this._barOffset);
-                if (pattern == null) throw new Error();
-                sequence.append(new ChangeNoteAdded(this._doc, pattern, note, this._cursor.curIndex));
 
+                const currentBar =
+                    (this._doc.bar + this._barOffset + this._doc.song.barCount) %
+                    this._doc.song.barCount;
+
+                sequence.append(new ChangeEnsurePatternExists(
+                    this._doc,
+                    this._doc.channel,
+                    currentBar
+                ));
+
+                const pattern: Pattern | null =
+                    this._doc.getCurrentPattern(this._barOffset);
+
+                if (pattern == null) throw new Error();
+
+                sequence.append(new ChangeNoteAdded(
+                    this._doc,
+                    pattern,
+                    note,
+                    this._cursor.curIndex
+                ));
                 if (this._doc.prefs.enableNotePreview && !this._doc.synth.playing) {
                     // Play the new note out loud if enabled.
                     const duration: number = Math.min(Config.partsPerBeat, this._cursor.end - this._cursor.start);
@@ -2558,6 +2609,8 @@ export class PatternEditor {
             this._svgBackground.setAttribute("width", "" + this._editorWidth);
             this._svgBackground.setAttribute("height", "" + this._editorHeight);
             this._svgPlayhead.setAttribute("height", "" + this._editorHeight);
+            this._svgBeathead.setAttribute("width", "" + (this._editorWidth / this._doc.song.beatsPerBar));
+            this._svgBeathead.setAttribute("height", "" + this._editorHeight);
             this._selectionRect.setAttribute("y", "0");
             this._selectionRect.setAttribute("height", "" + this._editorHeight);
         }

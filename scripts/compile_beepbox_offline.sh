@@ -22,7 +22,7 @@ npx terser \
 	--compress \
     --define OFFLINE=true \
 	--mangle \
-	--mangle-props regex="/^_.+/;"
+	--mangle-props regex="/^_(?!_*FLAC).+/;" #don't mangle stuff from the flac module, as that breaks wasm indexing stuff
 
 # Compile player/main.ts into build/player/main.js and dependencies
 npx tsc -p tsconfig_player.json

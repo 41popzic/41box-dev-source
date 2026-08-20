@@ -8,7 +8,7 @@ import { ColorConfig } from "./ColorConfig";
 import { Piano } from "./Piano";
 
 export class OctaveScrollBar {
-    private readonly _editorWidth: number = 20;
+    private readonly _editorWidth: number = 18;
     private readonly _editorHeight: number = 481;
     private readonly _notchHeight: number = 4.0;
     private readonly _octaveCount: number = Config.pitchOctaves;

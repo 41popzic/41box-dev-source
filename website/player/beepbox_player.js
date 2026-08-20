@@ -500,6 +500,7 @@ var beepbox = (function (exports) {
         { group: "Exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] },
         { group: "Exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] },
         { group: "Exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] },
+        { group: "Exotic", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] },
         { group: "Hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] },
         { group: "Hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] },
         { group: "Hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true, false, false, true, false, true, false, false] },
@@ -509,7 +510,7 @@ var beepbox = (function (exports) {
         { group: "Misc", name: "No Dabbing (MB)", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
         { group: "Misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "Misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "Misc", name: "whatdafuck", realName: "buh", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
+        { group: "Misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "Misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
     ]);
     Config.keys = toNameMap([
@@ -18418,7 +18419,7 @@ var beepbox = (function (exports) {
                             }
                         }
                         else {
-                            const parseOldSyntax = beforeThree;
+                            const parseOldSyntax = beforeThree && fromUltraBox;
                             const ok = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                             if (!ok) {
                                 continue;

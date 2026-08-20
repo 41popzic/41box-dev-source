@@ -17,24 +17,21 @@ export class TrackEditor {
     );
     private readonly _channelRowContainer: HTMLElement = HTML.div({ style: `display: flex; flex-direction: column; padding-top: ${Config.barEditorHeight}px` });
     private readonly _barNumberContainer: SVGGElement = SVG.g();
-    private readonly _playhead: SVGRectElement = SVG.rect({ fill: ColorConfig.playhead, x: 0, y: 0, width: 4, height: 128 });
+    private readonly _beathead: SVGRectElement = SVG.rect({ fill: ColorConfig.playhead, "fill-opacity": 0.10, stroke: ColorConfig.playhead, "stroke-opacity": 0.20, "stroke-width": 2, "pointer-events": "none", x: 0, y: 0, width: 32, height: 128});
     private readonly _boxHighlight: SVGRectElement = SVG.rect({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": 2, "pointer-events": "none", x: 1, y: 1, width: 30, height: 30 });
     private readonly _upHighlight: SVGPathElement = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
     private readonly _downHighlight: SVGPathElement = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
     private readonly _barEditorPath: SVGPathElement = SVG.path({ fill: ColorConfig.uiWidgetBackground, stroke: ColorConfig.uiWidgetBackground, "stroke-width": 1, "pointer-events": "none" });
     private readonly _selectionRect: SVGRectElement = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden", x: 1, y: 1, width: 62, height: 62 });
-    private readonly _barHighlight: SVGRectElement =
-    SVG.rect({ fill: ("white"), opacity: 0.07, x: 0, y: 0, width: 10, height: 10 });
     private readonly _svg: SVGSVGElement = SVG.svg({ style: `position: absolute; top: 0;` },
     
-        //this._barHighlight,
         this._barEditorPath,
         this._selectionRect,
         this._barNumberContainer,
         this._boxHighlight,
         this._upHighlight,
         this._downHighlight,
-        this._playhead,
+        this._beathead,
     );
     private readonly _select: HTMLSelectElement = HTML.select({ class: "trackSelectBox", style: "background: none; border: none; appearance: none; border-radius: initial; box-shadow: none; color: transparent; position: absolute; touch-action: none;" });
     public readonly container: HTMLElement = HTML.div({ class: "noSelection", style: `background-color: ${ColorConfig.editorBackground}; position: relative; overflow: hidden;` },
@@ -160,11 +157,17 @@ export class TrackEditor {
     }
 
     private _animatePlayhead = (timestamp: number): void => {
-        const playhead = (this._barWidth * this._doc.synth.playhead - 2);
-        if (this._renderedPlayhead != playhead) {
-            this._renderedPlayhead = playhead;
-            this._playhead.setAttribute("x", "" + playhead);
+        const playheadBar = Math.floor(this._doc.synth.playhead);
+
+        if (this._renderedPlayhead != playheadBar) {
+            this._renderedPlayhead = playheadBar;
+
+            this._beathead.setAttribute(
+                "x",
+                "" + (playheadBar * this._barWidth)
+            );
         }
+
         window.requestAnimationFrame(this._animatePlayhead);
     }
 
@@ -373,15 +376,7 @@ export class TrackEditor {
         this._renderedPatternCount = patternCount;
         const selectedPattern: number = this._doc.song.channels[this._doc.channel].bars[this._doc.bar];
         if (this._select.selectedIndex != selectedPattern) this._select.selectedIndex = selectedPattern;
-    
-        const barWidth = this._barWidth;
-
-this._barHighlight.setAttribute("x", "" + (this._doc.bar * barWidth));
-this._barHighlight.setAttribute("y", "0");
-this._barHighlight.setAttribute("width", "" + barWidth);
-this._barHighlight.setAttribute("height", "" + (Config.barEditorHeight + this._doc.song.getChannelCount() * ChannelRow.patternHeight));
-this._barHighlight.style.visibility = "visible";
-this._barHighlight.style.color = "255,255,255,0.07"    }
+    }
 
 
     public render(): void {
@@ -471,7 +466,7 @@ this._barHighlight.style.color = "255,255,255,0.07"    }
         if (this._renderedEditorHeight != editorHeight) {
             this._renderedEditorHeight = editorHeight;
             this._svg.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
-            this._playhead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
+            this._beathead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
             this.container.style.height = (editorHeight + Config.barEditorHeight) + "px";
         }
 

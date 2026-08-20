@@ -514,6 +514,7 @@ var beepbox = (function (exports) {
         { group: "Exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] },
         { group: "Exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] },
         { group: "Exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] },
+        { group: "Exotic", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] },
         { group: "Hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] },
         { group: "Hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] },
         { group: "Hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true, false, false, true, false, true, false, false] },
@@ -523,7 +524,7 @@ var beepbox = (function (exports) {
         { group: "Misc", name: "No Dabbing (MB)", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
         { group: "Misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "Misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "Misc", name: "whatdafuck", realName: "buh", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
+        { group: "Misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "Misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
     ]);
     Config.keys = toNameMap([
@@ -20311,7 +20312,7 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                         }
                         else {
-                            const parseOldSyntax = beforeThree;
+                            const parseOldSyntax = beforeThree && fromUltraBox;
                             const ok = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                             if (!ok) {
                                 continue;
@@ -31596,7 +31597,8 @@ li.select2-results__option[role=group] > strong:hover {
             this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
             this.showLetters = window.localStorage.getItem("showLetters") != "false";
             this.showChannels = window.localStorage.getItem("showChannels") == "true";
-            this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
+            window.localStorage.removeItem("showScrollBar");
+            this.showScrollBar = true;
             this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
             this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
             this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
@@ -31630,7 +31632,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.selectiveRandom.fromJsonObject(JSON.parse(window.localStorage.getItem("selectiveRandom") || "{}"));
             this.selectivePaste.fromJsonObject(JSON.parse(window.localStorage.getItem("selectivePaste") || "{}"));
             const defaultScale = Config.scales.dictionary[window.localStorage.getItem("defaultScale")];
-            this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
+            this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 16;
             if (window.localStorage.getItem("volume") != null) {
                 this.volume = Math.min(window.localStorage.getItem("volume") >>> 0, 75);
             }
@@ -31651,7 +31653,7 @@ li.select2-results__option[role=group] > strong:hover {
             window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
             window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
             window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
-            window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
+            window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "true");
             window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
             window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
             window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");
@@ -39426,13 +39428,12 @@ li.select2-results__option[role=group] > strong:hover {
             this._formatSelect = select$c({ style: "width: 100%;" }, option$c({ value: "wav" }, "Export as .wav"), option$c({ value: "mp3" }, "Export as .mp3"), option$c({ value: "midi" }, "Export as .mid"), option$c({ value: "json" }, "Export as .json"), option$c({ value: "html" }, "Export as .html"));
             this._removeWhitespace = input$h({ type: "checkbox" });
             this._removeWhitespaceDiv = div$p({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
-            this._oggWarning = div$p({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. IOS is an example of this, exporting is still possible, but playback is not.");
             this._cancelButton = button$p({ class: "cancelButton" });
             this._exportButton = button$p({ class: "exportButton", style: "width:45%;" }, "Export");
             this._outputProgressBar = div$p({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
             this._outputProgressLabel = div$p({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
             this._outputProgressContainer = div$p({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1; margin-bottom: 14px;` }, this._outputProgressBar, this._outputProgressLabel);
-            this._exportPrompt = div$p({}, div$p({ class: "promptTitle", style: "margin-bottom: 14px;" }, h2$o({ class: "exportExt", style: "text-align: inherit;" }, ""), h2$o({ class: "exportTitle" }, "Export Options")), div$p({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "File name:", this._fileName), div$p({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Length:", this._computedSamplesLabel), div$p({ style: "display: table; width: 100%; margin-bottom: 14px;" }, div$p({ style: "display: table-row;" }, div$p({ style: "display: table-cell;" }, "Intro:"), div$p({ style: "display: table-cell;" }, "Loop Count:"), div$p({ style: "display: table-cell;" }, "Outro:")), div$p({ style: "display: table-row; margin-bottom: 14px;" }, div$p({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$p({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$p({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), div$p({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect), this._removeWhitespaceDiv, this._oggWarning, div$p({ style: "text-align: left; margin-bottom: 14px;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$p({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-bottom: 14px;" }, this._exportButton), this._cancelButton);
+            this._exportPrompt = div$p({}, div$p({ class: "promptTitle", style: "margin-bottom: 14px;" }, h2$o({ class: "exportExt", style: "text-align: inherit;" }, ""), h2$o({ class: "exportTitle" }, "Export Options")), div$p({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "File name:", this._fileName), div$p({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Length:", this._computedSamplesLabel), div$p({ style: "display: table; width: 100%; margin-bottom: 14px;" }, div$p({ style: "display: table-row;" }, div$p({ style: "display: table-cell;" }, "Intro:"), div$p({ style: "display: table-cell;" }, "Loop Count:"), div$p({ style: "display: table-cell;" }, "Outro:")), div$p({ style: "display: table-row; margin-bottom: 14px;" }, div$p({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$p({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$p({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), div$p({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect), this._removeWhitespaceDiv, div$p({ style: "text-align: left; margin-bottom: 14px;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$p({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-bottom: 14px;" }, this._exportButton), this._cancelButton);
             this.container = div$p({ class: "prompt noSelection", style: "width: 200px;" }, this._exportPrompt);
             this._close = () => {
                 if (this.synth != null)
@@ -39465,10 +39466,6 @@ li.select2-results__option[role=group] > strong:hover {
                     case "mp3":
                         this.outputStarted = true;
                         this._exportTo("mp3");
-                        break;
-                    case "ogg":
-                        this.outputStarted = true;
-                        this._exportTo("ogg");
                         break;
                     case "midi":
                         this.outputStarted = true;
@@ -39515,12 +39512,6 @@ li.select2-results__option[role=group] > strong:hover {
             }
             else {
                 this._removeWhitespaceDiv.style.display = "none";
-            }
-            if (this._formatSelect.value == "ogg") {
-                this._oggWarning.style.display = "block";
-            }
-            else {
-                this._oggWarning.style.display = "none";
             }
             this._fileName.select();
             setTimeout(() => this._fileName.focus());
@@ -39599,9 +39590,6 @@ li.select2-results__option[role=group] > strong:hover {
                 else if (this.thenExportTo == "mp3") {
                     this._exportToMp3Finish();
                 }
-                else if (this.thenExportTo == "ogg") {
-                    this._exportToOgg();
-                }
                 else {
                     throw new Error("Unrecognized file export type chosen!");
                 }
@@ -39618,9 +39606,6 @@ li.select2-results__option[role=group] > strong:hover {
                 this.synth.samplesPerSecond = 48000;
             }
             else if (type == "mp3") {
-                this.synth.samplesPerSecond = 44100;
-            }
-            else if (type == "ogg") {
                 this.synth.samplesPerSecond = 44100;
             }
             else {
@@ -39734,22 +39719,6 @@ li.select2-results__option[role=group] > strong:hover {
                 script.src = "https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js";
                 script.onload = whenEncoderIsAvailable;
                 document.head.appendChild(script);
-            }
-        }
-        _exportToOgg() {
-            const whenEncoderIsAvailable = () => {
-                const libopusEncoder = window["opus-encdec"];
-                console.log("Is libopusEcoder? " + libopusEncoder);
-            };
-            if ("opus-encdec" in window) {
-                whenEncoderIsAvailable();
-            }
-            else {
-                var script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40/dist/libopus-encoder.js";
-                script.onload = whenEncoderIsAvailable;
-                document.head.appendChild(script);
-                console.log("Perhaps the other one failed? " + script);
             }
         }
         _exportToMidi() {
@@ -46100,7 +46069,7 @@ You should be redirected to the song at:<br /><br />
         constructor(_doc, _piano) {
             this._doc = _doc;
             this._piano = _piano;
-            this._editorWidth = 20;
+            this._editorWidth = 18;
             this._editorHeight = 481;
             this._notchHeight = 4.0;
             this._octaveCount = Config.pitchOctaves;
@@ -46718,7 +46687,6 @@ You should be redirected to the song at:<br /><br />
             this._cursor = new PatternCursor();
             this._stashCursorPinVols = [];
             this._pattern = null;
-            this._playheadX = 0.0;
             this._octaveOffset = 0;
             this._renderedWidth = -1;
             this._renderedHeight = -1;
@@ -46785,8 +46753,9 @@ You should be redirected to the song at:<br /><br />
                 }
                 const playheadBar = Math.floor(this._doc.synth.playhead);
                 const noteFlashElements = this._svgNoteContainer.querySelectorAll('.note-flash');
-                if (this._doc.synth.playing && ((this._pattern != null && this._doc.song.getPattern(this._doc.channel, Math.floor(this._doc.synth.playhead)) == this._pattern) || Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset)) {
+                if (this._doc.synth.playing && Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset) {
                     this._svgPlayhead.setAttribute("visibility", "visible");
+                    this._svgBeathead.setAttribute("visibility", "visible");
                     const modPlayhead = this._doc.synth.playhead - playheadBar;
                     for (var i = 0; i < noteFlashElements.length; i++) {
                         var element = noteFlashElements[i];
@@ -46800,16 +46769,22 @@ You should be redirected to the song at:<br /><br />
                             element.style.opacity = "0";
                         }
                     }
-                    if (Math.abs(modPlayhead - this._playheadX) > 0.1) {
-                        this._playheadX = modPlayhead;
-                    }
-                    else {
-                        this._playheadX += (modPlayhead - this._playheadX) * 0.2;
-                    }
-                    this._svgPlayhead.setAttribute("x", "" + prettyNumber(this._playheadX * this._editorWidth - 2));
+                    const localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
+                    this._svgPlayhead.style.willChange = "transform";
+                    this._svgPlayhead.style.transform = `translateX(${localPlayhead * this._editorWidth - 2}px)`;
+                    const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
+                    const beatProgress = (localPlayhead * this._doc.song.beatsPerBar) % 1;
+                    const fadeOpacity = 1 - beatProgress;
+                    this._svgBeathead.setAttribute("fill-opacity", String(0.10 * fadeOpacity));
+                    this._svgBeathead.setAttribute("stroke-opacity", String(0.20 * fadeOpacity));
+                    this._svgBeathead.setAttribute("visibility", "visible");
+                    const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
+                    this._svgBeathead.style.willChange = "transform";
+                    this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;
                 }
                 else {
                     this._svgPlayhead.setAttribute("visibility", "hidden");
+                    this._svgBeathead.setAttribute("visibility", "hidden");
                     for (var i = 0; i < noteFlashElements.length; i++) {
                         var element = noteFlashElements[i];
                         element.style.opacity = "0";
@@ -46955,10 +46930,11 @@ You should be redirected to the song at:<br /><br />
             this._svgBackground = SVG.rect({ x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
             this._svgNoteContainer = SVG.svg();
             this._svgPlayhead = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
+            this._svgBeathead = SVG.rect({ fill: ColorConfig.playhead, "fill-opacity": 0.10, stroke: ColorConfig.playhead, "stroke-opacity": 0.20, "stroke-width": 2, "pointer-events": "none", x: 0, y: 0 });
             this._selectionRect = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden" });
             this._svgPreview = SVG.path({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": "2", "pointer-events": "none" });
             this.modDragValueLabel = HTML.div({ width: "90", "text-anchor": "start", contenteditable: "true", style: "display: flex, justify-content: center; align-items:center; position:absolute; pointer-events: none;", "dominant-baseline": "central", });
-            this._svg = SVG.svg({ id: 'firstImage', style: `background-image: url(${getLocalStorageItem("customTheme", "")}); background-repeat: no-repeat; background-size: 100% 100%; background-color: ${ColorConfig.editorBackground}; touch-action: none; position: absolute;`, width: "100%", height: "100%" }, SVG.defs(this._svgNoteBackground, this._svgDrumBackground, this._svgModBackground), this._svgBackground, this._selectionRect, this._svgNoteContainer, this._svgPreview, this._svgPlayhead);
+            this._svg = SVG.svg({ id: 'firstImage', style: `background-image: url(${getLocalStorageItem("customTheme", "")}); background-repeat: no-repeat; background-size: 100% 100%; background-color: ${ColorConfig.editorBackground}; touch-action: none; position: absolute;`, width: "100%", height: "100%" }, SVG.defs(this._svgNoteBackground, this._svgDrumBackground, this._svgModBackground), this._svgBackground, this._selectionRect, this._svgNoteContainer, this._svgPreview, this._svgBeathead, this._svgPlayhead);
             this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
             for (let i = 0; i < Config.pitchesPerOctave; i++) {
                 const rectangle = SVG.rect();
@@ -48337,7 +48313,9 @@ You should be redirected to the song at:<br /><br />
                     for (const oldPin of this._cursor.pins) {
                         note.pins.push(makeNotePin(0, oldPin.time, oldPin.size));
                     }
-                    sequence.append(new ChangeEnsurePatternExists(this._doc, this._doc.channel, this._doc.bar));
+                    const currentBar = (this._doc.bar + this._barOffset + this._doc.song.barCount) %
+                        this._doc.song.barCount;
+                    sequence.append(new ChangeEnsurePatternExists(this._doc, this._doc.channel, currentBar));
                     const pattern = this._doc.getCurrentPattern(this._barOffset);
                     if (pattern == null)
                         throw new Error();
@@ -48861,6 +48839,8 @@ You should be redirected to the song at:<br /><br />
                 this._svgBackground.setAttribute("width", "" + this._editorWidth);
                 this._svgBackground.setAttribute("height", "" + this._editorHeight);
                 this._svgPlayhead.setAttribute("height", "" + this._editorHeight);
+                this._svgBeathead.setAttribute("width", "" + (this._editorWidth / this._doc.song.beatsPerBar));
+                this._svgBeathead.setAttribute("height", "" + this._editorHeight);
                 this._selectionRect.setAttribute("y", "0");
                 this._selectionRect.setAttribute("height", "" + this._editorHeight);
             }
@@ -49229,6 +49209,238 @@ You should be redirected to the song at:<br /><br />
         }
         _pitchToPixelHeight(pitch) {
             return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);
+        }
+    }
+
+    class PatternScrollBar {
+        constructor(_doc) {
+            this._doc = _doc;
+            this._editorHeight = 18;
+            this._barNotches = [];
+            this._notchHeight = 4;
+            this._handle = SVG.rect({
+                fill: ColorConfig.uiWidgetBackground,
+                y: 2,
+                height: this._editorHeight - 4,
+            });
+            this._handleHighlightTop = SVG.rect({
+                fill: ColorConfig.hoverPreview,
+                "pointer-events": "none",
+            });
+            this._handleHighlightBottom = SVG.rect({
+                fill: ColorConfig.hoverPreview,
+                "pointer-events": "none",
+            });
+            this._handleHighlightLeft = SVG.rect({
+                fill: ColorConfig.hoverPreview,
+                "pointer-events": "none",
+            });
+            this._handleHighlightRight = SVG.rect({
+                fill: ColorConfig.hoverPreview,
+                "pointer-events": "none",
+            });
+            this._svg = SVG.svg({
+                style: "background-color: " + ColorConfig.editorBackground +
+                    "; touch-action: pan-x; position: absolute;",
+                width: "100%",
+                height: this._editorHeight,
+                viewBox: "0 0 100 20",
+                preserveAspectRatio: "none",
+            });
+            this.container = HTML.div({
+                id: "patternScrollBarContainer",
+                style: "width: 100%; height: 20px; overflow: hidden; position: relative; flex-shrink: 0;",
+            }, this._svg);
+            this._mouseX = 0;
+            this._mouseDown = false;
+            this._mouseOver = false;
+            this._dragging = false;
+            this._dragStart = 0;
+            this._renderedBarCount = -1;
+            this._whenMouseOver = (event) => {
+                if (this._mouseOver)
+                    return;
+                this._mouseOver = true;
+                this._updatePreview();
+            };
+            this._whenMouseOut = (event) => {
+                if (!this._mouseOver)
+                    return;
+                this._mouseOver = false;
+                this._updatePreview();
+            };
+            this._whenMousePressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX =
+                    ((event.clientX || event.pageX) - boundingRect.left)
+                        * 100 / boundingRect.width;
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                this._updatePreview();
+                if (this._isMouseOverHandle()) {
+                    this._dragging = true;
+                    this._dragStart = this._mouseX;
+                }
+            };
+            this._whenTouchPressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX =
+                    (event.touches[0].clientX - boundingRect.left)
+                        * 100 / boundingRect.width;
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                this._updatePreview();
+                if (this._isMouseOverHandle()) {
+                    this._dragging = true;
+                    this._dragStart = this._mouseX;
+                }
+            };
+            this._whenMouseMoved = (event) => {
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX =
+                    ((event.clientX || event.pageX) - boundingRect.left)
+                        * 100 / boundingRect.width;
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                this._whenCursorMoved();
+            };
+            this._whenTouchMoved = (event) => {
+                if (!this._mouseDown)
+                    return;
+                event.preventDefault();
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX =
+                    (event.touches[0].clientX - boundingRect.left)
+                        * 100 / boundingRect.width;
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                this._whenCursorMoved();
+            };
+            this._whenCursorReleased = (event) => {
+                this._mouseDown = false;
+                this._dragging = false;
+                this._updatePreview();
+            };
+            this._documentChanged = () => {
+                const barCount = this._doc.song.barCount;
+                if (barCount !== this._renderedBarCount) {
+                    this._renderedBarCount = barCount;
+                    for (const notch of this._barNotches) {
+                        notch.remove();
+                    }
+                    this._barNotches.length = 0;
+                    if (barCount > 0) {
+                        for (let i = 0; i <= barCount; i++) {
+                            const notch = SVG.rect({
+                                fill: ColorConfig.tonic,
+                                x: i * (100 / barCount),
+                                y: 0,
+                                width: 0.4,
+                                height: this._editorHeight,
+                            });
+                            this._barNotches.push(notch);
+                            this._svg.insertBefore(notch, this._handleHighlightTop);
+                        }
+                    }
+                }
+                this._updateHandle();
+                this._updatePreview();
+            };
+            this._doc.notifier.watch(this._documentChanged);
+            this._svg.appendChild(this._handle);
+            for (let i = 0; i <= this._doc.song.barCount; i++) {
+                const notch = SVG.rect({
+                    fill: ColorConfig.tonic,
+                    x: i * (100 / Math.max(1, this._doc.song.barCount)),
+                    y: 0,
+                    width: 0.4,
+                    height: this._notchHeight,
+                });
+                this._barNotches.push(notch);
+                this._svg.appendChild(notch);
+            }
+            this._svg.appendChild(this._handleHighlightTop);
+            this._svg.appendChild(this._handleHighlightBottom);
+            this._svg.appendChild(this._handleHighlightLeft);
+            this._svg.appendChild(this._handleHighlightRight);
+            this._documentChanged();
+            this.container.addEventListener("mousedown", this._whenMousePressed);
+            document.addEventListener("mousemove", this._whenMouseMoved);
+            document.addEventListener("mouseup", this._whenCursorReleased);
+            this.container.addEventListener("mouseover", this._whenMouseOver);
+            this.container.addEventListener("mouseout", this._whenMouseOut);
+            this.container.addEventListener("touchstart", this._whenTouchPressed);
+            this.container.addEventListener("touchmove", this._whenTouchMoved);
+            this.container.addEventListener("touchend", this._whenCursorReleased);
+            this.container.addEventListener("touchcancel", this._whenCursorReleased);
+            this._dragStart = this._dragStart;
+        }
+        _whenCursorMoved() {
+            if (!this._dragging) {
+                if (this._mouseOver)
+                    this._updatePreview();
+                return;
+            }
+            const barCount = this._doc.song.barCount;
+            if (barCount <= 1)
+                return;
+            const bar = Math.max(0, Math.min(barCount - 1, Math.floor((this._mouseX / 100) * barCount)));
+            if (bar !== this._doc.bar) {
+                this._doc.selection.setChannelBar(this._doc.channel, bar);
+                this._doc.selection.resetBoxSelection();
+            }
+            this._updateHandle();
+        }
+        _updateHandle() {
+            const barCount = this._doc.song.barCount;
+            if (barCount <= 0)
+                return;
+            const barWidth = 100 / barCount;
+            const x = this._doc.bar * barWidth;
+            this._handle.setAttribute("x", String(x));
+            this._handle.setAttribute("width", String(barWidth));
+            const pixelWidth = this._svg.getBoundingClientRect().width;
+            const inset = pixelWidth > 0 ? (2 / pixelWidth) * 100 : 0;
+            const highlightWidth = Math.max(0, barWidth - inset * 2);
+            this._handleHighlightTop.setAttribute("x", String(x + inset));
+            this._handleHighlightTop.setAttribute("y", "0");
+            this._handleHighlightTop.setAttribute("width", String(highlightWidth));
+            this._handleHighlightTop.setAttribute("height", "2");
+            this._handleHighlightBottom.setAttribute("x", String(x + inset));
+            this._handleHighlightBottom.setAttribute("y", String(this._editorHeight - 2));
+            this._handleHighlightBottom.setAttribute("width", String(highlightWidth));
+            this._handleHighlightBottom.setAttribute("height", "2");
+            this._handleHighlightLeft.setAttribute("x", String(x));
+            this._handleHighlightLeft.setAttribute("y", "0");
+            this._handleHighlightLeft.setAttribute("width", String(inset));
+            this._handleHighlightLeft.setAttribute("height", String(this._editorHeight));
+            this._handleHighlightRight.setAttribute("x", String(x + barWidth - inset));
+            this._handleHighlightRight.setAttribute("y", "0");
+            this._handleHighlightRight.setAttribute("width", String(inset));
+            this._handleHighlightRight.setAttribute("height", String(this._editorHeight));
+        }
+        _isMouseOverHandle() {
+            const barCount = this._doc.song.barCount;
+            if (barCount <= 0)
+                return false;
+            const barWidth = 100 / barCount;
+            const x = this._doc.bar * barWidth;
+            return this._mouseX >= x &&
+                this._mouseX <= x + barWidth;
+        }
+        _updatePreview() {
+            const showHighlight = this._mouseOver && !this._mouseDown;
+            const visibility = showHighlight && this._isMouseOverHandle()
+                ? "inherit"
+                : "hidden";
+            this._handleHighlightTop.style.visibility = visibility;
+            this._handleHighlightBottom.style.visibility = visibility;
+            this._handleHighlightLeft.style.visibility = visibility;
+            this._handleHighlightRight.style.visibility = visibility;
         }
     }
 
@@ -51037,14 +51249,13 @@ You should be redirected to the song at:<br /><br />
             this._barDropDown = HTML.select({ style: "width: 32px; height: " + Config.barEditorHeight + "px; top: 0px; position: absolute; opacity: 0" }, HTML.option({ value: "barBefore" }, "Insert Bar Before"), HTML.option({ value: "barAfter" }, "Insert Bar After"), HTML.option({ value: "deleteBar" }, "Delete This Bar"));
             this._channelRowContainer = HTML.div({ style: `display: flex; flex-direction: column; padding-top: ${Config.barEditorHeight}px` });
             this._barNumberContainer = SVG.g();
-            this._playhead = SVG.rect({ fill: ColorConfig.playhead, x: 0, y: 0, width: 4, height: 128 });
+            this._beathead = SVG.rect({ fill: ColorConfig.playhead, "fill-opacity": 0.10, stroke: ColorConfig.playhead, "stroke-opacity": 0.20, "stroke-width": 2, "pointer-events": "none", x: 0, y: 0, width: 32, height: 128 });
             this._boxHighlight = SVG.rect({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": 2, "pointer-events": "none", x: 1, y: 1, width: 30, height: 30 });
             this._upHighlight = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
             this._downHighlight = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
             this._barEditorPath = SVG.path({ fill: ColorConfig.uiWidgetBackground, stroke: ColorConfig.uiWidgetBackground, "stroke-width": 1, "pointer-events": "none" });
             this._selectionRect = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden", x: 1, y: 1, width: 62, height: 62 });
-            this._barHighlight = SVG.rect({ fill: ("white"), opacity: 0.07, x: 0, y: 0, width: 10, height: 10 });
-            this._svg = SVG.svg({ style: `position: absolute; top: 0;` }, this._barEditorPath, this._selectionRect, this._barNumberContainer, this._boxHighlight, this._upHighlight, this._downHighlight, this._playhead);
+            this._svg = SVG.svg({ style: `position: absolute; top: 0;` }, this._barEditorPath, this._selectionRect, this._barNumberContainer, this._boxHighlight, this._upHighlight, this._downHighlight, this._beathead);
             this._select = HTML.select({ class: "trackSelectBox", style: "background: none; border: none; appearance: none; border-radius: initial; box-shadow: none; color: transparent; position: absolute; touch-action: none;" });
             this.container = HTML.div({ class: "noSelection", style: `background-color: ${ColorConfig.editorBackground}; position: relative; overflow: hidden;` }, this._channelRowContainer, this._svg, this._select, this._barDropDown);
             this._channels = [];
@@ -51096,10 +51307,10 @@ You should be redirected to the song at:<br /><br />
                 this._doc.selection.setPattern(this._select.selectedIndex);
             };
             this._animatePlayhead = (timestamp) => {
-                const playhead = (this._barWidth * this._doc.synth.playhead - 2);
-                if (this._renderedPlayhead != playhead) {
-                    this._renderedPlayhead = playhead;
-                    this._playhead.setAttribute("x", "" + playhead);
+                const playheadBar = Math.floor(this._doc.synth.playhead);
+                if (this._renderedPlayhead != playheadBar) {
+                    this._renderedPlayhead = playheadBar;
+                    this._beathead.setAttribute("x", "" + (playheadBar * this._barWidth));
                 }
                 window.requestAnimationFrame(this._animatePlayhead);
             };
@@ -51310,13 +51521,6 @@ You should be redirected to the song at:<br /><br />
             const selectedPattern = this._doc.song.channels[this._doc.channel].bars[this._doc.bar];
             if (this._select.selectedIndex != selectedPattern)
                 this._select.selectedIndex = selectedPattern;
-            const barWidth = this._barWidth;
-            this._barHighlight.setAttribute("x", "" + (this._doc.bar * barWidth));
-            this._barHighlight.setAttribute("y", "0");
-            this._barHighlight.setAttribute("width", "" + barWidth);
-            this._barHighlight.setAttribute("height", "" + (Config.barEditorHeight + this._doc.song.getChannelCount() * ChannelRow.patternHeight));
-            this._barHighlight.style.visibility = "visible";
-            this._barHighlight.style.color = "255,255,255,0.07";
         }
         render() {
             this._barWidth = this._doc.getBarWidth();
@@ -51382,7 +51586,7 @@ You should be redirected to the song at:<br /><br />
             if (this._renderedEditorHeight != editorHeight) {
                 this._renderedEditorHeight = editorHeight;
                 this._svg.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
-                this._playhead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
+                this._beathead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
                 this.container.style.height = (editorHeight + Config.barEditorHeight) + "px";
             }
             this._select.style.display = this._touchMode ? "" : "none";
@@ -53459,18 +53663,64 @@ You should be redirected to the song at:<br /><br />
         }
     }
     class SongEditor {
+        _startPatternEditorAnimation(direction) {
+            if (this._patternEditorAnimating)
+                return;
+            this._patternEditorAnimating = true;
+            this._patternEditorAnimationStart = performance.now();
+            this._patternEditorAnimationDirection = direction;
+            window.requestAnimationFrame(this._animatePatternEditor);
+        }
+        _renderPatternEditorBuffers() {
+            this._patternEditorMinus1.render();
+            this._patternEditor4.render();
+            this._patternEditor5.render();
+        }
         constructor() {
             this.prompt = null;
             this.doc = new SongDocument();
             this._keyboardLayout = new KeyboardLayout(this.doc);
-            this._patternEditorPrev = new PatternEditor(this.doc, false, -1);
             this._patternEditor = new PatternEditor(this.doc, true, 0);
-            this._patternEditorNext = new PatternEditor(this.doc, false, 1);
+            this._patternEditor2 = new PatternEditor(this.doc, true, 1);
+            this._patternEditor3 = new PatternEditor(this.doc, true, 2);
+            this._patternEditor4 = new PatternEditor(this.doc, true, 3);
+            this._patternEditor5 = new PatternEditor(this.doc, true, 4);
+            this._patternEditorMinus1 = new PatternEditor(this.doc, true, -1);
+            this._patternEditorAnimating = false;
+            this._patternEditorAnimationStart = 0;
+            this._patternEditorAnimationDuration = 150;
+            this._patternEditorAnimationDirection = 0;
+            this._animatePatternEditor = (timestamp) => {
+                if (!this.doc.getFullScreen())
+                    return;
+                if (!this._patternEditorAnimating)
+                    return;
+                const elapsed = timestamp - this._patternEditorAnimationStart;
+                const progress = Math.min(elapsed / this._patternEditorAnimationDuration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const patternEditorWidth = this._patternEditor.container.clientWidth;
+                const baseOffset = -patternEditorWidth;
+                const animationOffset = (1 - eased) *
+                    patternEditorWidth *
+                    -this._patternEditorAnimationDirection;
+                const offset = baseOffset + animationOffset;
+                this._patternEditorTrack.style.transform =
+                    `translateX(${offset}px)`;
+                if (progress >= 1) {
+                    this._patternEditorAnimating = false;
+                    this._patternEditorAnimationDirection = 0;
+                    this._patternEditorTrack.style.transform =
+                        `translateX(${-patternEditorWidth}px)`;
+                    return;
+                }
+                window.requestAnimationFrame(this._animatePatternEditor);
+            };
             this._trackEditor = new TrackEditor(this.doc, this);
             this._muteEditor = new MuteEditor(this.doc, this);
             this._loopEditor = new LoopEditor(this.doc, this._trackEditor);
             this._piano = new Piano(this.doc);
             this._octaveScrollBar = new OctaveScrollBar(this.doc, this._piano);
+            this._patternScrollBar = new PatternScrollBar(this.doc);
             this._playButton = button({ class: "playButton", type: "button", title: "Play (Space)" }, span("Play"));
             this._pauseButton = button({ class: "pauseButton", style: "display: none;", type: "button", title: "Pause (Space)" }, "Pause");
             this._recordButton = button({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span("Record"));
@@ -53495,7 +53745,7 @@ You should be redirected to the song at:<br /><br />
             this._volumeBarBoxR = div({ class: "playback-volume-bar", style: "height: 12px; margin-top: -5px; align-self: center;" }, this._volumeBarContainerR);
             this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song (⇧`)"), option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "pasteSelective" }, "Selective Instrument Paste (Alt+V)"), option({ value: "customizePasteSelective" }, "Customize Selective Paste (" + EditorConfig.ctrlSymbol + "Alt+V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"), option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"), option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"), option({ value: "barCount" }, "Change Song Length... (L)"), option({ value: "channelSettings" }, "Channel Settings... (Q)"), option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"), option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"));
-            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "rainbowLoop" }, "Rainbowify Loop Accent"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"), option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"), option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "layout" }, "Set Layout..."), option({ value: "colorTheme" }, "Set Theme..."), option({ value: "customTheme" }, "Custom Theme... (ADVANCED)")));
+            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "rainbowLoop" }, "Rainbowify Loop Accent"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"), option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"), option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "layout" }, "Set Layout..."), option({ value: "colorTheme" }, "Set Theme..."), option({ value: "customTheme" }, "Custom Theme... (ADVANCED)")));
             this._scaleSelect = select();
             this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
@@ -53769,8 +54019,11 @@ You should be redirected to the song at:<br /><br />
             this._promptContainerBG = div({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
             this._zoomInButton = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
             this._zoomOutButton = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
-            this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" }, this._patternEditorPrev.container, this._patternEditor.container, this._patternEditorNext.container);
-            this._patternArea = div({ class: "pattern-area" }, this._piano.container, this._patternEditorRow, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton);
+            this._patternEditorTrack = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;" }, this._patternEditorMinus1.container, this._patternEditor.container, this._patternEditor2.container, this._patternEditor3.container, this._patternEditor4.container, this._patternEditor5.container);
+            this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._patternEditorTrack);
+            this._patternEditorAndPianoRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._piano.container, this._patternEditorRow);
+            this._patternEditorColumn = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;" }, this._patternEditorAndPianoRow, this._patternScrollBar.container);
+            this._patternArea = div({ class: "pattern-area" }, this._patternEditorColumn, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton);
             this._trackContainer = div({ class: "trackContainer" }, this._trackEditor.container, this._loopEditor.container);
             this._trackVisibleArea = div({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });
             this._trackAndMuteContainer = div({ class: "trackAndMuteContainer" }, this._muteEditor.container, this._trackContainer, this._trackVisibleArea);
@@ -53876,6 +54129,14 @@ You should be redirected to the song at:<br /><br />
                 if (document.getElementById('text-content'))
                     document.getElementById('text-content').style.display = this.doc.prefs.showDescription ? "" : "none";
                 if (this.doc.getFullScreen()) {
+                    this._patternEditorMinus1.container.style.display = "";
+                    this._patternEditor.container.style.display = "";
+                    this._patternEditor2.container.style.display = "";
+                    this._patternEditor3.container.style.display = "";
+                    this._patternEditor4.container.style.display = "";
+                    this._patternEditor5.container.style.display = "";
+                    this._patternEditorTrack.style.width = "auto";
+                    this._patternEditorTrack.style.flexShrink = "0";
                     const semitoneHeight = this._patternEditorRow.clientHeight / this.doc.getVisiblePitchCount();
                     const targetBeatWidth = semitoneHeight * 5;
                     const minBeatWidth = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar * 3);
@@ -53891,30 +54152,55 @@ You should be redirected to the song at:<br /><br />
                         beepboxEditorContainer.style.paddingBottom = "";
                         beepboxEditorContainer.style.borderStyle = "";
                     }
-                    this._patternEditorPrev.container.style.width = patternEditorWidth + "px";
+                    this._patternEditorMinus1.container.style.width = patternEditorWidth + "px";
+                    this._patternEditorMinus1.container.style.flexGrow = "0";
+                    this._patternEditorMinus1.container.style.flexShrink = "0";
                     this._patternEditor.container.style.width = patternEditorWidth + "px";
-                    this._patternEditorNext.container.style.width = patternEditorWidth + "px";
-                    this._patternEditorPrev.container.style.flexShrink = "0";
+                    this._patternEditor.container.style.flexGrow = "0";
                     this._patternEditor.container.style.flexShrink = "0";
-                    this._patternEditorNext.container.style.flexShrink = "0";
-                    this._patternEditorPrev.container.style.display = "";
-                    this._patternEditorNext.container.style.display = "";
-                    this._patternEditorPrev.render();
-                    this._patternEditorNext.render();
-                    this._zoomInButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-                    this._zoomOutButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-                    this._zoomInButton.style.right = prefs.showScrollBar ? "24px" : "4px";
-                    this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";
+                    this._patternEditor2.container.style.width = patternEditorWidth + "px";
+                    this._patternEditor2.container.style.flexGrow = "0";
+                    this._patternEditor2.container.style.flexShrink = "0";
+                    this._patternEditor3.container.style.width = patternEditorWidth + "px";
+                    this._patternEditor3.container.style.flexGrow = "0";
+                    this._patternEditor3.container.style.flexShrink = "0";
+                    this._patternEditor4.container.style.width = patternEditorWidth + "px";
+                    this._patternEditor4.container.style.flexGrow = "0";
+                    this._patternEditor4.container.style.flexShrink = "0";
+                    this._patternEditor5.container.style.width = patternEditorWidth + "px";
+                    this._patternEditor5.container.style.flexGrow = "0";
+                    this._patternEditor5.container.style.flexShrink = "0";
+                    this._patternEditorTrack.style.transform =
+                        `translateX(-${patternEditorWidth}px)`;
+                    this._zoomInButton.style.display =
+                        (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+                    this._zoomOutButton.style.display =
+                        (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+                    this._zoomInButton.style.right =
+                        prefs.showScrollBar ? "24px" : "4px";
+                    this._zoomOutButton.style.right =
+                        prefs.showScrollBar ? "24px" : "4px";
+                    this._patternEditor.render();
+                    this._patternEditor2.render();
+                    this._patternEditor3.render();
                 }
                 else {
-                    this._patternEditor.container.style.width = "";
-                    this._patternEditor.container.style.flexShrink = "";
-                    this._patternEditorPrev.container.style.display = "none";
-                    this._patternEditorNext.container.style.display = "none";
+                    this._patternEditorMinus1.container.style.display = "none";
+                    this._patternEditor.container.style.display = "";
+                    this._patternEditor.container.style.width = "100%";
+                    this._patternEditor.container.style.flexGrow = "1";
+                    this._patternEditor.container.style.flexShrink = "1";
+                    this._patternEditor2.container.style.display = "none";
+                    this._patternEditor3.container.style.display = "none";
+                    this._patternEditor4.container.style.display = "none";
+                    this._patternEditor5.container.style.display = "none";
+                    this._patternEditorTrack.style.transform = "";
+                    this._patternEditorTrack.style.width = "100%";
+                    this._patternEditorTrack.style.flexShrink = "1";
                     this._zoomInButton.style.display = "none";
                     this._zoomOutButton.style.display = "none";
+                    this._patternEditor.render();
                 }
-                this._patternEditor.render();
                 const textOnIcon = ColorConfig.getComputed("--text-enabled-icon");
                 const textOffIcon = ColorConfig.getComputed("--text-disabled-icon");
                 const textSpacingIcon = ColorConfig.getComputed("--text-spacing-icon");
@@ -53942,7 +54228,6 @@ You should be redirected to the song at:<br /><br />
                     (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
                     (prefs.oldModNotes ? textOnIcon : textOffIcon) + "Use Old Mod Notes",
                     (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
-                    (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
                     (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
                     (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
                     (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
@@ -55958,8 +56243,12 @@ You should be redirected to the song at:<br /><br />
                             this.doc.selection.selectionUpdated();
                         }
                         else {
-                            this.doc.selection.setChannelBar(this.doc.channel, (this.doc.bar + this.doc.song.barCount - 1) % this.doc.song.barCount);
+                            const oldBar = this.doc.bar;
+                            const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
+                            this._startPatternEditorAnimation(1);
+                            this.doc.selection.setChannelBar(this.doc.channel, newBar);
                             this.doc.selection.resetBoxSelection();
+                            this._renderPatternEditorBuffers();
                         }
                         event.preventDefault();
                         break;
@@ -55978,8 +56267,12 @@ You should be redirected to the song at:<br /><br />
                             this.doc.selection.selectionUpdated();
                         }
                         else {
-                            this.doc.selection.setChannelBar(this.doc.channel, (this.doc.bar + 1) % this.doc.song.barCount);
+                            const oldBar = this.doc.bar;
+                            const newBar = (oldBar + 1) % this.doc.song.barCount;
+                            this._startPatternEditorAnimation(-1);
+                            this.doc.selection.setChannelBar(this.doc.channel, newBar);
                             this.doc.selection.resetBoxSelection();
+                            this._renderPatternEditorBuffers();
                         }
                         event.preventDefault();
                         break;

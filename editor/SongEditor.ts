@@ -35,6 +35,7 @@ import { OctaveScrollBar } from "./OctaveScrollBar";
 import { MidiInputHandler } from "./MidiInput";
 import { KeyboardLayout } from "./KeyboardLayout";
 import { PatternEditor } from "./PatternEditor";
+import { PatternScrollBar } from "./PatternScrollBar";
 import { Piano } from "./Piano";
 import { Prompt } from "./Prompt";
 import { SelectiveRandomPastePrompt } from "./SelectiveRandomPastePrompt";
@@ -730,14 +731,73 @@ export class SongEditor {
     public doc: SongDocument = new SongDocument();
 
     private readonly _keyboardLayout: KeyboardLayout = new KeyboardLayout(this.doc);
-    private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this.doc, false, -1);
+    //private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this.doc, false, -1);
     private readonly _patternEditor: PatternEditor = new PatternEditor(this.doc, true, 0);
-    private readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
+    //bprivate readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
+    private readonly _patternEditor2: PatternEditor = new PatternEditor(this.doc, true, 1);
+    private readonly _patternEditor3: PatternEditor = new PatternEditor(this.doc, true, 2);
+    private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, true, 3);
+    private readonly _patternEditor5: PatternEditor = new PatternEditor(this.doc, true, 4);
+    private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, true, -1);
+    private _patternEditorAnimating: boolean = false;
+    private _patternEditorAnimationStart: number = 0;
+    private _patternEditorAnimationDuration: number = 150;
+    private _patternEditorAnimationDirection: number = 0;
+
+    private _animatePatternEditor = (timestamp: number): void => {
+        if (!this.doc.getFullScreen()) return;
+
+        if (!this._patternEditorAnimating) return;
+
+        const elapsed = timestamp - this._patternEditorAnimationStart;
+        const progress = Math.min(elapsed / this._patternEditorAnimationDuration, 1);
+
+        // Smooth-ish ease-out.
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const patternEditorWidth = this._patternEditor.container.clientWidth;
+
+        const baseOffset = -patternEditorWidth;
+
+        const animationOffset =
+            (1 - eased) *
+            patternEditorWidth *
+            -this._patternEditorAnimationDirection;
+
+        const offset = baseOffset + animationOffset;
+
+        this._patternEditorTrack.style.transform =
+            `translateX(${offset}px)`;
+
+        if (progress >= 1) {
+            this._patternEditorAnimating = false;
+            this._patternEditorAnimationDirection = 0;
+
+            this._patternEditorTrack.style.transform =
+                `translateX(${-patternEditorWidth}px)`;
+
+            return;
+        }
+
+        window.requestAnimationFrame(this._animatePatternEditor);
+    };
+
+    private _startPatternEditorAnimation(direction: number): void {
+        if (this._patternEditorAnimating) return;
+
+        this._patternEditorAnimating = true;
+        this._patternEditorAnimationStart = performance.now();
+        this._patternEditorAnimationDirection = direction;
+
+        window.requestAnimationFrame(this._animatePatternEditor);
+    }
+
     private readonly _trackEditor: TrackEditor = new TrackEditor(this.doc, this);
     private readonly _muteEditor: MuteEditor = new MuteEditor(this.doc, this);
     private readonly _loopEditor: LoopEditor = new LoopEditor(this.doc, this._trackEditor);
     private readonly _piano: Piano = new Piano(this.doc);
     private readonly _octaveScrollBar: OctaveScrollBar = new OctaveScrollBar(this.doc, this._piano);
+    private readonly _patternScrollBar: PatternScrollBar = new PatternScrollBar(this.doc);
     private readonly _playButton: HTMLButtonElement = button({ class: "playButton", type: "button", title: "Play (Space)" }, span("Play"));
     private readonly _pauseButton: HTMLButtonElement = button({ class: "pauseButton", style: "display: none;", type: "button", title: "Pause (Space)" }, "Pause");
     private readonly _recordButton: HTMLButtonElement = button({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span("Record"));
@@ -838,7 +898,7 @@ export class SongEditor {
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
         option({ value: "oldModNotes" }, 'Use Old Mod Notes'),
         option({ value: "showChannels" }, "Show All Channels"),
-        option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
+        //option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
         option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
         option({ value: "showLetters" }, "Show Piano Keys"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
@@ -1340,18 +1400,45 @@ export class SongEditor {
     private readonly _promptContainerBG: HTMLDivElement = div({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
     private readonly _zoomInButton: HTMLButtonElement = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
     private readonly _zoomOutButton: HTMLButtonElement = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
-    private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" },
-        this._patternEditorPrev.container,
+   
+    private _renderPatternEditorBuffers(): void {
+        this._patternEditorMinus1.render();
+        this._patternEditor4.render();
+        this._patternEditor5.render();
+    }
+
+    // My bad chat; the code below is so messy -popzic
+
+    private readonly _patternEditorTrack: HTMLDivElement = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;"},
+        this._patternEditorMinus1.container,
         this._patternEditor.container,
-        this._patternEditorNext.container,
+        this._patternEditor2.container,
+        this._patternEditor3.container,
+        this._patternEditor4.container,
+        this._patternEditor5.container,
     );
-    private readonly _patternArea: HTMLDivElement = div({ class: "pattern-area" },
+
+    private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;"},
+        this._patternEditorTrack,
+    );
+
+    private readonly _patternEditorAndPianoRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;"},
         this._piano.container,
         this._patternEditorRow,
+    );
+
+    private readonly _patternEditorColumn: HTMLDivElement = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;"},
+        this._patternEditorAndPianoRow,
+        this._patternScrollBar.container,
+    );
+    
+    private readonly _patternArea: HTMLDivElement = div({ class: "pattern-area" },
+        this._patternEditorColumn,
         this._octaveScrollBar.container,
         this._zoomInButton,
         this._zoomOutButton,
     );
+    
     private readonly _trackContainer: HTMLDivElement = div({ class: "trackContainer" },
         this._trackEditor.container,
         this._loopEditor.container,
@@ -1615,22 +1702,22 @@ export class SongEditor {
             
             const groups: Record<string, HTMLOptGroupElement> = {};
 
-        for (let i: number = 0; i < Config.chipWaves.length; i++) {
-            const wave = Config.chipWaves[i];
+            for (let i: number = 0; i < Config.chipWaves.length; i++) {
+                const wave = Config.chipWaves[i];
 
-            if (!groups[wave.group]) {
-                groups[wave.group] = optgroup({ label: wave.group });
-                this._chipWaveSelect.appendChild(groups[wave.group]);
-            }
+                if (!groups[wave.group]) {
+                    groups[wave.group] = optgroup({ label: wave.group });
+                    this._chipWaveSelect.appendChild(groups[wave.group]);
+                }
 
-            groups[wave.group].appendChild(
-                option(
-                    { value: i },
-                    wave.name
-                )
-            );
-        }*/
-            
+                groups[wave.group].appendChild(
+                    option(
+                        { value: i },
+                        wave.name
+                    )
+                );
+            }*/
+
             const waveformDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.FM, i) }, "▼");
             const waveformDropdownHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:");
             const waveformPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this.doc, (oldValue: number, newValue: number) => new ChangeOperatorPulseWidth(this.doc, operatorIndex, oldValue, newValue), true);
@@ -2659,6 +2746,18 @@ export class SongEditor {
             document.getElementById('text-content')!.style.display = this.doc.prefs.showDescription ? "" : "none";
 
         if (this.doc.getFullScreen()) {
+            this._patternEditorMinus1.container.style.display = "";
+            this._patternEditor.container.style.display = "";
+            this._patternEditor2.container.style.display = "";
+            this._patternEditor3.container.style.display = "";
+            this._patternEditor4.container.style.display = "";
+            this._patternEditor5.container.style.display = "";
+            //this._patternEditor.container.style.width = "";
+            //this._patternEditor.container.style.flexGrow = "";
+            //this._patternEditor.container.style.flexShrink = "";
+            this._patternEditorTrack.style.width = "auto";
+            this._patternEditorTrack.style.flexShrink = "0";
+
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this.doc.getVisiblePitchCount();
             const targetBeatWidth: number = semitoneHeight * 5;
             const minBeatWidth: number = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar * 3);
@@ -2676,7 +2775,7 @@ export class SongEditor {
                 beepboxEditorContainer.style.borderStyle = "";
             }
 
-            this._patternEditorPrev.container.style.width = patternEditorWidth + "px";
+            /*this._patternEditorPrev.container.style.width = patternEditorWidth + "px";
             this._patternEditor.container.style.width = patternEditorWidth + "px";
             this._patternEditorNext.container.style.width = patternEditorWidth + "px";
             this._patternEditorPrev.container.style.flexShrink = "0";
@@ -2689,16 +2788,73 @@ export class SongEditor {
             this._zoomInButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
             this._zoomOutButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
             this._zoomInButton.style.right = prefs.showScrollBar ? "24px" : "4px";
-            this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";
+            this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";*/
+
+            this._patternEditorMinus1.container.style.width = patternEditorWidth + "px";
+            this._patternEditorMinus1.container.style.flexGrow = "0";
+            this._patternEditorMinus1.container.style.flexShrink = "0";
+
+            this._patternEditor.container.style.width = patternEditorWidth + "px";
+            this._patternEditor.container.style.flexGrow = "0";
+            this._patternEditor.container.style.flexShrink = "0";
+
+            this._patternEditor2.container.style.width = patternEditorWidth + "px";
+            this._patternEditor2.container.style.flexGrow = "0";
+            this._patternEditor2.container.style.flexShrink = "0";
+
+            this._patternEditor3.container.style.width = patternEditorWidth + "px";
+            this._patternEditor3.container.style.flexGrow = "0";
+            this._patternEditor3.container.style.flexShrink = "0";
+
+            this._patternEditor4.container.style.width = patternEditorWidth + "px";
+            this._patternEditor4.container.style.flexGrow = "0";
+            this._patternEditor4.container.style.flexShrink = "0";
+
+            this._patternEditor5.container.style.width = patternEditorWidth + "px";
+            this._patternEditor5.container.style.flexGrow = "0";
+            this._patternEditor5.container.style.flexShrink = "0";
+
+                // Current pattern is the editor immediately inside the viewport.
+            this._patternEditorTrack.style.transform =
+                `translateX(-${patternEditorWidth}px)`;
+
+            this._zoomInButton.style.display =
+                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+
+            this._zoomOutButton.style.display =
+                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+
+            this._zoomInButton.style.right =
+                prefs.showScrollBar ? "24px" : "4px";
+
+            this._zoomOutButton.style.right =
+                prefs.showScrollBar ? "24px" : "4px";
+
+            this._patternEditor.render();
+            this._patternEditor2.render();
+            this._patternEditor3.render();
         } else {
-            this._patternEditor.container.style.width = "";
-            this._patternEditor.container.style.flexShrink = "";
-            this._patternEditorPrev.container.style.display = "none";
-            this._patternEditorNext.container.style.display = "none";
+            this._patternEditorMinus1.container.style.display = "none";
+
+            this._patternEditor.container.style.display = "";
+            this._patternEditor.container.style.width = "100%";
+            this._patternEditor.container.style.flexGrow = "1";
+            this._patternEditor.container.style.flexShrink = "1";
+
+            this._patternEditor2.container.style.display = "none";
+            this._patternEditor3.container.style.display = "none";
+            this._patternEditor4.container.style.display = "none";
+            this._patternEditor5.container.style.display = "none";
+
+            this._patternEditorTrack.style.transform = "";
+            this._patternEditorTrack.style.width = "100%";
+            this._patternEditorTrack.style.flexShrink = "1";
+
             this._zoomInButton.style.display = "none";
             this._zoomOutButton.style.display = "none";
+
+            this._patternEditor.render();
         }
-        this._patternEditor.render();
 
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
@@ -2730,7 +2886,7 @@ export class SongEditor {
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
             (prefs.oldModNotes ? textOnIcon : textOffIcon) + "Use Old Mod Notes",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
-            (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
+            //(prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
             (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
             (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
             (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
@@ -5148,9 +5304,16 @@ export class SongEditor {
                     this.doc.selection.scrollToEndOfSelection();
                     this.doc.selection.selectionUpdated();
                 } else {
-                    this.doc.selection.setChannelBar(this.doc.channel, (this.doc.bar + this.doc.song.barCount - 1) % this.doc.song.barCount);
+                    const oldBar = this.doc.bar;
+                    const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
+
+                    this._startPatternEditorAnimation(1);
+
+                    this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();
-                }
+
+                    this._renderPatternEditorBuffers();
+                } 
                 event.preventDefault();
                 break;
             case 39: // right
@@ -5165,8 +5328,15 @@ export class SongEditor {
                     this.doc.selection.scrollToEndOfSelection();
                     this.doc.selection.selectionUpdated();
                 } else {
-                    this.doc.selection.setChannelBar(this.doc.channel, (this.doc.bar + 1) % this.doc.song.barCount);
+                    const oldBar = this.doc.bar;
+                    const newBar = (oldBar + 1) % this.doc.song.barCount;
+
+                    this._startPatternEditorAnimation(-1);
+
+                    this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();
+
+                    this._renderPatternEditorBuffers();
                 }
                 event.preventDefault();
                 break;

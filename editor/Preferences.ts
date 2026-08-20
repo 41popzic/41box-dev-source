@@ -104,7 +104,8 @@ export class Preferences {
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
 		this.showChannels = window.localStorage.getItem("showChannels") == "true";
-		this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
+		window.localStorage.removeItem("showScrollBar");
+		this.showScrollBar = true;
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
 		this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
@@ -139,7 +140,7 @@ export class Preferences {
 		this.selectivePaste.fromJsonObject(JSON.parse(window.localStorage.getItem("selectivePaste") || "{}"));
 
 		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
-		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
+		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 16;
 		
 		if (window.localStorage.getItem("volume") != null) {
 			this.volume = Math.min(<any>window.localStorage.getItem("volume") >>> 0, 75);
@@ -163,7 +164,7 @@ export class Preferences {
 		window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
 		window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
 		window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
-		window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
+		window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "true");
 		window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
 		window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
 		window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");

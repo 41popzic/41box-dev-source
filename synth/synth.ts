@@ -427,8 +427,6 @@ export class Note {
     public pins: NotePin[];
     public start: number;
     public end: number;
-    public startBeat: number;
-    public endBeat: number;
     public continuesLastPattern: boolean;
 
 public constructor(pitch: number, start: number, end: number, size: number, fadeout: boolean = false) { this.pitches = [pitch]; this.pins = [makeNotePin(0, 0, size), makeNotePin(0, end - start, fadeout ? 0 : size)]; this.start = start; this.end = end; this.continuesLastPattern = false; }
@@ -4477,7 +4475,7 @@ export class Song {
                     else {
                         // UB version 2 URLs and below will be using the old syntax, so we do need to parse it in that case.
                         // UB version 3 URLs should only have the new syntax, though, unless the user has edited the URL manually.
-                        const parseOldSyntax: boolean = beforeThree;
+                        const parseOldSyntax: boolean = beforeThree && fromUltraBox;
                         const ok: boolean = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                         if (!ok) {
                             continue;

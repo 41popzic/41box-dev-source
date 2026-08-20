@@ -21,4 +21,4 @@ npx terser \
 	--compress \
 	--define OFFLINE=false \
 	--mangle \
-	--mangle-props regex="/^_.+/;"
+	--mangle-props regex="/^_(?!_*FLAC).+/;" #don't mangle stuff from the flac module, as that breaks wasm indexing stuff
