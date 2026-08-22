@@ -1154,7 +1154,6 @@ export class SongEditor {
     private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
 
-    //SongEditor.ts
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
     private readonly _envelopeSpeedSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["envelope speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEnvelopeSpeed(this.doc, oldValue, newValue), false);
     private readonly _envelopeSpeedRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("envelopeSpeed") }, "‣ Spd:"), this._envelopeSpeedDisplay, this._envelopeSpeedSlider.container);
@@ -2728,12 +2727,11 @@ export class SongEditor {
             this._patternEditorTrack.style.width = "auto";
             this._patternEditorTrack.style.flexShrink = "0";
 
-            const semitoneHeight: number = this._patternEditorRow.clientHeight / this.doc.getVisiblePitchCount();
-            const targetBeatWidth: number = semitoneHeight * 5;
-            const minBeatWidth: number = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar * 3);
-            const maxBeatWidth: number = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar + 2);
-            const beatWidth: number = Math.max(minBeatWidth, Math.min(maxBeatWidth, targetBeatWidth));
-            const patternEditorWidth: number = beatWidth * this.doc.song.beatsPerBar;
+            const beatWidth: number =
+                this._patternEditorRow.clientWidth / this.doc.song.beatsPerBar;
+
+            const patternEditorWidth: number =
+                beatWidth * (this.doc.song.beatsPerBar / 3); // For 3 PatternEditor contexts
 
             const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
 

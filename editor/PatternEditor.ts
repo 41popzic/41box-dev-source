@@ -55,12 +55,13 @@ export class PatternEditor {
     private readonly _backgroundDrumRow: SVGRectElement = SVG.rect();
     private readonly _backgroundModRow: SVGRectElement = SVG.rect();
 
-    public _editorWidth: number;
+    public  _editorWidth: number;
+    public  _editorHeight: number;
 
     private _modDragValueLabelLeft: number = 0;
     private _modDragValueLabelTop: number = 0;
     private _modDragValueLabelWidth: number = 0;
-    public editingModLabel: boolean = false;
+    public   editingModLabel: boolean = false;
     private _modDragStartValue: number = 0;
     private _modDragPin: NotePin;
     private _modDragNote: Note;
@@ -68,7 +69,6 @@ export class PatternEditor {
     private _modDragLowerBound: number = 0;
     private _modDragUpperBound: number = 6;
 
-    public _editorHeight: number;
     private _partWidth: number;
     private _pitchHeight: number = -1;
     private _pitchBorder: number;
@@ -115,7 +115,7 @@ export class PatternEditor {
     private _renderedNoiseChannelCount: number = -1;
     private _renderedModChannelCount: number = -1;
     private _followPlayheadBar: number = -1;
-    public rhythmEnabled: boolean = true;
+    public   rhythmEnabled: boolean = true;
 
     private readonly _patternBorderLeft = SVG.line({
         x1: 0,
@@ -2660,8 +2660,8 @@ export class PatternEditor {
             this._svgModBackground.setAttribute("width", "" + beatWidth);
             this._svgModBackground.setAttribute("height", "" + (this._pitchHeight));
             this._svgModBackground.setAttribute("y", "" + (this._pitchBorder / 2));
-            this._backgroundDrumRow.setAttribute("width", "" + (beatWidth - 2));
-            this._backgroundDrumRow.setAttribute("height", "" + (this._pitchHeight - 2));
+            this._backgroundDrumRow.setAttribute("width", "" + (beatWidth - 1));
+            this._backgroundDrumRow.setAttribute("height", "" + (this._pitchHeight - 1));
             if (this._pitchHeight > this._pitchBorder) {
                 this._backgroundModRow.setAttribute("width", "" + (beatWidth - 2));
                 this._backgroundModRow.setAttribute("height", "" + (this._pitchHeight - this._pitchBorder));
@@ -2672,9 +2672,9 @@ export class PatternEditor {
             for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
                 const rectangle: SVGRectElement = this._backgroundPitchRows[j];
                 const y: number = (Config.pitchesPerOctave - j) % Config.pitchesPerOctave;
-                rectangle.setAttribute("width", "" + (beatWidth - 2));
+                rectangle.setAttribute("width", "" + (beatWidth - 1));
                 rectangle.setAttribute("y", "" + (y * this._pitchHeight + 1));
-                rectangle.setAttribute("height", "" + (this._pitchHeight - 2));
+                rectangle.setAttribute("height", "" + (this._pitchHeight - 1));
             }
         }
 

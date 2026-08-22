@@ -37212,9 +37212,9 @@ li.select2-results__option[role=group] > strong:hover {
             this._renderedScale = -1;
             this._documentChanged();
         }
-        static getBassCutoffPitch(doc) {
-            const octaveOffset = doc.getBaseVisibleOctave(doc.channel);
-            return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
+        static getBassCutoffPitch(_doc) {
+            const octaveOffset = _doc.getBaseVisibleOctave(_doc.channel);
+            return octaveOffset * Config.pitchesPerOctave + Math.floor(_doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
         }
         constructor(_doc) {
             this._doc = _doc;
@@ -37379,8 +37379,8 @@ li.select2-results__option[role=group] > strong:hover {
                         }
                         else {
                             this._pianoKeys[j].style.background = ColorConfig.blackPianoKey;
-                            this._pianoKeys[j].style.width = "24px";
-                            this._pianoLabels[j].style.paddingLeft = "8.6777777777px";
+                            this._pianoKeys[j].style.width = "32px";
+                            this._pianoLabels[j].style.paddingLeft = "15px";
                         }
                         let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
                         if (!scale[j % Config.pitchesPerOctave]) {
@@ -49101,8 +49101,8 @@ You should be redirected to the song at:<br /><br />
                 this._svgModBackground.setAttribute("width", "" + beatWidth);
                 this._svgModBackground.setAttribute("height", "" + (this._pitchHeight));
                 this._svgModBackground.setAttribute("y", "" + (this._pitchBorder / 2));
-                this._backgroundDrumRow.setAttribute("width", "" + (beatWidth - 2));
-                this._backgroundDrumRow.setAttribute("height", "" + (this._pitchHeight - 2));
+                this._backgroundDrumRow.setAttribute("width", "" + (beatWidth - 1));
+                this._backgroundDrumRow.setAttribute("height", "" + (this._pitchHeight - 1));
                 if (this._pitchHeight > this._pitchBorder) {
                     this._backgroundModRow.setAttribute("width", "" + (beatWidth - 2));
                     this._backgroundModRow.setAttribute("height", "" + (this._pitchHeight - this._pitchBorder));
@@ -49110,9 +49110,9 @@ You should be redirected to the song at:<br /><br />
                 for (let j = 0; j < Config.pitchesPerOctave; j++) {
                     const rectangle = this._backgroundPitchRows[j];
                     const y = (Config.pitchesPerOctave - j) % Config.pitchesPerOctave;
-                    rectangle.setAttribute("width", "" + (beatWidth - 2));
+                    rectangle.setAttribute("width", "" + (beatWidth - 1));
                     rectangle.setAttribute("y", "" + (y * this._pitchHeight + 1));
-                    rectangle.setAttribute("height", "" + (this._pitchHeight - 2));
+                    rectangle.setAttribute("height", "" + (this._pitchHeight - 1));
                 }
             }
             if (this._interactive) {
@@ -55088,12 +55088,8 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor5.container.style.display = "";
                     this._patternEditorTrack.style.width = "auto";
                     this._patternEditorTrack.style.flexShrink = "0";
-                    const semitoneHeight = this._patternEditorRow.clientHeight / this.doc.getVisiblePitchCount();
-                    const targetBeatWidth = semitoneHeight * 5;
-                    const minBeatWidth = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar * 3);
-                    const maxBeatWidth = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar + 2);
-                    const beatWidth = Math.max(minBeatWidth, Math.min(maxBeatWidth, targetBeatWidth));
-                    const patternEditorWidth = beatWidth * this.doc.song.beatsPerBar;
+                    const beatWidth = this._patternEditorRow.clientWidth / this.doc.song.beatsPerBar;
+                    const patternEditorWidth = beatWidth * (this.doc.song.beatsPerBar / 3);
                     const beepboxEditorContainer = document.getElementById("beepboxEditorContainer");
                     if (this.doc.prefs.showDescription == false) {
                         beepboxEditorContainer.style.paddingBottom = "0";

@@ -47,9 +47,9 @@ export class Piano {
     }
 
     // Bass cutoff pitch is roughly half of the viewed window and below, though on odd-numbered octave counts the lead has priority for the middle octave.
-    public static getBassCutoffPitch(doc: SongDocument): number {
-        const octaveOffset: number = doc.getBaseVisibleOctave(doc.channel);
-        return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
+    public static getBassCutoffPitch(_doc: SongDocument): number {
+        const octaveOffset: number = _doc.getBaseVisibleOctave(_doc.channel);
+        return octaveOffset * Config.pitchesPerOctave + Math.floor(_doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
     }
 
     constructor(private _doc: SongDocument) {
@@ -320,7 +320,14 @@ export class Piano {
                 const pitchNameIndex: number = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
                 const isWhiteKey: boolean = Config.keys[pitchNameIndex].isWhiteKey;
                 this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                if (isWhiteKey) { this._pianoKeys[j].style.background = ColorConfig.whitePianoKey; this._pianoKeys[j].style.width = "32px"; this._pianoLabels[j].style.paddingLeft = "15px"; } else { this._pianoKeys[j].style.background = ColorConfig.blackPianoKey; this._pianoKeys[j].style.width = "24px"; this._pianoLabels[j].style.paddingLeft = "8.6777777777px"; };
+                if (isWhiteKey) { 
+                    this._pianoKeys[j].style.background = ColorConfig.whitePianoKey; 
+                    this._pianoKeys[j].style.width = "32px"; this._pianoLabels[j].style.paddingLeft = "15px"; 
+                } else { 
+                    this._pianoKeys[j].style.background = ColorConfig.blackPianoKey; 
+                    this._pianoKeys[j].style.width = "32px"; this._pianoLabels[j].style.paddingLeft = "15px"; 
+                };
+                // Don't mind the above
                 let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
                 if (!scale[j % Config.pitchesPerOctave]) {
                     this._pianoKeys[j].classList.add("disabled");
