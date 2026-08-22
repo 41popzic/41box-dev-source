@@ -54638,8 +54638,11 @@ You should be redirected to the song at:<br /><br />
             this._patternEditorAnimationDuration = 150;
             this._patternEditorAnimationDirection = 0;
             this._animatePatternEditor = (timestamp) => {
-                if (!this.doc.getFullScreen())
+                if (!this.doc.getFullScreen() || ["small", "wide", "tall"].includes(this.doc.prefs.layout)) {
+                    this._patternEditorAnimating = false;
+                    this._patternEditorAnimationDirection = 0;
                     return;
+                }
                 if (!this._patternEditorAnimating)
                     return;
                 const elapsed = timestamp - this._patternEditorAnimationStart;
@@ -55075,7 +55078,8 @@ You should be redirected to the song at:<br /><br />
                 this._instrumentSettingsArea.style.scrollbarWidth = this.doc.prefs.showInstrumentScrollbars ? "" : "none";
                 if (document.getElementById('text-content'))
                     document.getElementById('text-content').style.display = this.doc.prefs.showDescription ? "" : "none";
-                if (this.doc.getFullScreen()) {
+                const layout = this.doc.prefs.layout;
+                if (layout === "long" || layout === "wide long" || layout === "flipped long") {
                     this._patternEditorMinus1.container.style.display = "";
                     this._patternEditor.container.style.display = "";
                     this._patternEditor2.container.style.display = "";
@@ -55152,22 +55156,50 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor4.setBarOffset(3 + offset);
                     this._patternEditor5.setBarOffset(4 + offset);
                 }
-                else {
+                else if (layout === "small" || layout === "small+") {
                     this._patternEditorMinus1.container.style.display = "none";
-                    this._patternEditor.container.style.display = "";
-                    this._patternEditor.container.style.width = "100%";
-                    this._patternEditor.container.style.flexGrow = "1";
-                    this._patternEditor.container.style.flexShrink = "1";
                     this._patternEditor2.container.style.display = "none";
                     this._patternEditor3.container.style.display = "none";
                     this._patternEditor4.container.style.display = "none";
                     this._patternEditor5.container.style.display = "none";
-                    this._patternEditorTrack.style.transform = "";
+                    this._patternEditor.container.style.display = "";
+                    this._patternEditor.container.style.width = "100%";
+                    this._patternEditor.container.style.flexGrow = "1";
+                    this._patternEditor.container.style.flexShrink = "1";
+                    this._patternEditorTrack.style.transform = "translateX(0)";
+                    this._patternEditorTrack.style.left = "0";
                     this._patternEditorTrack.style.width = "100%";
                     this._patternEditorTrack.style.flexShrink = "1";
+                    this._patternEditor.setBarOffset(0);
+                    this._patternEditor.setPatternSelected(false);
                     this._zoomInButton.style.display = "none";
                     this._zoomOutButton.style.display = "none";
                     this._patternEditor.render();
+                }
+                else if (layout === "tall" || layout === "wide") {
+                    this._patternEditorMinus1.container.style.display = "none";
+                    this._patternEditor2.container.style.display = "none";
+                    this._patternEditor3.container.style.display = "none";
+                    this._patternEditor4.container.style.display = "none";
+                    this._patternEditor5.container.style.display = "none";
+                    this._patternEditor.container.style.display = "";
+                    this._patternEditor.container.style.width = "100%";
+                    this._patternEditor.container.style.flexGrow = "1";
+                    this._patternEditor.container.style.flexShrink = "1";
+                    this._patternEditorTrack.style.transform = "translateX(0)";
+                    this._patternEditorTrack.style.left = "0";
+                    this._patternEditorTrack.style.width = "100%";
+                    this._patternEditorTrack.style.flexShrink = "1";
+                    this._patternEditor.setBarOffset(0);
+                    this._patternEditor.setPatternSelected(false);
+                    this._zoomInButton.style.display =
+                        (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+                    this._zoomOutButton.style.display =
+                        (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+                    this._zoomInButton.style.right =
+                        prefs.showScrollBar ? "24px" : "4px";
+                    this._zoomOutButton.style.right =
+                        prefs.showScrollBar ? "24px" : "4px";
                 }
                 const textOnIcon = ColorConfig.getComputed("--text-enabled-icon");
                 const textOffIcon = ColorConfig.getComputed("--text-disabled-icon");

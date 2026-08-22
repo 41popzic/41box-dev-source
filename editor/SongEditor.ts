@@ -746,7 +746,11 @@ export class SongEditor {
     private _patternEditorAnimationDirection: number = 0;
 
     private _animatePatternEditor = (timestamp: number): void => {
-        if (!this.doc.getFullScreen()) return;
+        if (!this.doc.getFullScreen() || ["small", "wide", "tall"].includes(this.doc.prefs.layout)) {
+            this._patternEditorAnimating = false;
+            this._patternEditorAnimationDirection = 0;
+            return;
+        };
 
         if (!this._patternEditorAnimating) return;
 
@@ -2709,7 +2713,9 @@ export class SongEditor {
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this.doc.prefs.showDescription ? "" : "none";
 
-        if (this.doc.getFullScreen()) {
+        const layout = this.doc.prefs.layout;
+
+        if (layout === "long" || layout === "wide long" || layout === "flipped long") {
             this._patternEditorMinus1.container.style.display = "";
             this._patternEditor.container.style.display = "";
             this._patternEditor2.container.style.display = "";
@@ -2822,27 +2828,87 @@ export class SongEditor {
             this._patternEditor3.setBarOffset(2 + offset);
             this._patternEditor4.setBarOffset(3 + offset);
             this._patternEditor5.setBarOffset(4 + offset);
-        } else {
+
+        } else if (layout === "small" || layout === "small+") {
+
             this._patternEditorMinus1.container.style.display = "none";
+            this._patternEditor2.container.style.display = "none";
+            this._patternEditor3.container.style.display = "none";
+            this._patternEditor4.container.style.display = "none";
+            this._patternEditor5.container.style.display = "none";
 
             this._patternEditor.container.style.display = "";
             this._patternEditor.container.style.width = "100%";
             this._patternEditor.container.style.flexGrow = "1";
             this._patternEditor.container.style.flexShrink = "1";
 
-            this._patternEditor2.container.style.display = "none";
-            this._patternEditor3.container.style.display = "none";
-            this._patternEditor4.container.style.display = "none";
-            this._patternEditor5.container.style.display = "none";
-
-            this._patternEditorTrack.style.transform = "";
+            this._patternEditorTrack.style.transform = "translateX(0)";
+            this._patternEditorTrack.style.left = "0";
             this._patternEditorTrack.style.width = "100%";
             this._patternEditorTrack.style.flexShrink = "1";
+
+            //this._patternEditorMinus1.setBarOffset(-1);
+            this._patternEditor.setBarOffset(0);
+            //this._patternEditor2.setBarOffset(1);
+            //this._patternEditor3.setBarOffset(2);
+            //this._patternEditor4.setBarOffset(3);
+            //this._patternEditor5.setBarOffset(4);
+
+            //this._patternEditorMinus1.setPatternSelected(false);
+            this._patternEditor.setPatternSelected(false);
+            //this._patternEditor2.setPatternSelected(false);
+            //this._patternEditor3.setPatternSelected(false);
+            //this._patternEditor4.setPatternSelected(false);
+            //this._patternEditor5.setPatternSelected(false);
 
             this._zoomInButton.style.display = "none";
             this._zoomOutButton.style.display = "none";
 
             this._patternEditor.render();
+
+        } else if (layout === "tall" || layout === "wide") {
+
+            this._patternEditorMinus1.container.style.display = "none";
+            this._patternEditor2.container.style.display = "none";
+            this._patternEditor3.container.style.display = "none";
+            this._patternEditor4.container.style.display = "none";
+            this._patternEditor5.container.style.display = "none";
+
+            this._patternEditor.container.style.display = "";
+            this._patternEditor.container.style.width = "100%";
+            this._patternEditor.container.style.flexGrow = "1";
+            this._patternEditor.container.style.flexShrink = "1";
+
+            this._patternEditorTrack.style.transform = "translateX(0)";
+            this._patternEditorTrack.style.left = "0";
+            this._patternEditorTrack.style.width = "100%";
+            this._patternEditorTrack.style.flexShrink = "1";
+
+            //this._patternEditorMinus1.setBarOffset(-1);
+            this._patternEditor.setBarOffset(0);
+            //this._patternEditor2.setBarOffset(1);
+            //this._patternEditor3.setBarOffset(2);
+            //this._patternEditor4.setBarOffset(3);
+            //this._patternEditor5.setBarOffset(4);
+
+            //this._patternEditorMinus1.setPatternSelected(false);
+            this._patternEditor.setPatternSelected(false);
+            //this._patternEditor2.setPatternSelected(false);
+            //this._patternEditor3.setPatternSelected(false);
+            //this._patternEditor4.setPatternSelected(false);
+            //this._patternEditor5.setPatternSelected(false);
+
+            this._zoomInButton.style.display =
+                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+
+            this._zoomOutButton.style.display =
+                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
+
+            this._zoomInButton.style.right =
+                prefs.showScrollBar ? "24px" : "4px";
+
+            this._zoomOutButton.style.right =
+                prefs.showScrollBar ? "24px" : "4px";            
         }
 
         // make the names of these two variables as short as possible for readability
