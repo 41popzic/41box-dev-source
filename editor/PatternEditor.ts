@@ -55,7 +55,7 @@ export class PatternEditor {
     private readonly _backgroundDrumRow: SVGRectElement = SVG.rect();
     private readonly _backgroundModRow: SVGRectElement = SVG.rect();
 
-    private _editorWidth: number;
+    public _editorWidth: number;
 
     private _modDragValueLabelLeft: number = 0;
     private _modDragValueLabelTop: number = 0;
@@ -68,7 +68,7 @@ export class PatternEditor {
     private _modDragLowerBound: number = 0;
     private _modDragUpperBound: number = 6;
 
-    private _editorHeight: number;
+    public _editorHeight: number;
     private _partWidth: number;
     private _pitchHeight: number = -1;
     private _pitchBorder: number;
@@ -117,6 +117,28 @@ export class PatternEditor {
     private _followPlayheadBar: number = -1;
     public rhythmEnabled: boolean = true;
 
+    private readonly _patternBorderLeft = SVG.line({
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+        stroke: ColorConfig.loopAccent,
+        "stroke-width": 4,
+        "pointer-events": "none",
+        visibility: "hidden",
+    });
+
+    private readonly _patternBorderRight = SVG.line({
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+        stroke: ColorConfig.loopAccent,
+        "stroke-width": 4,
+        "pointer-events": "none",
+        visibility: "hidden",
+    });
+
     constructor(private _doc: SongDocument, private _interactive: boolean, private _barOffset: number) {
         this._svgNoteBackground = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
         this._svgDrumBackground = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
@@ -140,6 +162,9 @@ export class PatternEditor {
             this._svgPreview,
             this._svgBeathead,
             this._svgPlayhead,
+
+            this._patternBorderLeft,
+            this._patternBorderRight,
         );
         this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
 
@@ -2613,6 +2638,15 @@ export class PatternEditor {
             this._svgBeathead.setAttribute("height", "" + this._editorHeight);
             this._selectionRect.setAttribute("y", "0");
             this._selectionRect.setAttribute("height", "" + this._editorHeight);
+            this._patternBorderLeft.setAttribute("x1", "0");
+            this._patternBorderLeft.setAttribute("y1", "0");
+            this._patternBorderLeft.setAttribute("x2", "0");
+            this._patternBorderLeft.setAttribute("y2", String(this._editorHeight));
+
+            this._patternBorderRight.setAttribute("x1", String(this._editorWidth));
+            this._patternBorderRight.setAttribute("y1", "0");
+            this._patternBorderRight.setAttribute("x2", String(this._editorWidth));
+            this._patternBorderRight.setAttribute("y2", String(this._editorHeight));
         }
 
         const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
@@ -3008,6 +3042,18 @@ export class PatternEditor {
             svgElement.setAttribute("d", pathString);
             }
     } 
+
+    public setPatternSelected(selected: boolean): void {
+        const visibility = selected ? "visible" : "hidden";
+
+        this._patternBorderLeft.setAttribute("visibility", visibility);
+        this._patternBorderRight.setAttribute("visibility", visibility);
+    }
+
+    public setBarOffset(offset: number): void {
+        this._barOffset = offset;
+        this.render();
+    }
     
     private _pitchToPixelHeight(pitch: number): number {
         return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);
