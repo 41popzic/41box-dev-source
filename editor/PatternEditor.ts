@@ -1,7 +1,9 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { getLocalStorageItem, Chord, Transition, Config } from "../synth/SynthConfig";
-import { NotePin, Note, makeNotePin, FilterSettings, Channel, Pattern, Instrument, FilterControlPoint } from "../synth/synth";
+import { FilterSettings, FilterControlPoint } from "../synth/Filter";
+import { Note, NotePin, makeNotePin} from "../synth/Pattern";
+import { Instrument } from "../synth/Instrument";
 import { ColorConfig } from "./ColorConfig";
 import { SongDocument } from "./SongDocument";
 import { Slider } from "./HTMLWrapper";
@@ -11,6 +13,8 @@ import { ChangeSequence, UndoableChange } from "./Change";
 import { ChangeVolume, FilterMoveData, ChangeTempo, ChangePan, ChangeReverb, ChangeDistortion, ChangeOperatorAmplitude, ChangeFeedbackAmplitude, ChangePulseWidth, ChangeDetune, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeChorus, ChangeEQFilterSimplePeak, ChangeNoteFilterSimplePeak, ChangeStringSustain, ChangeEnvelopeSpeed, ChangeSupersawDynamism, ChangeSupersawShape, ChangeSupersawSpread, ChangePitchShift, ChangeChannelBar, ChangeDragSelectedNotes, ChangeEnsurePatternExists, ChangeNoteTruncate, ChangeNoteAdded, ChangePatternSelection, ChangePinTime, ChangeSizeBend, ChangePitchBend, ChangePitchAdded, ChangeArpeggioSpeed, ChangeBitcrusherQuantization, ChangeBitcrusherFreq, ChangeEchoSustain, ChangeEQFilterSimpleCut, ChangeNoteFilterSimpleCut, ChangeFilterMovePoint, ChangeDuplicateSelectedReusedPatterns, ChangeHoldingModRecording, ChangeDecimalOffset, ChangePerEnvelopeSpeed, ChangeSongFilterMovePoint, ChangeRingMod, ChangeRingModHz, ChangeGranular, ChangeGrainSize, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound, ChangeGrainAmounts, ChangeGrainRange } from "./changes";
 import { prettyNumber } from "./EditorConfig";
 import { EnvelopeEditor } from "./EnvelopeEditor";
+import { Channel } from "../synth/Channel";
+import { Pattern } from "../synth/Pattern"
 
 function makeEmptyReplacementElement<T extends Node>(node: T): T {
     const clone: T = <T>node.cloneNode(false);

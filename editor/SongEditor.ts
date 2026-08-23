@@ -15,7 +15,9 @@ import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
-import { Instrument, Channel, Synth } from "../synth/synth";
+import { Synth } from "../synth/synth";
+import { Instrument } from "../synth/Instrument";
+import { Channel } from "../synth/Channel"
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
@@ -746,7 +748,7 @@ export class SongEditor {
     private _patternEditorAnimationDirection: number = 0;
 
     private _animatePatternEditor = (timestamp: number): void => {
-        if (!this.doc.getFullScreen() || ["small", "wide", "tall"].includes(this.doc.prefs.layout)) {
+        if (!this.doc.getFullScreen() || ["small", "small+", "wide", "tall"].includes(this.doc.prefs.layout)) {
             this._patternEditorAnimating = false;
             this._patternEditorAnimationDirection = 0;
             return;
@@ -2714,7 +2716,7 @@ export class SongEditor {
 
         const layout = this.doc.prefs.layout;
 
-        if (layout === "long" || layout === "wide long" || layout === "flipped long") {
+        if (layout === "long" || layout === "wide long" || layout === "flipped long" || layout === "switched long") {
             this._patternEditorMinus1.container.style.display = "";
             this._patternEditor.container.style.display = "";
             this._patternEditor2.container.style.display = "";
