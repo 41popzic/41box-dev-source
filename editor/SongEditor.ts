@@ -740,7 +740,7 @@ export class SongEditor {
     //bprivate readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
     private readonly _patternEditor2: PatternEditor = new PatternEditor(this.doc, true, 1);
     private readonly _patternEditor3: PatternEditor = new PatternEditor(this.doc, true, 2);
-    //private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, true, 3);
+    private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, true, 3);
     //private readonly _patternEditor5: PatternEditor = new PatternEditor(this.doc, true, 4);
     private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, true, -1);
 
@@ -1378,7 +1378,7 @@ export class SongEditor {
    
     private _renderPatternEditorBuffers(): void {
         this._patternEditorMinus1.render();
-        //this._patternEditor4.render();
+        this._patternEditor4.render();
         //this._patternEditor5.render();
     }
 
@@ -1389,7 +1389,7 @@ export class SongEditor {
         this._patternEditor.container,
         this._patternEditor2.container,
         this._patternEditor3.container,
-        //this._patternEditor4.container,
+        this._patternEditor4.container,
         //this._patternEditor5.container,
     );
 
@@ -2730,7 +2730,7 @@ export class SongEditor {
             this._patternEditor.container.style.display = "";
             this._patternEditor2.container.style.display = "";
             this._patternEditor3.container.style.display = "";
-            //this._patternEditor4.container.style.display = "";
+            this._patternEditor4.container.style.display = "";
             //this._patternEditor5.container.style.display = "";
             //this._patternEditor.container.style.width = "";
             //this._patternEditor.container.style.flexGrow = "";
@@ -2785,9 +2785,9 @@ export class SongEditor {
             this._patternEditor3.container.style.flexGrow = "0";
             this._patternEditor3.container.style.flexShrink = "0";
 
-            //this._patternEditor4.container.style.width = patternEditorWidth + "px";
-            //this._patternEditor4.container.style.flexGrow = "0";
-            //this._patternEditor4.container.style.flexShrink = "0";
+            this._patternEditor4.container.style.width = patternEditorWidth + "px";
+            this._patternEditor4.container.style.flexGrow = "0";
+            this._patternEditor4.container.style.flexShrink = "0";
 
             //this._patternEditor5.container.style.width = patternEditorWidth + "px";
             //this._patternEditor5.container.style.flexGrow = "0";
@@ -2820,7 +2820,7 @@ export class SongEditor {
             this._patternEditor.setPatternSelected(bar === 0);
             this._patternEditor2.setPatternSelected(bar !== 0 && bar !== lastBar);
             this._patternEditor3.setPatternSelected(bar === lastBar);
-            //this._patternEditor4.setPatternSelected(false);
+            this._patternEditor4.setPatternSelected(false);
             //this._patternEditor5.setPatternSelected(false);
 
             let offset = -1;
@@ -2835,7 +2835,7 @@ export class SongEditor {
             this._patternEditor.setBarOffset(0 + offset);
             this._patternEditor2.setBarOffset(1 + offset);
             this._patternEditor3.setBarOffset(2 + offset);
-            //this._patternEditor4.setBarOffset(3 + offset);
+            this._patternEditor4.setBarOffset(3 + offset);
             //this._patternEditor5.setBarOffset(4 + offset);
 
         } else if (layout === "small" || layout === "small+") {
@@ -2843,7 +2843,7 @@ export class SongEditor {
             this._patternEditorMinus1.container.style.display = "none";
             this._patternEditor2.container.style.display = "none";
             this._patternEditor3.container.style.display = "none";
-            //this._patternEditor4.container.style.display = "none";
+            this._patternEditor4.container.style.display = "none";
             //this._patternEditor5.container.style.display = "none";
 
             this._patternEditor.container.style.display = "";
@@ -2880,7 +2880,7 @@ export class SongEditor {
             this._patternEditorMinus1.container.style.display = "none";
             this._patternEditor2.container.style.display = "none";
             this._patternEditor3.container.style.display = "none";
-            //this._patternEditor4.container.style.display = "none";
+            this._patternEditor4.container.style.display = "none";
             //this._patternEditor5.container.style.display = "none";
 
             this._patternEditor.container.style.display = "";
@@ -2897,7 +2897,7 @@ export class SongEditor {
             this._patternEditor.setBarOffset(0);
             //this._patternEditor2.setBarOffset(1);
             //this._patternEditor3.setBarOffset(2);
-            //this._patternEditor4.setBarOffset(3);
+            this._patternEditor4.setBarOffset(3);
             //this._patternEditor5.setBarOffset(4);
 
             //this._patternEditorMinus1.setPatternSelected(false);
