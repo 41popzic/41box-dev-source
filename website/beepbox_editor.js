@@ -54818,8 +54818,6 @@ You should be redirected to the song at:<br /><br />
         }
         _renderPatternEditorBuffers() {
             this._patternEditorMinus1.render();
-            this._patternEditor4.render();
-            this._patternEditor5.render();
         }
         constructor() {
             this.prompt = null;
@@ -54828,8 +54826,6 @@ You should be redirected to the song at:<br /><br />
             this._patternEditor = new PatternEditor(this.doc, true, 0);
             this._patternEditor2 = new PatternEditor(this.doc, true, 1);
             this._patternEditor3 = new PatternEditor(this.doc, true, 2);
-            this._patternEditor4 = new PatternEditor(this.doc, true, 3);
-            this._patternEditor5 = new PatternEditor(this.doc, true, 4);
             this._patternEditorMinus1 = new PatternEditor(this.doc, true, -1);
             this._patternEditorAnimating = false;
             this._patternEditorAnimationStart = 0;
@@ -55169,7 +55165,7 @@ You should be redirected to the song at:<br /><br />
             this._promptContainerBG = div({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
             this._zoomInButton = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
             this._zoomOutButton = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
-            this._patternEditorTrack = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;" }, this._patternEditorMinus1.container, this._patternEditor.container, this._patternEditor2.container, this._patternEditor3.container, this._patternEditor4.container, this._patternEditor5.container);
+            this._patternEditorTrack = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;" }, this._patternEditorMinus1.container, this._patternEditor.container, this._patternEditor2.container, this._patternEditor3.container);
             this._patternRuler = new PatternRuler(this.doc, () => this._patternEditor.container.clientWidth);
             this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._patternEditorTrack);
             this._patternEditorAndPianoRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._piano.container, this._patternEditorRow);
@@ -55285,8 +55281,6 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor.container.style.display = "";
                     this._patternEditor2.container.style.display = "";
                     this._patternEditor3.container.style.display = "";
-                    this._patternEditor4.container.style.display = "";
-                    this._patternEditor5.container.style.display = "";
                     this._patternEditorTrack.style.width = "auto";
                     this._patternEditorTrack.style.flexShrink = "0";
                     const beatWidth = this._patternEditorRow.clientWidth / this.doc.song.beatsPerBar;
@@ -55312,12 +55306,6 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor3.container.style.width = patternEditorWidth + "px";
                     this._patternEditor3.container.style.flexGrow = "0";
                     this._patternEditor3.container.style.flexShrink = "0";
-                    this._patternEditor4.container.style.width = patternEditorWidth + "px";
-                    this._patternEditor4.container.style.flexGrow = "0";
-                    this._patternEditor4.container.style.flexShrink = "0";
-                    this._patternEditor5.container.style.width = patternEditorWidth + "px";
-                    this._patternEditor5.container.style.flexGrow = "0";
-                    this._patternEditor5.container.style.flexShrink = "0";
                     this._patternEditorTrack.style.transform =
                         `translateX(-${patternEditorWidth}px)`;
                     this._zoomInButton.style.display =
@@ -55337,8 +55325,6 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor.setPatternSelected(bar === 0);
                     this._patternEditor2.setPatternSelected(bar !== 0 && bar !== lastBar);
                     this._patternEditor3.setPatternSelected(bar === lastBar);
-                    this._patternEditor4.setPatternSelected(false);
-                    this._patternEditor5.setPatternSelected(false);
                     let offset = -1;
                     if (bar === 0) {
                         offset = 0;
@@ -55350,15 +55336,11 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditor.setBarOffset(0 + offset);
                     this._patternEditor2.setBarOffset(1 + offset);
                     this._patternEditor3.setBarOffset(2 + offset);
-                    this._patternEditor4.setBarOffset(3 + offset);
-                    this._patternEditor5.setBarOffset(4 + offset);
                 }
                 else if (layout === "small" || layout === "small+") {
                     this._patternEditorMinus1.container.style.display = "none";
                     this._patternEditor2.container.style.display = "none";
                     this._patternEditor3.container.style.display = "none";
-                    this._patternEditor4.container.style.display = "none";
-                    this._patternEditor5.container.style.display = "none";
                     this._patternEditor.container.style.display = "";
                     this._patternEditor.container.style.width = "100%";
                     this._patternEditor.container.style.flexGrow = "1";
@@ -55377,8 +55359,6 @@ You should be redirected to the song at:<br /><br />
                     this._patternEditorMinus1.container.style.display = "none";
                     this._patternEditor2.container.style.display = "none";
                     this._patternEditor3.container.style.display = "none";
-                    this._patternEditor4.container.style.display = "none";
-                    this._patternEditor5.container.style.display = "none";
                     this._patternEditor.container.style.display = "";
                     this._patternEditor.container.style.width = "100%";
                     this._patternEditor.container.style.flexGrow = "1";
