@@ -740,9 +740,9 @@ export class SongEditor {
     //bprivate readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
     private readonly _patternEditor2: PatternEditor = new PatternEditor(this.doc, true, 1);
     private readonly _patternEditor3: PatternEditor = new PatternEditor(this.doc, true, 2);
-    private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, true, 3);
+    private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, false, 3);
     //private readonly _patternEditor5: PatternEditor = new PatternEditor(this.doc, true, 4);
-    private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, true, -1);
+    private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, false, -1);
 
     private _patternEditorAnimating: boolean = false;
     private _patternEditorAnimationStart: number = 0;
@@ -940,7 +940,7 @@ export class SongEditor {
     private readonly _echoSustainRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
     private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
     private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });
+    private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });
     private readonly _rhythmActionSelect: HTMLSelectElement = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
     private readonly _rhythmActionOption: HTMLOptionElement = option({ value: "toggleRhythm" }, "Disable Subgrid");
     private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
@@ -5322,13 +5322,13 @@ export class SongEditor {
                     const lastBar = this.doc.song.barCount - 1;
 
                     if (newBar !== 0 && oldBar !== lastBar) {
+                        this._renderPatternEditorBuffers();
                         this._startPatternEditorAnimation(1);
                     }
 
                     this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();
 
-                    this._renderPatternEditorBuffers();
                 } 
                 event.preventDefault();
                 break;
@@ -5349,13 +5349,12 @@ export class SongEditor {
                     const lastBar = this.doc.song.barCount - 1;
 
                     if (oldBar !== 0 && newBar !== lastBar) {
+                        this._renderPatternEditorBuffers();
                         this._startPatternEditorAnimation(-1);
                     }
 
                     this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();
-
-                    this._renderPatternEditorBuffers();
                 }
                 event.preventDefault();
                 break;
@@ -5716,19 +5715,20 @@ export class SongEditor {
             this._rhythmActionSelect.selectedIndex = 0;
             return;
         }
+
+        const rhythm = this._rhythmInput.valueAsNumber;
+        const isFactorOfPartsPerBeat = rhythm > 0 && Config.partsPerBeat % rhythm === 0; // Factors of partsPerBeat greater than 12
         switch (this._rhythmActionSelect.value) {
             case "forceRhythm":
-                if (this._patternEditor.rhythmEnabled) {
+                if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                     this.doc.selection.forceRhythm();
                 }
                 break;
-
             case "forceRhythmAll":
-                if (this._patternEditor.rhythmEnabled) {
+                if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                     this.doc.selection.forceRhythmAllPatterns();
                 }
                 break;
-
             case "toggleRhythm":
                 this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
 

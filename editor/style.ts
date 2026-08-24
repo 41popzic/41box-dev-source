@@ -363,6 +363,7 @@ html {
 	align-items: center;
 }
 .beepboxEditor .piano-button::before {
+	display: none !important;
 	content: "";
 	position: absolute;
 	left: 0;
@@ -370,12 +371,13 @@ html {
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
-	background-image: var(--internal-piano-key-symbol);
+	/*background-image: var(--internal-piano-key-symbol);
 	background-repeat: no-repeat;
 	background-position: center;
-	background-size: 100% 115.38%;
+	background-size: 100% 115.38%;*/
 }
 .beepboxEditor .piano-button.disabled::after {
+	display: none !important;
 	content: "";
 	position: absolute;
 	right: 0;
@@ -384,11 +386,11 @@ html {
 	height: 100%;
 	pointer-events: none;
 	background: ${ColorConfig.editorBackground};
-	-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
+	/*-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 	mask-repeat: no-repeat;
-	mask-position: center;
+	mask-position: center;*/
 }
 
 .beepboxEditor .piano-button.pressed, .beepboxEditor .drum-button.pressed {

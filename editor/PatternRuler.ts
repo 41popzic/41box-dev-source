@@ -41,7 +41,7 @@ export class PatternRuler {
             this._svg.removeChild(this._svg.firstChild);
         }
 
-        const pianoWidth = this._doc.prefs.showLetters ? 32 : 0;
+        const pianoWidth = this._doc.prefs.showLetters ? 24 : 0;
 
         this.container.style.marginLeft = pianoWidth + "px";
         this.container.style.width = `calc(100% - ${pianoWidth}px)`;  

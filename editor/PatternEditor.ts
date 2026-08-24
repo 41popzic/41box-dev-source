@@ -127,7 +127,7 @@ export class PatternEditor {
         x2: 0,
         y2: 0,
         stroke: ColorConfig.loopAccent,
-        "stroke-width": 4,
+        "stroke-width": 2,
         "pointer-events": "none",
         visibility: "hidden",
     });
@@ -138,7 +138,7 @@ export class PatternEditor {
         x2: 0,
         y2: 0,
         stroke: ColorConfig.loopAccent,
-        "stroke-width": 4,
+        "stroke-width": 2,
         "pointer-events": "none",
         visibility: "hidden",
     });
@@ -207,7 +207,7 @@ export class PatternEditor {
             this.modDragValueLabel.addEventListener("input", this._validateModDragLabelInput);
         } else {
             this._svgPlayhead.style.display = "none";
-            this._svg.appendChild(SVG.rect({ x: 0, y: 0, width: 10000, height: 10000, fill: ColorConfig.editorBackground, style: "opacity: 0.5;" }));
+            this._svgBeathead.style.display = "none";
         }
 
         this.resetCopiedPins();
@@ -2733,7 +2733,8 @@ export class PatternEditor {
         for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
             let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
 
-            this._backgroundPitchRows[j].style.visibility = scale[j] ? "visible" : "hidden";
+            this._backgroundPitchRows[j].style.visibility = "visible";
+            this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0.5";
         }
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {

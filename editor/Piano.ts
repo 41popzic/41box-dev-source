@@ -11,7 +11,7 @@ export class Piano {
     private readonly _drumContainer: HTMLDivElement = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
     private readonly _modContainer: HTMLDivElement = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
     private readonly _preview: HTMLDivElement = HTML.div({ style: `width: 100%; height: 40px; border: 2px solid ${ColorConfig.primaryText}; position: absolute; box-sizing: border-box; pointer-events: none;` });
-    public readonly container: HTMLDivElement = HTML.div({ style: "width: 32px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" },
+    public readonly container: HTMLDivElement = HTML.div({ style: "width: 24px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" },
         this._pianoContainer,
         this._drumContainer,
         this._modContainer,
@@ -116,29 +116,8 @@ export class Piano {
     }
 
     private _updateCursorPitch(): void {
-        const scale: ReadonlyArray<boolean> = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
         const mousePitch: number = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
-        if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
-            this._cursorPitch = Math.floor(mousePitch);
-        } else {
-            let topPitch: number = Math.floor(mousePitch) + 1;
-            let bottomPitch: number = Math.floor(mousePitch) - 1;
-            while (!scale[topPitch % Config.pitchesPerOctave]) {
-                topPitch++;
-            }
-            while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
-                bottomPitch--;
-            }
-            let topRange: number = topPitch;
-            let bottomRange: number = bottomPitch + 1;
-            if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
-                topRange -= 0.5;
-            }
-            if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
-                bottomRange += 0.5;
-            }
-            this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
-        }
+        this._cursorPitch = Math.floor(mousePitch);
     }
 
     private _playLiveInput(): void {
@@ -305,7 +284,7 @@ export class Piano {
             if (this._renderedPitchCount != this._pitchCount) {
                 this._pianoContainer.innerHTML = "";
                 for (let i: number = 0; i < this._pitchCount; i++) {
-                    const pianoLabel: HTMLDivElement = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 15px; white-space: nowrap;" });
+                    const pianoLabel: HTMLDivElement = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 10px; white-space: nowrap;" });
                     const pianoKey: HTMLDivElement = HTML.div({ class: "piano-button", style: "background: gray; position: relative;" }, pianoLabel);
                     this._pianoContainer.appendChild(pianoKey);
                     this._pianoLabels[i] = pianoLabel;
@@ -320,45 +299,30 @@ export class Piano {
                 const pitchNameIndex: number = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
                 const isWhiteKey: boolean = Config.keys[pitchNameIndex].isWhiteKey;
                 this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                if (isWhiteKey) { 
-                    this._pianoKeys[j].style.background = ColorConfig.whitePianoKey; 
-                    this._pianoKeys[j].style.width = "32px"; this._pianoLabels[j].style.paddingLeft = "15px"; 
-                } else { 
-                    this._pianoKeys[j].style.background = ColorConfig.blackPianoKey; 
-                    this._pianoKeys[j].style.width = "32px"; this._pianoLabels[j].style.paddingLeft = "15px"; 
-                };
-                // Don't mind the above
-                let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                if (!scale[j % Config.pitchesPerOctave]) {
-                    this._pianoKeys[j].classList.add("disabled");
-                    this._pianoLabels[j].style.display = "none";
-                } else {
-                    this._pianoKeys[j].classList.remove("disabled");
-                    this._pianoLabels[j].style.display = "";
+                //this._pianoKeys[j].classList.remove("disabled");
+                this._pianoLabels[j].style.display = "";
 
-                    const label: HTMLDivElement = this._pianoLabels[j];
+                const label: HTMLDivElement = this._pianoLabels[j];
 
-                    if ((j % 12) == 0) {
-                        label.style.transform = "translate(-5px, 0px)";
-                    }
-                    else {
-                        label.style.transform = "translate(0px, 0px)";
-                    }
-
-                    /* @jummbus - Visual distinciton for bass notes during live input. Axed for now... maybe needs new colors?
-                    I want to do filter: hue-shift(60deg) but keys are usually grayscale, and filter: is used already anyway for displaying played notes as pressed.
-                    if ( j + octaveOffset <= Piano.getBassCutoffPitch(this._doc) && this._doc.prefs.bassOffset != 0) {
-                        label.style.setProperty("font-style", "italic");
-                    }
-                    else {
-                        this._pianoKeys[j].style.setProperty("font-style", "");
-                    }
-                    */
-
-                    label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
-                    label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
-
+                if ((j % 12) == 0) {
+                    label.style.transform = "translate(-5px, 0px)";
                 }
+                else {
+                    label.style.transform = "translate(0px, 0px)";
+                }
+
+                /* @jummbus - Visual distinciton for bass notes during live input. Axed for now... maybe needs new colors?
+                I want to do filter: hue-shift(60deg) but keys are usually grayscale, and filter: is used already anyway for displaying played notes as pressed.
+                if ( j + octaveOffset <= Piano.getBassCutoffPitch(this._doc) && this._doc.prefs.bassOffset != 0) {
+                    label.style.setProperty("font-style", "italic");
+                }
+                else {
+                    this._pianoKeys[j].style.setProperty("font-style", "");
+                }
+                */
+
+                label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.blackPianoKey : ColorConfig.whitePianoKey;
+                label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
             }
         }
         else if (isMod) {

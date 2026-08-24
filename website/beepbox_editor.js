@@ -14423,6 +14423,7 @@ html {
 	align-items: center;
 }
 .beepboxEditor .piano-button::before {
+	display: none !important;
 	content: "";
 	position: absolute;
 	left: 0;
@@ -14430,12 +14431,13 @@ html {
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
-	background-image: var(--internal-piano-key-symbol);
+	/*background-image: var(--internal-piano-key-symbol);
 	background-repeat: no-repeat;
 	background-position: center;
-	background-size: 100% 115.38%;
+	background-size: 100% 115.38%;*/
 }
 .beepboxEditor .piano-button.disabled::after {
+	display: none !important;
 	content: "";
 	position: absolute;
 	right: 0;
@@ -14444,11 +14446,11 @@ html {
 	height: 100%;
 	pointer-events: none;
 	background: ${ColorConfig.editorBackground};
-	-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
+	/*-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 	mask-repeat: no-repeat;
-	mask-position: center;
+	mask-position: center;*/
 }
 
 .beepboxEditor .piano-button.pressed, .beepboxEditor .drum-button.pressed {
@@ -37337,7 +37339,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._drumContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
             this._modContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
             this._preview = HTML.div({ style: `width: 100%; height: 40px; border: 2px solid ${ColorConfig.primaryText}; position: absolute; box-sizing: border-box; pointer-events: none;` });
-            this.container = HTML.div({ style: "width: 32px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" }, this._pianoContainer, this._drumContainer, this._modContainer, this._preview);
+            this.container = HTML.div({ style: "width: 24px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" }, this._pianoContainer, this._drumContainer, this._modContainer, this._preview);
             this._editorHeight = 481;
             this._pianoKeys = [];
             this._pianoLabels = [];
@@ -37473,7 +37475,7 @@ li.select2-results__option[role=group] > strong:hover {
                     if (this._renderedPitchCount != this._pitchCount) {
                         this._pianoContainer.innerHTML = "";
                         for (let i = 0; i < this._pitchCount; i++) {
-                            const pianoLabel = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 15px; white-space: nowrap;" });
+                            const pianoLabel = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 10px; white-space: nowrap;" });
                             const pianoKey = HTML.div({ class: "piano-button", style: "background: gray; position: relative;" }, pianoLabel);
                             this._pianoContainer.appendChild(pianoKey);
                             this._pianoLabels[i] = pianoLabel;
@@ -37487,34 +37489,16 @@ li.select2-results__option[role=group] > strong:hover {
                         const pitchNameIndex = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
                         const isWhiteKey = Config.keys[pitchNameIndex].isWhiteKey;
                         this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                        if (isWhiteKey) {
-                            this._pianoKeys[j].style.background = ColorConfig.whitePianoKey;
-                            this._pianoKeys[j].style.width = "32px";
-                            this._pianoLabels[j].style.paddingLeft = "15px";
+                        this._pianoLabels[j].style.display = "";
+                        const label = this._pianoLabels[j];
+                        if ((j % 12) == 0) {
+                            label.style.transform = "translate(-5px, 0px)";
                         }
                         else {
-                            this._pianoKeys[j].style.background = ColorConfig.blackPianoKey;
-                            this._pianoKeys[j].style.width = "32px";
-                            this._pianoLabels[j].style.paddingLeft = "15px";
+                            label.style.transform = "translate(0px, 0px)";
                         }
-                        let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                        if (!scale[j % Config.pitchesPerOctave]) {
-                            this._pianoKeys[j].classList.add("disabled");
-                            this._pianoLabels[j].style.display = "none";
-                        }
-                        else {
-                            this._pianoKeys[j].classList.remove("disabled");
-                            this._pianoLabels[j].style.display = "";
-                            const label = this._pianoLabels[j];
-                            if ((j % 12) == 0) {
-                                label.style.transform = "translate(-5px, 0px)";
-                            }
-                            else {
-                                label.style.transform = "translate(0px, 0px)";
-                            }
-                            label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
-                            label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
-                        }
+                        label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.blackPianoKey : ColorConfig.whitePianoKey;
+                        label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
                     }
                 }
                 else if (isMod) {
@@ -37755,30 +37739,8 @@ li.select2-results__option[role=group] > strong:hover {
             window.requestAnimationFrame(this._onAnimationFrame);
         }
         _updateCursorPitch() {
-            const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
             const mousePitch = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
-            if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
-                this._cursorPitch = Math.floor(mousePitch);
-            }
-            else {
-                let topPitch = Math.floor(mousePitch) + 1;
-                let bottomPitch = Math.floor(mousePitch) - 1;
-                while (!scale[topPitch % Config.pitchesPerOctave]) {
-                    topPitch++;
-                }
-                while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
-                    bottomPitch--;
-                }
-                let topRange = topPitch;
-                let bottomRange = bottomPitch + 1;
-                if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
-                    topRange -= 0.5;
-                }
-                if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
-                    bottomRange += 0.5;
-                }
-                this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
-            }
+            this._cursorPitch = Math.floor(mousePitch);
         }
         _playLiveInput() {
             const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
@@ -47042,7 +47004,7 @@ You should be redirected to the song at:<br /><br />
                 x2: 0,
                 y2: 0,
                 stroke: ColorConfig.loopAccent,
-                "stroke-width": 4,
+                "stroke-width": 2,
                 "pointer-events": "none",
                 visibility: "hidden",
             });
@@ -47052,7 +47014,7 @@ You should be redirected to the song at:<br /><br />
                 x2: 0,
                 y2: 0,
                 stroke: ColorConfig.loopAccent,
-                "stroke-width": 4,
+                "stroke-width": 2,
                 "pointer-events": "none",
                 visibility: "hidden",
             });
@@ -47319,7 +47281,7 @@ You should be redirected to the song at:<br /><br />
             }
             else {
                 this._svgPlayhead.style.display = "none";
-                this._svg.appendChild(SVG.rect({ x: 0, y: 0, width: 10000, height: 10000, fill: ColorConfig.editorBackground, style: "opacity: 0.5;" }));
+                this._svgBeathead.style.display = "none";
             }
             this.resetCopiedPins();
         }
@@ -49278,7 +49240,8 @@ You should be redirected to the song at:<br /><br />
             }
             for (let j = 0; j < Config.pitchesPerOctave; j++) {
                 let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                this._backgroundPitchRows[j].style.visibility = scale[j] ? "visible" : "hidden";
+                this._backgroundPitchRows[j].style.visibility = "visible";
+                this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0.5";
             }
             if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
                 if (!this._renderedDrums) {
@@ -54210,7 +54173,7 @@ You should be redirected to the song at:<br /><br />
             while (this._svg.firstChild) {
                 this._svg.removeChild(this._svg.firstChild);
             }
-            const pianoWidth = this._doc.prefs.showLetters ? 32 : 0;
+            const pianoWidth = this._doc.prefs.showLetters ? 24 : 0;
             this.container.style.marginLeft = pianoWidth + "px";
             this.container.style.width = `calc(100% - ${pianoWidth}px)`;
             const barWidth = this._getBarWidth();
@@ -54827,8 +54790,8 @@ You should be redirected to the song at:<br /><br />
             this._patternEditor = new PatternEditor(this.doc, true, 0);
             this._patternEditor2 = new PatternEditor(this.doc, true, 1);
             this._patternEditor3 = new PatternEditor(this.doc, true, 2);
-            this._patternEditor4 = new PatternEditor(this.doc, true, 3);
-            this._patternEditorMinus1 = new PatternEditor(this.doc, true, -1);
+            this._patternEditor4 = new PatternEditor(this.doc, false, 3);
+            this._patternEditorMinus1 = new PatternEditor(this.doc, false, -1);
             this._patternEditorAnimating = false;
             this._patternEditorAnimationStart = 0;
             this._patternEditorAnimationDuration = 150;
@@ -54930,7 +54893,7 @@ You should be redirected to the song at:<br /><br />
             this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
             this._echoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
             this._echoDelayRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
-            this._rhythmInput = input({ type: "number", min: "1", max: "12", style: "width: 5em;" });
+            this._rhythmInput = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });
             this._rhythmActionSelect = select({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;", }, "");
             this._rhythmActionOption = option({ value: "toggleRhythm" }, "Disable Subgrid");
             this._favoriteRhythmOption = option({ value: "toggleFavoriteRhythm" }, "Add Current Division to Favorites");
@@ -57388,11 +57351,11 @@ You should be redirected to the song at:<br /><br />
                             const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
                             const lastBar = this.doc.song.barCount - 1;
                             if (newBar !== 0 && oldBar !== lastBar) {
+                                this._renderPatternEditorBuffers();
                                 this._startPatternEditorAnimation(1);
                             }
                             this.doc.selection.setChannelBar(this.doc.channel, newBar);
                             this.doc.selection.resetBoxSelection();
-                            this._renderPatternEditorBuffers();
                         }
                         event.preventDefault();
                         break;
@@ -57415,11 +57378,11 @@ You should be redirected to the song at:<br /><br />
                             const newBar = (oldBar + 1) % this.doc.song.barCount;
                             const lastBar = this.doc.song.barCount - 1;
                             if (oldBar !== 0 && newBar !== lastBar) {
+                                this._renderPatternEditorBuffers();
                                 this._startPatternEditorAnimation(-1);
                             }
                             this.doc.selection.setChannelBar(this.doc.channel, newBar);
                             this.doc.selection.resetBoxSelection();
-                            this._renderPatternEditorBuffers();
                         }
                         event.preventDefault();
                         break;
@@ -57660,14 +57623,16 @@ You should be redirected to the song at:<br /><br />
                     this._rhythmActionSelect.selectedIndex = 0;
                     return;
                 }
+                const rhythm = this._rhythmInput.valueAsNumber;
+                const isFactorOfPartsPerBeat = rhythm > 0 && Config.partsPerBeat % rhythm === 0;
                 switch (this._rhythmActionSelect.value) {
                     case "forceRhythm":
-                        if (this._patternEditor.rhythmEnabled) {
+                        if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                             this.doc.selection.forceRhythm();
                         }
                         break;
                     case "forceRhythmAll":
-                        if (this._patternEditor.rhythmEnabled) {
+                        if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                             this.doc.selection.forceRhythmAllPatterns();
                         }
                         break;
