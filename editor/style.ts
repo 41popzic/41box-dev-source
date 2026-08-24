@@ -387,7 +387,6 @@ html {
 	-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }

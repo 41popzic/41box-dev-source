@@ -498,34 +498,34 @@ var beepbox = (function (exports) {
     Config.willReloadForCustomSamples = false;
     Config.jsonFormat = "41box";
     Config.scales = toNameMap([
-        { group: "Standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
-        { group: "Standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
-        { group: "Standard", name: "Minor", realName: "aeolian", flags: [true, false, true, true, false, true, false, true, true, false, true, false] },
-        { group: "Standard", name: "Mixolydian", realName: "mixolydian", flags: [true, false, true, false, true, true, false, true, false, true, true, false] },
-        { group: "Standard", name: "Lydian", realName: "lydian", flags: [true, false, true, false, true, false, true, true, false, true, false, true] },
-        { group: "Standard", name: "Dorian", realName: "dorian", flags: [true, false, true, true, false, true, false, true, false, true, true, false] },
-        { group: "Standard", name: "Phrygian", realName: "phrygian", flags: [true, true, false, true, false, true, false, true, true, false, true, false] },
-        { group: "Standard", name: "Locrian", realName: "locrian", flags: [true, true, false, true, false, true, true, false, true, false, true, false] },
-        { group: "Exotic", name: "Half Diminished", realName: "aeolian b5/locrian nat2", flags: [true, false, true, true, false, true, true, false, true, false, true, false] },
-        { group: "Exotic", name: "Lydian Dominant", realName: "lydian dominant", flags: [true, false, true, false, true, false, true, true, false, true, true, false] },
-        { group: "Exotic", name: "Phrygian Dominant", realName: "phrygian dominant", flags: [true, true, false, false, true, true, false, true, true, false, true, false] },
-        { group: "Exotic", name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] },
-        { group: "Exotic", name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] },
-        { group: "Exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] },
-        { group: "Exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] },
-        { group: "Exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] },
-        { group: "Exotic", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] },
-        { group: "Hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] },
-        { group: "Hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] },
-        { group: "Hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true, false, false, true, false, true, false, false] },
-        { group: "Hexatonic", name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] },
-        { group: "Pentatonic", name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] },
-        { group: "Pentatonic", name: "Minor Pentatonic", realName: "minor pentatonic", flags: [true, false, false, true, false, true, false, true, false, false, true, false] },
-        { group: "Misc", name: "No Dabbing (MB)", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
-        { group: "Misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
-        { group: "Misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "Misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
-        { group: "Misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
+        { group: "standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
+        { group: "standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
+        { group: "standard", name: "Minor", realName: "aeolian", flags: [true, false, true, true, false, true, false, true, true, false, true, false] },
+        { group: "standard", name: "Mixolydian", realName: "mixolydian", flags: [true, false, true, false, true, true, false, true, false, true, true, false] },
+        { group: "standard", name: "Lydian", realName: "lydian", flags: [true, false, true, false, true, false, true, true, false, true, false, true] },
+        { group: "standard", name: "Dorian", realName: "dorian", flags: [true, false, true, true, false, true, false, true, false, true, true, false] },
+        { group: "standard", name: "Phrygian", realName: "phrygian", flags: [true, true, false, true, false, true, false, true, true, false, true, false] },
+        { group: "standard", name: "Locrian", realName: "locrian", flags: [true, true, false, true, false, true, true, false, true, false, true, false] },
+        { group: "exotic", name: "Half Diminished", realName: "aeolian b5/locrian nat2", flags: [true, false, true, true, false, true, true, false, true, false, true, false] },
+        { group: "exotic", name: "Lydian Dominant", realName: "lydian dominant", flags: [true, false, true, false, true, false, true, true, false, true, true, false] },
+        { group: "exotic", name: "Phrygian Dominant", realName: "phrygian dominant", flags: [true, true, false, false, true, true, false, true, true, false, true, false] },
+        { group: "exotic", name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] },
+        { group: "exotic", name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] },
+        { group: "exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] },
+        { group: "exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] },
+        { group: "exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] },
+        { group: "hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] },
+        { group: "hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] },
+        { group: "hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true, false, false, true, false, true, false, false] },
+        { group: "hexatonic", name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] },
+        { group: "pentatonic", name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] },
+        { group: "pentatonic", name: "Minor Pentatonic", realName: "minor pentatonic", flags: [true, false, false, true, false, true, false, true, false, false, true, false] },
+        { group: "misc", name: "No Dabbing (MB)", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
+        { group: "misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
+        { group: "misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
+        { group: "misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
+        { group: "misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
+        { group: "misc", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] },
     ]);
     Config.keys = toNameMap([
         { name: "C", isWhiteKey: true, basePitch: 12 },
@@ -14447,7 +14447,6 @@ html {
 	-webkit-mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: linear-gradient(90deg, transparent 0%, gray 70%, gray 100%);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -54183,6 +54182,81 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
+    class PatternRuler {
+        constructor(_doc, _getBarWidth) {
+            this._doc = _doc;
+            this._getBarWidth = _getBarWidth;
+            this._height = 10;
+            this._svg = SVG.svg({
+                style: "display: block; height: 100%; " +
+                    "background-color: " + ColorConfig.editorBackground + ";",
+                width: "100%",
+                height: this._height,
+                preserveAspectRatio: "none",
+            });
+            this.container = HTML.div({ style: "height: 24px; " + "flex-shrink: 0; " + "overflow: hidden;" }, this._svg);
+            this._documentChanged = () => {
+                this._render();
+                requestAnimationFrame(() => {
+                    this._render();
+                });
+            };
+            this._doc.notifier.watch(this._documentChanged);
+            requestAnimationFrame(() => {
+                this._render();
+            });
+        }
+        _render() {
+            while (this._svg.firstChild) {
+                this._svg.removeChild(this._svg.firstChild);
+            }
+            const pianoWidth = this._doc.prefs.showLetters ? 32 : 0;
+            this.container.style.marginLeft = pianoWidth + "px";
+            this.container.style.width = `calc(100% - ${pianoWidth}px)`;
+            const barWidth = this._getBarWidth();
+            const beatsPerBar = this._doc.song.beatsPerBar;
+            const barCount = this._doc.song.barCount;
+            if (barWidth <= 0 || beatsPerBar <= 0 || barCount <= 0)
+                return;
+            const beatWidth = barWidth / beatsPerBar;
+            this._svg.setAttribute("width", String(barWidth * barCount));
+            const firstBar = this._doc.bar === this._doc.song.barCount - 1 ? Math.max(0, this._doc.bar - 2) : Math.max(0, this._doc.bar - 1);
+            for (let bar = 0; bar < barCount; bar++) {
+                const barX = bar * barWidth;
+                this._svg.appendChild(SVG.line({
+                    x1: barX,
+                    y1: 0,
+                    x2: barX,
+                    y2: this._height,
+                    stroke: ColorConfig.tonic,
+                    "stroke-width": 1,
+                }));
+                for (let beat = 0; beat < beatsPerBar; beat++) {
+                    const beatX = barX + beat * beatWidth;
+                    const beatText = SVG.text({
+                        x: beatX + 3,
+                        y: 15,
+                        fill: beat === 0
+                            ? ColorConfig.primaryText
+                            : ColorConfig.secondaryText,
+                        "font-size": 11,
+                        "font-family": "sans-serif",
+                    });
+                    if (beat === 0) {
+                        beatText.textContent = String(firstBar + bar + 1);
+                    }
+                    else {
+                        beatText.textContent = String(beat + 1);
+                    }
+                    this._svg.appendChild(beatText);
+                }
+            }
+        }
+        setOffset(offset) {
+            this._svg.style.transform = `translateX(${offset}px)`;
+        }
+    }
+
     const { button, div, input, select, span, optgroup, option, canvas } = HTML;
     function buildOptions(menu, items) {
         for (let index = 0; index < items.length; index++) {
@@ -54780,11 +54854,13 @@ You should be redirected to the song at:<br /><br />
                 const offset = baseOffset + animationOffset;
                 this._patternEditorTrack.style.transform =
                     `translateX(${offset}px)`;
+                this._patternRuler.setOffset(offset);
                 if (progress >= 1) {
                     this._patternEditorAnimating = false;
                     this._patternEditorAnimationDirection = 0;
                     this._patternEditorTrack.style.transform =
                         `translateX(${-patternEditorWidth}px)`;
+                    this._patternRuler.setOffset(0);
                     return;
                 }
                 window.requestAnimationFrame(this._animatePatternEditor);
@@ -55094,9 +55170,10 @@ You should be redirected to the song at:<br /><br />
             this._zoomInButton = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
             this._zoomOutButton = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
             this._patternEditorTrack = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;" }, this._patternEditorMinus1.container, this._patternEditor.container, this._patternEditor2.container, this._patternEditor3.container, this._patternEditor4.container, this._patternEditor5.container);
+            this._patternRuler = new PatternRuler(this.doc, () => this._patternEditor.container.clientWidth);
             this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._patternEditorTrack);
             this._patternEditorAndPianoRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;" }, this._piano.container, this._patternEditorRow);
-            this._patternEditorColumn = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;" }, this._patternEditorAndPianoRow, this._patternScrollBar.container);
+            this._patternEditorColumn = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;" }, this._patternRuler.container, this._patternEditorAndPianoRow, this._patternScrollBar.container);
             this._patternArea = div({ class: "pattern-area" }, this._patternEditorColumn, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton);
             this._trackContainer = div({ class: "trackContainer" }, this._trackEditor.container, this._loopEditor.container);
             this._trackVisibleArea = div({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });

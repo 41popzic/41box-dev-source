@@ -908,38 +908,39 @@ export class Config {
 
     public static readonly scales: DictionaryArray<Scale> = toNameMap([
 
-        //   C     Db      D     Eb      E      F     F#      G     Ab      A     Bb      B      C    
-        { group: "Standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] }, // Free
-        { group: "Standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] }, // Major
-        { group: "Standard", name: "Minor", realName: "aeolian", flags: [true, false, true, true, false, true, false, true, true, false, true, false] }, // Minor
-        { group: "Standard", name: "Mixolydian", realName: "mixolydian", flags: [true, false, true, false, true, true, false, true, false, true, true, false] }, // Mixolydian
-        { group: "Standard", name: "Lydian", realName: "lydian", flags: [true, false, true, false, true, false, true, true, false, true, false, true] }, // Lydian
-        { group: "Standard", name: "Dorian", realName: "dorian", flags: [true, false, true, true, false, true, false, true, false, true, true, false] }, // Dorian
-        { group: "Standard", name: "Phrygian", realName: "phrygian", flags: [true, true, false, true, false, true, false, true, true, false, true, false] }, // Phrygian
-        { group: "Standard", name: "Locrian", realName: "locrian", flags: [true, true, false, true, false, true, true, false, true, false, true, false] }, // Locrian
-        { group: "Exotic", name: "Half Diminished", realName: "aeolian b5/locrian nat2", flags: [true, false, true, true, false, true, true, false, true, false, true, false] }, // Locrian
-        { group: "Exotic", name: "Lydian Dominant", realName: "lydian dominant", flags: [true, false, true, false, true, false, true, true, false, true, true, false] }, // Lydian Dominant
-        { group: "Exotic", name: "Phrygian Dominant", realName: "phrygian dominant", flags: [true, true, false, false, true, true, false, true, true, false, true, false] }, // Phrygian Dominant
-        { group: "Exotic", name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] }, // Harmonic Major
-        { group: "Exotic", name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] }, // Harmonic Minor
-        { group: "Exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
-        { group: "Exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
-        { group: "Exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
-        { group: "Exotic", name: "Blues Phrygian", realName:"blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }, // Blues Phrygian, custom scale made for 41Box 1.3
-        { group: "Hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
-        { group: "Hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
-        { group: "Hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true,false, false, true, false, true, false, false] }, // Blues Major
-        { group: "Hexatonic", name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] }, // Blues
-        { group: "Pentatonic", name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] }, // Major Pentatonic
-        { group: "Pentatonic", name: "Minor Pentatonic", realName: "minor pentatonic", flags: [true, false, false, true, false, true, false, true, false, false, true, false] }, // Minor Pentatonic
+        //                                                                 C     Db    D     Eb     E     F     F#    G     Ab    A     Bb    B    C (repeats)    
+        { group: "standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] }, // Free
+        { group: "standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] }, // Major
+        { group: "standard", name: "Minor", realName: "aeolian", flags: [true, false, true, true, false, true, false, true, true, false, true, false] }, // Minor
+        { group: "standard", name: "Mixolydian", realName: "mixolydian", flags: [true, false, true, false, true, true, false, true, false, true, true, false] }, // Mixolydian
+        { group: "standard", name: "Lydian", realName: "lydian", flags: [true, false, true, false, true, false, true, true, false, true, false, true] }, // Lydian
+        { group: "standard", name: "Dorian", realName: "dorian", flags: [true, false, true, true, false, true, false, true, false, true, true, false] }, // Dorian
+        { group: "standard", name: "Phrygian", realName: "phrygian", flags: [true, true, false, true, false, true, false, true, true, false, true, false] }, // Phrygian
+        { group: "standard", name: "Locrian", realName: "locrian", flags: [true, true, false, true, false, true, true, false, true, false, true, false] }, // Locrian
+        { group: "exotic", name: "Half Diminished", realName: "aeolian b5/locrian nat2", flags: [true, false, true, true, false, true, true, false, true, false, true, false] }, // Locrian
+        { group: "exotic", name: "Lydian Dominant", realName: "lydian dominant", flags: [true, false, true, false, true, false, true, true, false, true, true, false] }, // Lydian Dominant
+        { group: "exotic", name: "Phrygian Dominant", realName: "phrygian dominant", flags: [true, true, false, false, true, true, false, true, true, false, true, false] }, // Phrygian Dominant
+        { group: "exotic", name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] }, // Harmonic Major
+        { group: "exotic", name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] }, // Harmonic Minor
+        { group: "exotic", name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
+        { group: "exotic", name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
+        { group: "exotic", name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
+        { group: "hexatonic", name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
+        { group: "hexatonic", name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
+        { group: "hexatonic", name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true,false, false, true, false, true, false, false] }, // Blues Major
+        { group: "hexatonic", name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] }, // Blues
+        { group: "pentatonic", name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] }, // Major Pentatonic
+        { group: "pentatonic", name: "Minor Pentatonic", realName: "minor pentatonic", flags: [true, false, false, true, false, true, false, true, false, false, true, false] }, // Minor Pentatonic
         // TODO: remove these with 2.3
         // modbox
-        { group: "Misc", name: "No Dabbing (MB)", realName: "no dabbing", flags:[true, true, false, true, true, true, true, true, true, false, true, false] },
+        { group: "misc", name: "No Dabbing (MB)", realName: "no dabbing", flags:[true, true, false, true, true, true, true, true, true, false, true, false] },
         // todbox
-        { group: "Misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
-        { group: "Misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "Misc", name: "buh", realName:"whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
-        { group: "Misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
+        { group: "misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
+        { group: "misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
+        { group: "misc", name: "buh", realName:"whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
+        { group: "misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
+        // 41box
+        { group: "misc", name: "Blues Phrygian", realName:"blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }, // Blues Phrygian added in 41Box 1.3 URL ver 4
     ]);
     public static readonly keys: DictionaryArray<Key> = toNameMap([
         { name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.

@@ -322,7 +322,7 @@ export class Preferences {
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
 		this.showChannels = window.localStorage.getItem("showChannels") == "true";
-		window.localStorage.removeItem("showScrollBar");
+		window.localStorage.removeItem("showScrollBar"); // yessir !!!
 		this.showScrollBar = true;
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";

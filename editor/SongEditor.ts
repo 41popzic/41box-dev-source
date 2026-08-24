@@ -59,6 +59,7 @@ import { AddSamplesPrompt } from "./AddSamplesPrompt";
 import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 // import { Selection } from "./Selection";
 import { PreferencesPrompt } from "./PreferencesPrompt";
+import { PatternRuler } from "./PatternRuler"
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -742,6 +743,7 @@ export class SongEditor {
     private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, true, 3);
     private readonly _patternEditor5: PatternEditor = new PatternEditor(this.doc, true, 4);
     private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, true, -1);
+
     private _patternEditorAnimating: boolean = false;
     private _patternEditorAnimationStart: number = 0;
     private _patternEditorAnimationDuration: number = 150;
@@ -776,12 +778,16 @@ export class SongEditor {
         this._patternEditorTrack.style.transform =
             `translateX(${offset}px)`;
 
+        this._patternRuler.setOffset(offset);
+
         if (progress >= 1) {
             this._patternEditorAnimating = false;
             this._patternEditorAnimationDirection = 0;
 
             this._patternEditorTrack.style.transform =
                 `translateX(${-patternEditorWidth}px)`;
+
+            this._patternRuler.setOffset(0);
 
             return;
         }
@@ -1387,6 +1393,8 @@ export class SongEditor {
         this._patternEditor5.container,
     );
 
+    private readonly _patternRuler: PatternRuler = new PatternRuler(this.doc, () => this._patternEditor.container.clientWidth);
+
     private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;"},
         this._patternEditorTrack,
     );
@@ -1397,6 +1405,7 @@ export class SongEditor {
     );
 
     private readonly _patternEditorColumn: HTMLDivElement = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;"},
+        this._patternRuler.container,
         this._patternEditorAndPianoRow,
         this._patternScrollBar.container,
     );
