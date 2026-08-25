@@ -46366,7 +46366,7 @@ You should be redirected to the song at:<br /><br />
             this._piano = _piano;
             this._editorWidth = 18;
             this._editorHeight = 481;
-            this._notchHeight = 4.0;
+            this._notchHeight = 0;
             this._octaveCount = Config.pitchOctaves;
             this._octaveHeight = (this._editorHeight - this._notchHeight) / this._octaveCount;
             this._handle = SVG.rect({ fill: ColorConfig.uiWidgetBackground, x: 2, y: 0, width: this._editorWidth - 4 });
@@ -49158,14 +49158,14 @@ You should be redirected to the song at:<br /><br />
                 this._svgBeathead.setAttribute("height", "" + this._editorHeight);
                 this._selectionRect.setAttribute("y", "0");
                 this._selectionRect.setAttribute("height", "" + this._editorHeight);
-                this._patternBorderLeft.setAttribute("x1", "0");
+                this._patternBorderLeft.setAttribute("x1", "1");
                 this._patternBorderLeft.setAttribute("y1", "0");
-                this._patternBorderLeft.setAttribute("x2", "0");
-                this._patternBorderLeft.setAttribute("y2", String(this._editorHeight));
-                this._patternBorderRight.setAttribute("x1", String(this._editorWidth));
+                this._patternBorderLeft.setAttribute("x2", "1");
+                this._patternBorderLeft.setAttribute("y2", String(this._editorHeight - 1));
+                this._patternBorderRight.setAttribute("x1", String(this._editorWidth - 1));
                 this._patternBorderRight.setAttribute("y1", "0");
-                this._patternBorderRight.setAttribute("x2", String(this._editorWidth));
-                this._patternBorderRight.setAttribute("y2", String(this._editorHeight));
+                this._patternBorderRight.setAttribute("x2", String(this._editorWidth - 1));
+                this._patternBorderRight.setAttribute("y2", String(this._editorHeight - 1));
             }
             const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
             if (this._renderedBeatWidth != beatWidth || this._renderedPitchHeight != this._pitchHeight) {
@@ -49536,9 +49536,11 @@ You should be redirected to the song at:<br /><br />
             this._patternBorderLeft.setAttribute("visibility", visibility);
             this._patternBorderRight.setAttribute("visibility", visibility);
         }
-        setBarOffset(offset) {
+        setBarOffset(offset, render = true) {
             this._barOffset = offset;
-            this.render();
+            if (render) {
+                this.render();
+            }
         }
         _pitchToPixelHeight(pitch) {
             return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);
@@ -55298,6 +55300,7 @@ You should be redirected to the song at:<br /><br />
                     let offset = -1;
                     if (bar === 0) {
                         offset = 0;
+                        this._patternEditor.setBarOffset(offset, true);
                     }
                     else if (bar === lastBar) {
                         offset = -2;
@@ -57350,7 +57353,8 @@ You should be redirected to the song at:<br /><br />
                             const oldBar = this.doc.bar;
                             const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
                             const lastBar = this.doc.song.barCount - 1;
-                            if (newBar !== 0 && oldBar !== lastBar) {
+                            const usePatternBuffers = this.doc.song.barCount <= 36 && this.doc.song.getChannelCount() <= 10;
+                            if (usePatternBuffers && newBar !== 0 && oldBar !== lastBar) {
                                 this._renderPatternEditorBuffers();
                                 this._startPatternEditorAnimation(1);
                             }
@@ -57377,7 +57381,8 @@ You should be redirected to the song at:<br /><br />
                             const oldBar = this.doc.bar;
                             const newBar = (oldBar + 1) % this.doc.song.barCount;
                             const lastBar = this.doc.song.barCount - 1;
-                            if (oldBar !== 0 && newBar !== lastBar) {
+                            const usePatternBuffers = this.doc.song.barCount <= 36 && this.doc.song.getChannelCount() <= 10;
+                            if (usePatternBuffers && oldBar !== 0 && newBar !== lastBar) {
                                 this._renderPatternEditorBuffers();
                                 this._startPatternEditorAnimation(-1);
                             }

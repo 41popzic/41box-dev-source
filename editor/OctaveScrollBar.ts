@@ -10,7 +10,7 @@ import { Piano } from "./Piano";
 export class OctaveScrollBar {
     private readonly _editorWidth: number = 18;
     private readonly _editorHeight: number = 481;
-    private readonly _notchHeight: number = 4.0;
+    private readonly _notchHeight: number = 0; // was lazy to remove the notches smh
     private readonly _octaveCount: number = Config.pitchOctaves;
     private readonly _octaveHeight: number = (this._editorHeight - this._notchHeight) / this._octaveCount;
 

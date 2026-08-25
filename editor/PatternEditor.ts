@@ -2642,15 +2642,15 @@ export class PatternEditor {
             this._svgBeathead.setAttribute("height", "" + this._editorHeight);
             this._selectionRect.setAttribute("y", "0");
             this._selectionRect.setAttribute("height", "" + this._editorHeight);
-            this._patternBorderLeft.setAttribute("x1", "0");
+            this._patternBorderLeft.setAttribute("x1", "1");
             this._patternBorderLeft.setAttribute("y1", "0");
-            this._patternBorderLeft.setAttribute("x2", "0");
-            this._patternBorderLeft.setAttribute("y2", String(this._editorHeight));
+            this._patternBorderLeft.setAttribute("x2", "1");
+            this._patternBorderLeft.setAttribute("y2", String(this._editorHeight - 1));
 
-            this._patternBorderRight.setAttribute("x1", String(this._editorWidth));
+            this._patternBorderRight.setAttribute("x1", String(this._editorWidth - 1));
             this._patternBorderRight.setAttribute("y1", "0");
-            this._patternBorderRight.setAttribute("x2", String(this._editorWidth));
-            this._patternBorderRight.setAttribute("y2", String(this._editorHeight));
+            this._patternBorderRight.setAttribute("x2", String(this._editorWidth - 1));
+            this._patternBorderRight.setAttribute("y2", String(this._editorHeight - 1));
         }
 
         const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
@@ -3055,9 +3055,11 @@ export class PatternEditor {
         this._patternBorderRight.setAttribute("visibility", visibility);
     }
 
-    public setBarOffset(offset: number): void {
+    public setBarOffset(offset: number, render: boolean = true): void {
         this._barOffset = offset;
+        if (render) {
         this.render();
+        }
     }
     
     private _pitchToPixelHeight(pitch: number): number {

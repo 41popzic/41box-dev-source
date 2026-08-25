@@ -761,7 +761,7 @@ export class SongEditor {
         const elapsed = timestamp - this._patternEditorAnimationStart;
         const progress = Math.min(elapsed / this._patternEditorAnimationDuration, 1);
 
-        // Smooth-ish ease-out.
+        // Smooth-ish ease-out
         const eased = 1 - Math.pow(1 - progress, 3);
 
         const patternEditorWidth = this._patternEditor.container.clientWidth;
@@ -2827,6 +2827,7 @@ export class SongEditor {
 
             if (bar === 0) {
                 offset = 0;
+                this._patternEditor.setBarOffset(offset, true);
             } else if (bar === lastBar) {
                 offset = -2;
             }
@@ -5321,7 +5322,9 @@ export class SongEditor {
                     const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
                     const lastBar = this.doc.song.barCount - 1;
 
-                    if (newBar !== 0 && oldBar !== lastBar) {
+                    const usePatternBuffers = this.doc.song.barCount <= 36 && this.doc.song.getChannelCount() <= 10;
+
+                    if (usePatternBuffers && newBar !== 0 && oldBar !== lastBar) {
                         this._renderPatternEditorBuffers();
                         this._startPatternEditorAnimation(1);
                     }
@@ -5348,7 +5351,9 @@ export class SongEditor {
                     const newBar = (oldBar + 1) % this.doc.song.barCount;
                     const lastBar = this.doc.song.barCount - 1;
 
-                    if (oldBar !== 0 && newBar !== lastBar) {
+                    const usePatternBuffers = this.doc.song.barCount <= 36 && this.doc.song.getChannelCount() <= 10;
+
+                    if (usePatternBuffers && oldBar !== 0 && newBar !== lastBar) {
                         this._renderPatternEditorBuffers();
                         this._startPatternEditorAnimation(-1);
                     }
