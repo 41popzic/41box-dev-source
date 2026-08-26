@@ -316,9 +316,9 @@ export class Preferences {
 		this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
 		this.enableNotePreview = window.localStorage.getItem("enableNotePreview") != "false";
 		this.showFifth = window.localStorage.getItem("showFifth") != "false";
-		this.showThird = (window.localStorage.getItem("showThird") ?? "true") == "true";
+		this.showThird = window.localStorage.getItem("showThird") != "false";
 		this.advancedColorScheme = window.localStorage.getItem("advancedColorScheme") == "true";
-		this.rainbowLoop = (window.localStorage.getItem("rainbowLoop") ?? "true") == "true";
+		this.rainbowLoop = window.localStorage.getItem("rainbowLoop") != "false";
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
 		this.showChannels = window.localStorage.getItem("showChannels") == "true";
@@ -379,6 +379,7 @@ export class Preferences {
 		window.localStorage.setItem("showFifth", this.showFifth ? "true" : "false");
 		window.localStorage.setItem("showThird", this.showThird ? "true" : "false");
 		window.localStorage.setItem("advancedColorScheme", this.advancedColorScheme ? "true" : "false");
+		window.localStorage.setItem("rainbowLoop", this.rainbowLoop ? "true" : "false");
 		window.localStorage.setItem("notesOutsideScale", this.notesOutsideScale ? "true" : "false");
 		window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
 		window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");

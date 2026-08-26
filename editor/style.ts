@@ -637,6 +637,25 @@ html {
 	mask-position: center;
 }
 
+.beepboxEditor .new::before {
+	content: "";
+	flex-shrink: 0;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	width: var(--button-size);
+	height: var(--button-size);
+	background: currentColor;
+	-webkit-mask-image: var(--internal-file-page-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-image: var(--internal-file-page-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+}
+
 .beepboxEditor .menu.edit::before {
 	content: "";
 	flex-shrink: 0;
@@ -656,7 +675,45 @@ html {
 	mask-position: center;
 }
 
+.beepboxEditor .import::before {
+	content: "";
+	flex-shrink: 0;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	width: var(--button-size);
+	height: var(--button-size);
+	background: currentColor;
+	-webkit-mask-image: var(--internal-export-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-image: var(--internal-export-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+}
+
 .beepboxEditor button.preferences::before {
+	content: "";
+	flex-shrink: 0;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	width: var(--button-size);
+	height: var(--button-size);
+	background: currentColor;
+	-webkit-mask-image: var(--internal-preferences-gear-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-image: var(--internal-preferences-gear-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+}
+
+.beepboxEditor .menu.pref::before {
 	content: "";
 	flex-shrink: 0;
 	position: absolute;

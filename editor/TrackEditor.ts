@@ -18,6 +18,7 @@ export class TrackEditor {
     private readonly _channelRowContainer: HTMLElement = HTML.div({ style: `display: flex; flex-direction: column; padding-top: ${Config.barEditorHeight}px` });
     private readonly _barNumberContainer: SVGGElement = SVG.g();
     private readonly _beathead: SVGRectElement = SVG.rect({ fill: ColorConfig.playhead, "fill-opacity": 0.10, stroke: ColorConfig.playhead, "stroke-opacity": 0.20, "stroke-width": 2, "pointer-events": "none", x: 0, y: 0, width: 32, height: 128});
+    private readonly _playhead: SVGRectElement = SVG.rect({ fill: ColorConfig.playhead, x: 0, y: 0, width: 4, height: 128 });
     private readonly _boxHighlight: SVGRectElement = SVG.rect({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": 2, "pointer-events": "none", x: 1, y: 1, width: 30, height: 30 });
     private readonly _upHighlight: SVGPathElement = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
     private readonly _downHighlight: SVGPathElement = SVG.path({ fill: ColorConfig.invertedText, stroke: ColorConfig.invertedText, "stroke-width": 1, "pointer-events": "none" });
@@ -32,6 +33,7 @@ export class TrackEditor {
         this._upHighlight,
         this._downHighlight,
         this._beathead,
+        this._playhead,
     );
     private readonly _select: HTMLSelectElement = HTML.select({ class: "trackSelectBox", style: "background: none; border: none; appearance: none; border-radius: initial; box-shadow: none; color: transparent; position: absolute; touch-action: none;" });
     public readonly container: HTMLElement = HTML.div({ class: "noSelection", style: `background-color: ${ColorConfig.editorBackground}; position: relative; overflow: hidden;` },
@@ -68,6 +70,7 @@ export class TrackEditor {
 
     constructor(private _doc: SongDocument, private _songEditor: SongEditor) {
         window.requestAnimationFrame(this._animatePlayhead);
+        window.requestAnimationFrame(this._animateBeathead);
         this._svg.addEventListener("mousedown", this._whenMousePressed);
         document.addEventListener("mousemove", this._whenMouseMoved);
         document.addEventListener("mouseup", this._whenMouseReleased);
@@ -156,7 +159,7 @@ export class TrackEditor {
         this._doc.selection.setPattern(this._select.selectedIndex);
     }
 
-    private _animatePlayhead = (timestamp: number): void => {
+    private _animateBeathead = (timestamp: number): void => {
         const playheadBar = Math.floor(this._doc.synth.playhead);
 
         if (this._renderedPlayhead != playheadBar) {
@@ -168,6 +171,22 @@ export class TrackEditor {
             );
         }
 
+        window.requestAnimationFrame(this._animateBeathead);
+    }
+
+    private _animatePlayhead = (timestamp: number): void => {
+        const playhead = (this._barWidth * this._doc.synth.playhead - 2);
+        if (this._renderedPlayhead != playhead) {
+            this._renderedPlayhead = playhead;
+            this._playhead.setAttribute("x", "" + playhead);
+        }
+
+        if (this._doc.synth.playing) {
+            this._playhead.setAttribute("visibility", "visible");
+        } else {
+            this._playhead.setAttribute("visibility", "hidden");
+        }
+        
         window.requestAnimationFrame(this._animatePlayhead);
     }
 
@@ -467,6 +486,7 @@ export class TrackEditor {
             this._renderedEditorHeight = editorHeight;
             this._svg.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
             this._beathead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
+            this._playhead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
             this.container.style.height = (editorHeight + Config.barEditorHeight) + "px";
         }
 

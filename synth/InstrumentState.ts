@@ -9,7 +9,7 @@ import {  } from "./utils";
 import { DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { EnvelopeComputer } from "./EnvelopeComputer";
 import { FilterSettings, FilterControlPoint } from "./Filter";
-import { Grain } from "./EffectState"
+import { Grain } from "./EffectState";
 
 export class SpectrumWaveState {
     public wave: Float32Array | null = null;

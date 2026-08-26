@@ -7,8 +7,8 @@ import { ColorConfig } from "./ColorConfig";
 
 export class PatternScrollBar {
     private readonly _editorHeight: number = 18;
-    private readonly _barNotches: SVGRectElement[] = [];
-    private readonly _notchHeight: number = 4;
+    //private readonly _barNotches: SVGRectElement[] = [];
+    //private readonly _notchHeight: number = 4;
 
     private readonly _handle: SVGRectElement = SVG.rect({
         fill: ColorConfig.uiWidgetBackground,
@@ -55,14 +55,14 @@ export class PatternScrollBar {
     private _mouseOver: boolean = false;
     private _dragging: boolean = false;
     private _dragStart: number = 0;
-    private _renderedBarCount: number = -1;
+    //private _renderedBarCount: number = -1;
 
     constructor(private _doc: SongDocument) {
         this._doc.notifier.watch(this._documentChanged);
 
         this._svg.appendChild(this._handle);
 
-        for (let i: number = 0; i <= this._doc.song.barCount; i++) {
+        /*for (let i: number = 0; i <= this._doc.song.barCount; i++) {
             const notch: SVGRectElement = SVG.rect({
                 fill: ColorConfig.tonic,
                 x: i * (100 / Math.max(1, this._doc.song.barCount)),
@@ -73,7 +73,7 @@ export class PatternScrollBar {
 
             this._barNotches.push(notch);
             this._svg.appendChild(notch);
-        }
+        }*/
 
         this._svg.appendChild(this._handleHighlightTop);
         this._svg.appendChild(this._handleHighlightBottom);
@@ -117,9 +117,7 @@ export class PatternScrollBar {
 
         const boundingRect = this._svg.getBoundingClientRect();
 
-        this._mouseX =
-            ((event.clientX || event.pageX) - boundingRect.left)
-            * 100 / boundingRect.width;
+        this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * 100 / boundingRect.width;
 
         if (isNaN(this._mouseX)) this._mouseX = 0;
 
@@ -138,9 +136,7 @@ export class PatternScrollBar {
 
         const boundingRect = this._svg.getBoundingClientRect();
 
-        this._mouseX =
-            (event.touches[0].clientX - boundingRect.left)
-            * 100 / boundingRect.width;
+        this._mouseX = (event.touches[0].clientX - boundingRect.left) * 100 / boundingRect.width;
 
         if (isNaN(this._mouseX)) this._mouseX = 0;
 
@@ -155,9 +151,7 @@ export class PatternScrollBar {
     private _whenMouseMoved = (event: MouseEvent): void => {
         const boundingRect = this._svg.getBoundingClientRect();
 
-        this._mouseX =
-            ((event.clientX || event.pageX) - boundingRect.left)
-            * 100 / boundingRect.width;
+        this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * 100 / boundingRect.width;
 
         if (isNaN(this._mouseX)) this._mouseX = 0;
 
@@ -171,9 +165,7 @@ export class PatternScrollBar {
 
         const boundingRect = this._svg.getBoundingClientRect();
 
-        this._mouseX =
-            (event.touches[0].clientX - boundingRect.left)
-            * 100 / boundingRect.width;
+        this._mouseX = (event.touches[0].clientX - boundingRect.left) * 100 / boundingRect.width;
 
         if (isNaN(this._mouseX)) this._mouseX = 0;
 
@@ -190,18 +182,11 @@ export class PatternScrollBar {
         if (barCount <= 1) return;
 
         const bar = Math.max(
-            0,
-            Math.min(
-                barCount - 1,
-                Math.floor((this._mouseX / 100) * barCount)
-            )
+            0, Math.min(barCount - 1, Math.floor((this._mouseX / 100) * barCount))
         );
 
         if (bar !== this._doc.bar) {
-            this._doc.selection.setChannelBar(
-                this._doc.channel,
-                bar
-            );
+            this._doc.selection.setChannelBar(this._doc.channel, bar);
             this._doc.selection.resetBoxSelection();
         }
 
@@ -283,7 +268,7 @@ export class PatternScrollBar {
     }
 
     private _documentChanged = (): void => {
-        const barCount = this._doc.song.barCount;
+        /*const barCount = this._doc.song.barCount;
 
         if (barCount !== this._renderedBarCount) {
             this._renderedBarCount = barCount;
@@ -307,7 +292,7 @@ export class PatternScrollBar {
                     this._svg.insertBefore(notch, this._handleHighlightTop);
                 }
             }
-        }
+        }*/
 
         this._updateHandle();
         this._updatePreview();

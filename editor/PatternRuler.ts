@@ -6,17 +6,10 @@ import { ColorConfig } from "./ColorConfig";
 import { SongDocument  } from "./SongDocument";
 
 export class PatternRuler {
-    private readonly _height: number = 10;
-    private readonly _svg: SVGSVGElement = SVG.svg({
-        style:
-            "display: block; height: 100%; " +
-            "background-color: " + ColorConfig.editorBackground + ";",
-        width: "100%",
-        height: this._height,
-        preserveAspectRatio: "none",
-    });
+    private readonly _height: number = 15;
+    private readonly _svg: SVGSVGElement = SVG.svg({ style: "display: block; height: 100%; " + "background-color: " + ColorConfig.editorBackground + ";", width: "100%", height: this._height, preserveAspectRatio: "none"});
 
-    public readonly container: HTMLDivElement = HTML.div({style: "height: 24px; " + "flex-shrink: 0; " + "overflow: hidden;"}, 
+    public readonly container: HTMLDivElement = HTML.div({style: "height: this._height; " + "flex-shrink: 0; " + "overflow: hidden;"}, 
         this._svg
     );
 
@@ -54,10 +47,7 @@ export class PatternRuler {
 
         const beatWidth: number = barWidth / beatsPerBar;
 
-        this._svg.setAttribute(
-            "width",
-            String(barWidth * barCount)
-        );
+        this._svg.setAttribute("width", String(barWidth * barCount));
 
         const firstBar: number = this._doc.bar === this._doc.song.barCount - 1 ? Math.max(0, this._doc.bar - 2) : Math.max(0, this._doc.bar - 1);
 
@@ -80,7 +70,7 @@ export class PatternRuler {
 
                 const beatText: SVGTextElement = SVG.text({
                     x: beatX + 3,
-                    y: 15,
+                    y: this._height - 3,
                     fill: beat === 0
                         ? ColorConfig.primaryText
                         : ColorConfig.secondaryText,

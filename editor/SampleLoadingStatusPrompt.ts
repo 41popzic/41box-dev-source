@@ -14,7 +14,7 @@ export class SampleLoadingStatusPrompt {
     private _renderedWhenAllHaveStoppedChanging: boolean = false;
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private _statusesContainer: HTMLDivElement = div();
-    private _noSamplesMessage: HTMLDivElement = div({ style: "margin-top: 0.5em; display: none;" }, "There's no custom samples in this song.");
+    private _noSamplesMessage: HTMLDivElement = div({ style: "margin-top: 0.5em; display: none;" }, "There are no custom samples in this song");
     public container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 350px;" },
         div(
             h2("Sample Loading Status"),

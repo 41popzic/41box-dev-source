@@ -72,7 +72,7 @@ export class ExportPrompt implements Prompt {
     private readonly _removeWhitespaceDiv: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
     "Remove Whitespace: ", this._removeWhitespace);
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
-    private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
+    private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Save");
     private readonly _outputProgressBar: HTMLDivElement = div({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
     private readonly _outputProgressLabel: HTMLDivElement = div({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
     private readonly _outputProgressContainer: HTMLDivElement = div({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1; margin-bottom: 14px;` },
@@ -92,7 +92,7 @@ export class ExportPrompt implements Prompt {
     ];
 
     public _exportPrompt: HTMLDivElement = div({},
-        div({class:"promptTitle",style:"margin-bottom: 14px;"}, h2({class:"exportExt",style:"text-align: inherit;"}, ""), h2({class:"exportTitle"},"Export Options")),
+        div({class:"promptTitle",style:"margin-bottom: 14px;"}, h2({class:"exportExt",style:"text-align: inherit;"}, ""), h2({class:"exportTitle"},"Save Options")),
         div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
             "File name:",
             this._fileName,

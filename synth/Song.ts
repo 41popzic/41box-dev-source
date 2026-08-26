@@ -680,9 +680,9 @@ export class Song {
         this.loopLength = 4;
         this.tempo = 110;
         this.reverb = 0;
-        this.beatsPerBar = 8;
+        this.beatsPerBar = 4;
         this.barCount = 16;
-        this.patternsPerChannel = 16;
+        this.patternsPerChannel = 9;
         this.rhythm = 3;
         //this.rhythmEnabled = true;
         this.layeredInstruments = false;
@@ -693,7 +693,7 @@ export class Song {
         }
 
         //This is the tab's display name
-        this.title = "Unnamed";
+        this.title = "unnamed";
         this.titleNotifier.forEach(o => o());
 
         if (andResetChannels) {

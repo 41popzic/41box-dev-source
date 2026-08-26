@@ -22,8 +22,8 @@
 
     export class ImportPrompt implements Prompt {
 		private exportStuff:ExportPrompt = new ExportPrompt(this._doc);
-		private readonly _importButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width:50%; color: var(--primary-text); border-bottom: solid; border-bottom-color:var(--link-accent;)" }, "Import");
-		private readonly _exportButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width:50%; color: var(--secondary-text);" }, "Export");
+		private readonly _importButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width:50%; color: var(--primary-text); border-bottom: solid; border-bottom-color:var(--link-accent;)" }, "Load");
+		private readonly _exportButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width:50%; color: var(--secondary-text);" }, "Save");
 
         private readonly _fileInput: HTMLInputElement = input({ type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi" });
         private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
@@ -45,7 +45,7 @@
 		
 
 		public _importPrompt: HTMLDivElement = div({},
-			div({class:"promptTitle"}, h2({class:"importExt",style:"text-align: inherit;"}, ""), h2({class:"importTitle"},"Import")),
+			div({class:"promptTitle"}, h2({class:"importExt",style:"text-align: inherit;"}, ""), h2({class:"importTitle"},"Load .JSON")),
             p({ style: "text-align: left; margin: 0.5em 0;" },
                 "BeepBox songs can be exported and re-imported as .json files. You could also use other means to make .json files for BeepBox as long as they follow the same structure.",
             ),

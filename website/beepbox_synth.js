@@ -543,12 +543,11 @@ var beepbox = (() => {
         // todbox
         { group: "misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
         // Custom? considering allowing this one to be be completely configurable
         // 41box
         { group: "misc", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }
-        // Blues Phrygian added in 41Box 1.3 URL ver 4
+        // Blues Phrygian added in 41Box 1.3 URL ver 4  
       ]);
     }
     static {
@@ -9218,9 +9217,9 @@ var beepbox = (() => {
       this.loopLength = 4;
       this.tempo = 110;
       this.reverb = 0;
-      this.beatsPerBar = 8;
+      this.beatsPerBar = 4;
       this.barCount = 16;
-      this.patternsPerChannel = 16;
+      this.patternsPerChannel = 9;
       this.rhythm = 3;
       this.layeredInstruments = false;
       this.patternInstruments = false;
@@ -9228,7 +9227,7 @@ var beepbox = (() => {
       for (let i = 0; i < Config.filterMorphCount - 1; i++) {
         this.eqSubFilters[i] = null;
       }
-      this.title = "Unnamed";
+      this.title = "unnamed";
       this.titleNotifier.forEach((o) => o());
       if (andResetChannels) {
         this.pitchChannelCount = 3;
@@ -12991,7 +12990,7 @@ var beepbox = (() => {
           if (this.oscEnabled) {
             if (this.oscRefreshEventTimer <= 0) {
               events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
-              this.oscRefreshEventTimer = 2;
+              this.oscRefreshEventTimer = 1;
             } else {
               this.oscRefreshEventTimer--;
             }
@@ -13719,8 +13718,7 @@ var beepbox = (() => {
         const oldBar = this.bar;
         this.bar = this.song.loopStart;
         this.playheadInternal += this.bar - oldBar;
-        if (this.playing)
-          this.computeLatestModValues();
+        if (this.playing) this.computeLatestModValues();
       }
     }
     goToNextBar() {

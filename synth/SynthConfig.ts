@@ -937,10 +937,9 @@ export class Config {
         // todbox
         { group: "misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "misc", name: "buh", realName:"whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
         // 41box
-        { group: "misc", name: "Blues Phrygian", realName:"blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }, // Blues Phrygian added in 41Box 1.3 URL ver 4
+        { group: "misc", name: "Blues Phrygian", realName:"blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] }, // Blues Phrygian added in 41Box 1.3 URL ver 4  
     ]);
     public static readonly keys: DictionaryArray<Key> = toNameMap([
         { name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.

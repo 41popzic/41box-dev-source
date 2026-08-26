@@ -521,7 +521,7 @@ export class Synth {
     public modInsValues: (number | null)[][][] = [];
     private nextModValues: (number | null)[] = [];
     public nextModInsValues: (number | null)[][][] = [];
-    private isPlayingSong: boolean = false;
+    public isPlayingSong: boolean = false;
     private isRecording: boolean = false;
     private liveInputEndTime: number = 0.0;
     private browserAutomaticallyClearsAudioBuffer: boolean = true; // Assume true until proven otherwise. Older Chrome does not clear the buffer so it needs to be cleared manually.
@@ -1106,8 +1106,7 @@ export class Synth {
             this.bar = this.song.loopStart;
             this.playheadInternal += this.bar - oldBar;
 
-            if (this.playing)
-                this.computeLatestModValues();
+            if (this.playing) this.computeLatestModValues();
         }
     }
 
@@ -1204,7 +1203,7 @@ export class Synth {
             if (this.oscEnabled) {
                 if (this.oscRefreshEventTimer <= 0) {
                     events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
-                    this.oscRefreshEventTimer = 2;
+                    this.oscRefreshEventTimer = 1;
                 } else {
                     this.oscRefreshEventTimer--;
                 }
