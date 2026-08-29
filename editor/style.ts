@@ -751,7 +751,9 @@ html {
     color: ${ColorConfig.primaryText};
     background: ${ColorConfig.uiWidgetBackground};
 
-	border: 1px solid color-mix(in srgb, ${ColorConfig.primaryText} 30%, transparent);
+	border-left: 2px solid ${ColorConfig.uiWidgetFocus};
+	border-right: 2px solid ${ColorConfig.uiWidgetFocus};
+
 }
 
 .beepboxEditor .song-tab-close {

@@ -1177,7 +1177,7 @@ export class SongEditor {
 
     private readonly _drumsetGroup: HTMLElement = div({ class: "editor-controls" });
     private readonly _drumsetZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: () => this._openPrompt("drumsetSettings") }, "+");
-    private readonly _modulatorGroup: HTMLElement = div({ class: "editor-controls" });
+    private readonly _modulatorGroup: HTMLElement = div({ class: "editor-controls-alt" });
     private readonly _modNameRows: HTMLElement[];
     private readonly _modChannelBoxes: HTMLSelectElement[];
     private readonly _modInstrumentBoxes: HTMLSelectElement[];
@@ -1490,7 +1490,8 @@ export class SongEditor {
 
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
-        this._modulatorGroup);
+        this._modulatorGroup
+    );
 
     public readonly _otherSettingsArea: HTMLDivElement = div({ class: "other-settings-area"},
         div({ class: "version-area", },
@@ -1584,6 +1585,9 @@ export class SongEditor {
         this.doc.modRecordingHandler = () => { this.handleModRecording() };
         new MidiInputHandler(this.doc);
         window.addEventListener("resize", this.whenUpdated);
+        this.doc._whenSongOpened = (song) => {
+            this._tabs.openSong(song);
+        };
         window.requestAnimationFrame(this.updatePlayButton);
         window.requestAnimationFrame(this._animate);
 

@@ -14810,7 +14810,9 @@ html {
     color: ${ColorConfig.primaryText};
     background: ${ColorConfig.uiWidgetBackground};
 
-	border: 1px solid color-mix(in srgb, ${ColorConfig.primaryText} 30%, transparent);
+	border-left: 2px solid ${ColorConfig.uiWidgetFocus};
+	border-right: 2px solid ${ColorConfig.uiWidgetFocus};
+
 }
 
 .beepboxEditor .song-tab-close {
@@ -39363,53 +39365,24 @@ li.select2-results__option[role=group] > strong:hover {
             this._waitingToUpdateState = false;
             this._activeTabId = null;
             this._whenTabChanged = null;
+            this._whenSongOpened = null;
             this._whenHistoryStateChanged = () => {
-                var _a;
+                var _a, _b;
                 if (this.synth.recording) {
                     this.performance.abortRecording();
                 }
                 if (window.history.state == null && window.location.hash != "") {
-                    this._sequenceNumber++;
-                    this._resetSongRecoveryUid();
-                    const state = {
-                        canUndo: true,
-                        sequenceNumber: this._sequenceNumber,
-                        bar: this.bar,
-                        channel: this.channel,
-                        instrument: this.viewedInstrument[this.channel],
-                        recoveryUid: this._recoveryUid,
-                        prompt: null,
-                        selection: this.selection.toJSON(),
-                        tabId: this._activeTabId,
-                        song: this.song.toBase64String(),
-                    };
-                    try {
-                        new ChangeSong(this, state.song);
-                    }
-                    catch (error) {
-                        errorAlert(error);
-                    }
-                    this.prompt = state.prompt;
-                    if (this.prefs.displayBrowserUrl) {
-                        this._replaceState(state, this.song.toBase64String());
-                    }
-                    else {
-                        this._pushState(state, this.song.toBase64String());
-                    }
-                    this.forgetLastChange();
-                    this.notifier.notifyWatchers();
-                    this.synth.pause();
-                    this.synth.goToBar(0);
+                    (_a = this._whenSongOpened) === null || _a === void 0 ? void 0 : _a.call(this, window.location.hash);
                     return;
                 }
                 const state = this._getHistoryState();
                 if (state == null)
-                    throw new Error("History state is null");
+                    throw new Error("History state is null.");
                 if (state.sequenceNumber == this._sequenceNumber)
                     return;
                 if (state.tabId != null && state.tabId != this._activeTabId) {
                     this._activeTabId = state.tabId;
-                    (_a = this._whenTabChanged) === null || _a === void 0 ? void 0 : _a.call(this, state.tabId);
+                    (_b = this._whenTabChanged) === null || _b === void 0 ? void 0 : _b.call(this, state.tabId);
                 }
                 this.bar = state.bar;
                 this.channel = state.channel;
@@ -54256,6 +54229,9 @@ You should be redirected to the song at:<br /><br />
                 const newSong = new Song();
                 this._createTab("unnamed", newSong.toBase64String());
             });
+            document.addEventListener('contextmenu', function (event) {
+                event.preventDefault();
+            });
             this._load();
         }
         _createTab(title, song) {
@@ -54374,6 +54350,15 @@ You should be redirected to the song at:<br /><br />
         }
         selectTab(id) {
             this._selectTab(id);
+        }
+        openSong(song) {
+            const existingTab = this._tabs.find(tab => tab.song === song);
+            if (existingTab != null) {
+                this._selectTab(existingTab.id);
+            }
+            else {
+                this._createTab("unnamed", song);
+            }
         }
     }
     SongTabs.STORAGE_KEY = "song-tabs";
@@ -55183,7 +55168,7 @@ You should be redirected to the song at:<br /><br />
             this._envelopeDropdown = button({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(7) }, "▼");
             this._drumsetGroup = div({ class: "editor-controls" });
             this._drumsetZoom = button({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: () => this._openPrompt("drumsetSettings") }, "+");
-            this._modulatorGroup = div({ class: "editor-controls" });
+            this._modulatorGroup = div({ class: "editor-controls-alt" });
             this._feedback6OpTypeSelect = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
             this._feedback6OpRow1 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "feedback"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
             this._algorithmCanvasSwitch = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e) => this._toggleAlgorithmCanvas(e) }, "A");
@@ -58044,6 +58029,9 @@ You should be redirected to the song at:<br /><br />
             this.doc.modRecordingHandler = () => { this.handleModRecording(); };
             new MidiInputHandler(this.doc);
             window.addEventListener("resize", this.whenUpdated);
+            this.doc._whenSongOpened = (song) => {
+                this._tabs.openSong(song);
+            };
             window.requestAnimationFrame(this.updatePlayButton);
             window.requestAnimationFrame(this._animate);
             if (!("share" in navigator)) {

@@ -44,6 +44,11 @@ export class SongTabs {
             this._createTab("unnamed", newSong.toBase64String());
         });
 
+        document.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+});
+
+
         this._load();
     }
 
@@ -195,5 +200,15 @@ export class SongTabs {
 
     public selectTab(id: string): void {
         this._selectTab(id);
+    }
+    
+    public openSong(song: string): void {
+        const existingTab = this._tabs.find(tab => tab.song === song);
+
+        if (existingTab != null) {
+            this._selectTab(existingTab.id);
+        } else {
+            this._createTab("unnamed", song);
+        }
     }
 }

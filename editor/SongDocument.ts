@@ -70,6 +70,7 @@ export class SongDocument {
     private _activeTabId: string | null = null;
 
     public _whenTabChanged: ((tabId: string) => void) | null = null;
+    public _whenSongOpened: ((song: string) => void) | null = null;
 
     constructor() {
         this.notifier.watch(this._validateDocState);
@@ -237,46 +238,14 @@ export class SongDocument {
 			// Changes to the song while it's recording to could mess up the recording so just abort the recording.
 			this.performance.abortRecording();
 		}
-		
-		if (window.history.state == null && window.location.hash != "") {
-			// The user changed the hash directly.
-			this._sequenceNumber++;
-			this._resetSongRecoveryUid();
-			const state: HistoryState = {
-                canUndo: true, 
-                sequenceNumber: this._sequenceNumber, 
-                bar: this.bar, 
-                channel: this.channel, 
-                instrument: this.viewedInstrument[this.channel], 
-                recoveryUid: this._recoveryUid, 
-                prompt: null, 
-                selection: this.selection.toJSON(),
-                tabId: this._activeTabId,
-                song: this.song.toBase64String(),
-            };
-			try {
-				new ChangeSong(this, state.song);
-			} catch (error) {
-				errorAlert(error);
-			}
-			this.prompt = state.prompt;
-			if (this.prefs.displayBrowserUrl) {
-				this._replaceState(state, this.song.toBase64String());
-			} else {
-				this._pushState(state, this.song.toBase64String());
-			}
-			this.forgetLastChange();
-			this.notifier.notifyWatchers();
-			// Stop playing, and go to start when pasting new song in
-			this.synth.pause();
-			this.synth.goToBar(0);
-			return;
-		}
-			
+        if (window.history.state == null && window.location.hash != "") {
+            this._whenSongOpened?.(window.location.hash);
+            return;
+        }
 		const state: HistoryState | null = this._getHistoryState();
-		if (state == null) throw new Error("History state is null");
+		if (state == null) throw new Error("History state is null.");
 			
-		// Abort if we've already handled the current state
+		// Abort if we've already handled the current state.
 		if (state.sequenceNumber == this._sequenceNumber) return;
 
         if (state.tabId != null && state.tabId != this._activeTabId) {
