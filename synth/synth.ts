@@ -508,7 +508,7 @@ export class Synth {
     public heldMods: HeldMod[] = [];
     private wantToSkip: boolean = false;
     public playheadInternal: number = 0.0;
-    private bar: number = 0;
+    public bar: number = 0;
     private prevBar: number | null = null;
     private nextBar: number | null = null;
     private beat: number = 0;

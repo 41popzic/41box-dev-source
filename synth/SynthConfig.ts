@@ -69,6 +69,7 @@ export const enum EnvelopeType {
     rise,
     blip,
     fall, //slarmoo's box 1.2
+    sidechain, //41box 1.3
     //add new envelope types here
 }
 
@@ -117,10 +118,13 @@ export const enum EffectType {
     chord,
     // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses three six-bit characters.
     noteRange, //placeholder for ultrabox 2.3 update
+    // slarmoo's box
     ringModulation,
     granular,
-    flanger,   
-    //phaser, BAHAHA NO PHASER FOR Y'ALL
+
+    //41Box
+    flanger,
+
     length,
 }
 
@@ -985,11 +989,11 @@ export class Config {
     public static readonly phaserMaxFreq: number = 20000.0; 
     public static readonly phaserMinStages: number = 0; 
     public static readonly phaserMaxStages: number = 32; 
-    public static readonly flangerDelayRange = 24;
-    public static readonly flangerDepthRange = 32;
-    public static readonly flangerRateRange = 56;
-    public static readonly flangerFeedbackRange = 32;
-    public static readonly flangerMixRange = 51;
+    public static readonly flangerDelayRange: number = 24;
+    public static readonly flangerDepthRange: number = 32;
+    public static readonly flangerRateRange: number = 56;
+    public static readonly flangerFeedbackRange: number = 32;
+    public static readonly flangerMixRange: number = 51;
     public static readonly beatsPerBarMin: number = 1;
     public static readonly beatsPerBarMax: number = 64;
     public static readonly barCountMin: number = 1;
@@ -1539,6 +1543,7 @@ export class Config {
         { name: "rise", type: EnvelopeType.rise, speed: 32.0 },
         { name: "blip", type: EnvelopeType.blip, speed: 6.0 },
         { name: "fall", type: EnvelopeType.fall, speed: 6.0 },
+        //{ name: "sidechain", type: EnvelopeType.sidechain, speed: 1.0 }
     ]);
 
 

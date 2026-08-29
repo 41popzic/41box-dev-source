@@ -4620,7 +4620,7 @@ export function setDefaultInstruments(song: Song): void {
                         presetName = "square wave";
                         break;
                     case 2:
-                        presetName = "bass kick";
+                        presetName = "square wave";
                         break;
                     case 3:
                         presetName = "chiseled noise";

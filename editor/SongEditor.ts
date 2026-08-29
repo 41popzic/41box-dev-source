@@ -37,7 +37,7 @@ import { OctaveScrollBar } from "./OctaveScrollBar";
 import { MidiInputHandler } from "./MidiInput";
 import { KeyboardLayout } from "./KeyboardLayout";
 import { PatternEditor } from "./PatternEditor";
-import { PatternScrollBar } from "./PatternScrollBar";
+//import { PatternScrollBar } from "./PatternScrollBar";
 import { Piano } from "./Piano";
 import { Prompt } from "./Prompt";
 import { SelectiveRandomPastePrompt } from "./SelectiveRandomPastePrompt";
@@ -59,7 +59,7 @@ import { AddSamplesPrompt } from "./AddSamplesPrompt";
 import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 // import { Selection } from "./Selection";
 import { PreferencesPrompt } from "./PreferencesPrompt";
-import { PatternRuler } from "./PatternRuler"
+import { SongTabs } from "./SongTab";
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -102,7 +102,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
-        menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
+        menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise).name));
     }
 
     // TODO - When you port over the Dogebox2 import/export buttons be sure to uncomment these
@@ -735,16 +735,17 @@ export class SongEditor {
     public doc: SongDocument = new SongDocument();
 
     private readonly _keyboardLayout: KeyboardLayout = new KeyboardLayout(this.doc);
-    //private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this.doc, false, -1);
+    private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this.doc, false, -1);
     private readonly _patternEditor: PatternEditor = new PatternEditor(this.doc, true, 0);
-    //bprivate readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
-    private readonly _patternEditor2: PatternEditor = new PatternEditor(this.doc, true, 1);
-    private readonly _patternEditor3: PatternEditor = new PatternEditor(this.doc, true, 2);
-    private readonly _patternEditor4: PatternEditor = new PatternEditor(this.doc, false, 3);
-    //private readonly _patternEditor5: PatternEditor = new PatternEditor(this.doc, true, 4);
-    private readonly _patternEditorMinus1: PatternEditor = new PatternEditor(this.doc, false, -1);
-
-    private _patternEditorAnimating: boolean = false;
+    private readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
+    private readonly _tabs: SongTabs = new SongTabs((tab) => { 
+            this.doc.setActiveTabId(tab.id);
+            this.doc.loadSong(tab.song); 
+            this.doc.updateBrowserUrl();
+        }, 
+        this.doc.song.toBase64String()
+    );
+    /*private _patternEditorAnimating: boolean = false;
     private _patternEditorAnimationStart: number = 0;
     private _patternEditorAnimationDuration: number = 150;
     private _patternEditorAnimationDirection: number = 0;
@@ -803,17 +804,17 @@ export class SongEditor {
         this._patternEditorAnimationDirection = direction;
 
         window.requestAnimationFrame(this._animatePatternEditor);
-    }
+    }*/
 
     private readonly _trackEditor: TrackEditor = new TrackEditor(this.doc, this);
     private readonly _muteEditor: MuteEditor = new MuteEditor(this.doc, this);
     private readonly _loopEditor: LoopEditor = new LoopEditor(this.doc, this._trackEditor);
     private readonly _piano: Piano = new Piano(this.doc);
     private readonly _octaveScrollBar: OctaveScrollBar = new OctaveScrollBar(this.doc, this._piano);
-    private readonly _patternScrollBar: PatternScrollBar = new PatternScrollBar(this.doc);
+    //private readonly _patternScrollBar: PatternScrollBar = new PatternScrollBar(this.doc);
     private readonly _playButton: HTMLButtonElement = button({ class: "playButton", type: "button", title: "play (space)" }, span("play"));
     private readonly _pauseButton: HTMLButtonElement = button({ class: "pauseButton", style: "display: none;", type: "button", title: "pause (space)" }, "pause");
-    private readonly _recordButton: HTMLButtonElement = button({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span("Record"));
+    private readonly _recordButton: HTMLButtonElement = button({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span("record"));
     private readonly _stopButton: HTMLButtonElement = button({ class: "stopButton", style: "display: none;", type: "button", title: "Stop Recording (Space)" }, "Stop Recording");
     private readonly _prevBarButton: HTMLButtonElement = button({ class: "prevBarButton", type: "button", title: "Previous Bar (left bracket)" });
     private readonly _nextBarButton: HTMLButtonElement = button({ class: "nextBarButton", type: "button", title: "Next Bar (right bracket)" });
@@ -887,8 +888,8 @@ export class SongEditor {
         option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
     );
     private readonly _optionsMenu: HTMLButtonElement = button({ style: "width: 100%;", class: "preferences", type: "button", onclick: () => this._openPrompt("preferences")}, "options" );
-    private readonly _newSong: HTMLButtonElement = button({ style: "width: 49%; font-size: small; padding-left: 24px", class: "new", type: "button", onclick: () => this._newBlankSong()}, "blank slate" );
-    private readonly _import: HTMLButtonElement = button({ style: "width: 49%; font-size: small; padding-left: 20px;", class: "import", type: "button", onclick: () => this._setPrompt("import")}, "load/save" );
+    private readonly _newSong: HTMLButtonElement = button({ style: "width: 49%; font-size: smaller; padding-left: 24px", class: "new", type: "button", onclick: () => this._newBlankSong()}, "new song" );
+    private readonly _import: HTMLButtonElement = button({ style: "width: 49%; font-size: smaller; padding-left: 20px;", class: "import", type: "button", onclick: () => this._setPrompt("import")}, "load/save" );
     private readonly _buttonsRow: HTMLDivElement = div({ style: "display: flex; width: 100%; gap: 2%;"},
         this._newSong,
         this._import,
@@ -953,7 +954,7 @@ export class SongEditor {
     private readonly _favoriteRhythmOption: HTMLOptionElement = option({ value: "toggleFavoriteRhythm" }, "add current division to favorites");
     private readonly _rhythmDisabledLabel: HTMLSpanElement = span({ style: ` position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; color: #d77777; font-style: italic; `}, "(disabled)");
     private _favoriteRhythms: number[] = [];
-    private readonly _favoriteRhythmGroup = optgroup({ label: "Favorites"});
+    private readonly _favoriteRhythmGroup = optgroup({ label: "favorites"});
     //private readonly _phaserMixSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserMix(this.doc, oldValue, newValue), false);
     //private readonly _phaserMixRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("Phaser:")), this._phaserMixSlider.container);
     //private readonly _phaserFreqSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFreqRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserFreq(this.doc, oldValue, newValue), false);
@@ -972,7 +973,6 @@ export class SongEditor {
     private readonly _flangerDepthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerDepth"),}, span("depth")), this._flangerDepthSlider.container );
     private readonly _flangerRateSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0",  max: Config.flangerRateRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerRate(this.doc, oldValue, newValue), false );
     private readonly _flangerRateRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerRate"),}, span("rate "), div({ style: `color: ${ColorConfig.secondaryText};` },this.flangerRateNum),), this._flangerRateSlider.container,  );
-    
     private readonly _flangerFeedbackSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerFeedbackRange - 1, value: "0", step: "1", }), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerFeedback(this.doc, oldValue, newValue), false );
     private readonly _flangerFeedbackRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("flangerFeedback"),}, span("feedback")), this._flangerFeedbackSlider.container );    
     
@@ -1258,7 +1258,7 @@ export class SongEditor {
     );
     */
     private readonly _addEnvelopeButton: HTMLButtonElement = button({ type: "button", class: "add-envelope" });
-    private readonly _customInstrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
+    private readonly _customInstrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
         this._panSliderRow,
         this._panDropdownGroup,
         this._chipWaveSelectRow,
@@ -1336,13 +1336,13 @@ export class SongEditor {
         this._envelopeDropdownGroup,
         this.envelopeEditor.container,
     );
-    private readonly _instrumentCopyGroup: HTMLDivElement = div({ class: "editor-controls" },
+    private readonly _instrumentCopyGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
         div({ class: "selectRow" },
             this._instrumentCopyButton,
             this._instrumentPasteButton,
         ),
     );
-    private readonly _instrumentExportGroup: HTMLDivElement = div({ class: "editor-controls" },
+    private readonly _instrumentExportGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
         div({ class: "selectRow" },
             this._instrumentExportButton,
             this._instrumentImportButton,
@@ -1358,7 +1358,7 @@ export class SongEditor {
             div({ class: "drumSelect" }, this._drumPresetSelect)
         ),
     );
-    private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
+    private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
         this._instrumentSettingsTextRow,
         this._instrumentsButtonRow,
         // these could've been put into _instrumentSettingsGroup as well but I decided not to
@@ -1382,43 +1382,15 @@ export class SongEditor {
     private readonly _promptContainerBG: HTMLDivElement = div({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
     private readonly _zoomInButton: HTMLButtonElement = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
     private readonly _zoomOutButton: HTMLButtonElement = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
-   
-    private _renderPatternEditorBuffers(): void {
-        this._patternEditorMinus1.render();
-        this._patternEditor4.render();
-        //this._patternEditor5.render();
-    }
 
-    // My bad chat; the code below is so messy -popzic
-
-    private readonly _patternEditorTrack: HTMLDivElement = div({ style: "height: 100%; width: 100%; display: flex; flex-shrink: 1;"},
-        this._patternEditorMinus1.container,
+    private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" },
+        this._patternEditorPrev.container,
         this._patternEditor.container,
-        this._patternEditor2.container,
-        this._patternEditor3.container,
-        this._patternEditor4.container,
-        //this._patternEditor5.container,
+        this._patternEditorNext.container,
     );
-
-    private readonly _patternRuler: PatternRuler = new PatternRuler(this.doc, () => this._patternEditor.container.clientWidth);
-
-    private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;"},
-        this._patternEditorTrack,
-    );
-
-    private readonly _patternEditorAndPianoRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden;"},
+    private readonly _patternArea: HTMLDivElement = div({ class: "pattern-area" },
         this._piano.container,
         this._patternEditorRow,
-    );
-
-    private readonly _patternEditorColumn: HTMLDivElement = div({ style: "flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;"},
-        this._patternRuler.container,
-        this._patternEditorAndPianoRow,
-        this._patternScrollBar.container,
-    );
-    
-    private readonly _patternArea: HTMLDivElement = div({ class: "pattern-area" },
-        this._patternEditorColumn,
         this._octaveScrollBar.container,
         this._zoomInButton,
         this._zoomOutButton,
@@ -1444,9 +1416,9 @@ export class SongEditor {
         //this._newSong,
         //this._import,
         this._buttonsRow,
-        /*div({ class: "selectContainer menu file" },
-            this._fileMenu,
-        ),*/
+        div({ class: "selectContainer menu file" },
+            this._editMenu,
+        ),
         div({ class: "selectContainer menu pref" },
             this._fileMenu,
         ),
@@ -1515,11 +1487,13 @@ export class SongEditor {
             this._sampleLoadingStatusContainer,
         ),
     );
+
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
         this._modulatorGroup);
-    public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
-        div({ class: "version-area" },
+
+    public readonly _otherSettingsArea: HTMLDivElement = div({ class: "other-settings-area"},
+        div({ class: "version-area", },
             div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText};` },
                 this._songTitleInputBox.input,
             ),
@@ -1542,11 +1516,16 @@ export class SongEditor {
             this._globalOscscopeContainer,
         ),
         this._menuArea,
+    )
+
+    public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
+        this._otherSettingsArea,
         this._songSettingsArea,
         this._instrumentSettingsArea,
     );
 
     public readonly mainLayer: HTMLDivElement = div({ class: "beepboxEditor", tabIndex: "0" },
+        this._tabs.container,
         this._patternArea,
         this._trackArea,
         this._settingsArea,
@@ -1772,6 +1751,10 @@ export class SongEditor {
             );
             this._drumsetGroup.appendChild(row);
         }
+
+        this.doc._whenTabChanged = (tabId) => {
+            this._tabs.selectTab(tabId);
+        };
 
         this._modNameRows = [];
         this._modChannelBoxes = [];
@@ -2093,7 +2076,7 @@ export class SongEditor {
             this._unisonSelect.appendChild(group);
         }
 
-        const savedFavorites = localStorage.getItem("41box.favoriteRhythms");
+        const savedFavorites = localStorage.getItem("favoriteRhythms");
 
         if (savedFavorites != null) {
             try {
@@ -2106,7 +2089,7 @@ export class SongEditor {
 
     private _saveFavoriteRhythms(): void {
         localStorage.setItem(
-            "41box.favoriteRhythms",
+            "favoriteRhythms",
             JSON.stringify(this._favoriteRhythms)
         );
     }
@@ -2742,26 +2725,13 @@ export class SongEditor {
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this.doc.prefs.showDescription ? "" : "none";
 
-        const layout = this.doc.prefs.layout;
-
-        if (layout === "long" || layout === "wide long" || layout === "flipped long" || layout === "switched long") {
-            this._patternEditorMinus1.container.style.display = "";
-            this._patternEditor.container.style.display = "";
-            this._patternEditor2.container.style.display = "";
-            this._patternEditor3.container.style.display = "";
-            this._patternEditor4.container.style.display = "";
-            //this._patternEditor5.container.style.display = "";
-            //this._patternEditor.container.style.width = "";
-            //this._patternEditor.container.style.flexGrow = "";
-            //this._patternEditor.container.style.flexShrink = "";
-            this._patternEditorTrack.style.width = "auto";
-            this._patternEditorTrack.style.flexShrink = "0";
-
-            const beatWidth: number =
-                this._patternEditorRow.clientWidth / this.doc.song.beatsPerBar;
-
-            const patternEditorWidth: number =
-                beatWidth * (this.doc.song.beatsPerBar / 3); // For 3 PatternEditor contexts
+        if (this.doc.getFullScreen()) {
+            const semitoneHeight: number = this._patternEditorRow.clientHeight / this.doc.getVisiblePitchCount();
+            const targetBeatWidth: number = semitoneHeight * 5;
+            const minBeatWidth: number = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar * 3);
+            const maxBeatWidth: number = this._patternEditorRow.clientWidth / (this.doc.song.beatsPerBar + 2);
+            const beatWidth: number = Math.max(minBeatWidth, Math.min(maxBeatWidth, targetBeatWidth));
+            const patternEditorWidth: number = beatWidth * this.doc.song.beatsPerBar;
 
             const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
 
@@ -2773,7 +2743,7 @@ export class SongEditor {
                 beepboxEditorContainer.style.borderStyle = "";
             }
 
-            /*this._patternEditorPrev.container.style.width = patternEditorWidth + "px";
+            this._patternEditorPrev.container.style.width = patternEditorWidth + "px";
             this._patternEditor.container.style.width = patternEditorWidth + "px";
             this._patternEditorNext.container.style.width = patternEditorWidth + "px";
             this._patternEditorPrev.container.style.flexShrink = "0";
@@ -2786,159 +2756,19 @@ export class SongEditor {
             this._zoomInButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
             this._zoomOutButton.style.display = (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
             this._zoomInButton.style.right = prefs.showScrollBar ? "24px" : "4px";
-            this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";*/
+            this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";
+            //this._patternEditor.container.style.transform = 'translateX(30px)';
 
-            this._patternEditorMinus1.container.style.width = patternEditorWidth + "px";
-            this._patternEditorMinus1.container.style.flexGrow = "0";
-            this._patternEditorMinus1.container.style.flexShrink = "0";
-
-            this._patternEditor.container.style.width = patternEditorWidth + "px";
-            this._patternEditor.container.style.flexGrow = "0";
-            this._patternEditor.container.style.flexShrink = "0";
-
-            this._patternEditor2.container.style.width = patternEditorWidth + "px";
-            this._patternEditor2.container.style.flexGrow = "0";
-            this._patternEditor2.container.style.flexShrink = "0";
-
-            this._patternEditor3.container.style.width = patternEditorWidth + "px";
-            this._patternEditor3.container.style.flexGrow = "0";
-            this._patternEditor3.container.style.flexShrink = "0";
-
-            this._patternEditor4.container.style.width = patternEditorWidth + "px";
-            this._patternEditor4.container.style.flexGrow = "0";
-            this._patternEditor4.container.style.flexShrink = "0";
-
-            //this._patternEditor5.container.style.width = patternEditorWidth + "px";
-            //this._patternEditor5.container.style.flexGrow = "0";
-            //this._patternEditor5.container.style.flexShrink = "0";
-
-                // Current pattern is the editor immediately inside the viewport.
-            this._patternEditorTrack.style.transform =
-                `translateX(-${patternEditorWidth}px)`;
-
-            this._zoomInButton.style.display =
-                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-
-            this._zoomOutButton.style.display =
-                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-
-            this._zoomInButton.style.right =
-                prefs.showScrollBar ? "24px" : "4px";
-
-            this._zoomOutButton.style.right =
-                prefs.showScrollBar ? "24px" : "4px";
-
-            this._patternEditor.render();
-            this._patternEditor2.render();
-            this._patternEditor3.render();
-            
-            const bar = this.doc.bar;
-            const lastBar = this.doc.song.barCount - 1;
-
-            this._patternEditorMinus1.setPatternSelected(false);
-            this._patternEditor.setPatternSelected(bar === 0);
-            this._patternEditor2.setPatternSelected(bar !== 0 && bar !== lastBar);
-            this._patternEditor3.setPatternSelected(bar === lastBar);
-            this._patternEditor4.setPatternSelected(false);
-            //this._patternEditor5.setPatternSelected(false);
-
-            let offset = -1;
-
-            if (bar === 0) {
-                offset = 0;
-                this._patternEditor.setBarOffset(offset, true);
-            } else if (bar === lastBar) {
-                offset = -2;
-            }
-
-            this._patternEditorMinus1.setBarOffset(-1 + offset);
-            this._patternEditor.setBarOffset(0 + offset);
-            this._patternEditor2.setBarOffset(1 + offset);
-            this._patternEditor3.setBarOffset(2 + offset);
-            this._patternEditor4.setBarOffset(3 + offset);
-            //this._patternEditor5.setBarOffset(4 + offset);
-
-        } else if (layout === "small" || layout === "small+") {
-
-            this._patternEditorMinus1.container.style.display = "none";
-            this._patternEditor2.container.style.display = "none";
-            this._patternEditor3.container.style.display = "none";
-            this._patternEditor4.container.style.display = "none";
-            //this._patternEditor5.container.style.display = "none";
-
-            this._patternEditor.container.style.display = "";
-            this._patternEditor.container.style.width = "100%";
-            this._patternEditor.container.style.flexGrow = "1";
-            this._patternEditor.container.style.flexShrink = "1";
-
-            this._patternEditorTrack.style.transform = "translateX(0)";
-            this._patternEditorTrack.style.left = "0";
-            this._patternEditorTrack.style.width = "100%";
-            this._patternEditorTrack.style.flexShrink = "1";
-
-            //this._patternEditorMinus1.setBarOffset(-1);
-            this._patternEditor.setBarOffset(0);
-            //this._patternEditor2.setBarOffset(1);
-            //this._patternEditor3.setBarOffset(2);
-            //this._patternEditor4.setBarOffset(3);
-            //this._patternEditor5.setBarOffset(4);
-
-            //this._patternEditorMinus1.setPatternSelected(false);
-            this._patternEditor.setPatternSelected(false);
-            //this._patternEditor2.setPatternSelected(false);
-            //this._patternEditor3.setPatternSelected(false);
-            //this._patternEditor4.setPatternSelected(false);
-            //this._patternEditor5.setPatternSelected(false);
-
+        } else {
+            this._patternEditor.container.style.width = "";
+            this._patternEditor.container.style.flexShrink = "";
+            this._patternEditorPrev.container.style.display = "none";
+            this._patternEditorNext.container.style.display = "none";
             this._zoomInButton.style.display = "none";
             this._zoomOutButton.style.display = "none";
-
-            this._patternEditor.render();
-
-        } else if (layout === "tall" || layout === "wide") {
-
-            this._patternEditorMinus1.container.style.display = "none";
-            this._patternEditor2.container.style.display = "none";
-            this._patternEditor3.container.style.display = "none";
-            this._patternEditor4.container.style.display = "none";
-            //this._patternEditor5.container.style.display = "none";
-
-            this._patternEditor.container.style.display = "";
-            this._patternEditor.container.style.width = "100%";
-            this._patternEditor.container.style.flexGrow = "1";
-            this._patternEditor.container.style.flexShrink = "1";
-
-            this._patternEditorTrack.style.transform = "translateX(0)";
-            this._patternEditorTrack.style.left = "0";
-            this._patternEditorTrack.style.width = "100%";
-            this._patternEditorTrack.style.flexShrink = "1";
-
-            //this._patternEditorMinus1.setBarOffset(-1);
-            this._patternEditor.setBarOffset(0);
-            //this._patternEditor2.setBarOffset(1);
-            //this._patternEditor3.setBarOffset(2);
-            this._patternEditor4.setBarOffset(3);
-            //this._patternEditor5.setBarOffset(4);
-
-            //this._patternEditorMinus1.setPatternSelected(false);
-            this._patternEditor.setPatternSelected(false);
-            //this._patternEditor2.setPatternSelected(false);
-            //this._patternEditor3.setPatternSelected(false);
-            //this._patternEditor4.setPatternSelected(false);
-            //this._patternEditor5.setPatternSelected(false);
-
-            this._zoomInButton.style.display =
-                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-
-            this._zoomOutButton.style.display =
-                (this.doc.channel < this.doc.song.pitchChannelCount) ? "" : "none";
-
-            this._zoomInButton.style.right =
-                prefs.showScrollBar ? "24px" : "4px";
-
-            this._zoomOutButton.style.right =
-                prefs.showScrollBar ? "24px" : "4px";            
         }
+
+        this._patternEditor.render();
 
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
@@ -4349,6 +4179,7 @@ export class SongEditor {
         // Writeback to mods if control key is held while moving a slider.
         this.handleModRecording();
 
+        this._tabs.updateActiveSong(this.doc.song.toBase64String(), this.doc.song.title);
     }
 
     public handleModRecording(): void {
@@ -5339,14 +5170,6 @@ export class SongEditor {
                 } else {
                     const oldBar = this.doc.bar;
                     const newBar = (oldBar + this.doc.song.barCount - 1) % this.doc.song.barCount;
-                    const lastBar = this.doc.song.barCount - 1;
-
-                    const usePatternBuffers = this.doc.song.barCount <= 32 || this.doc.song.getChannelCount() <= 10;
-
-                    if (usePatternBuffers && newBar !== 0 && oldBar !== lastBar) {
-                        this._renderPatternEditorBuffers();
-                        this._startPatternEditorAnimation(1);
-                    }
 
                     this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();
@@ -5368,14 +5191,6 @@ export class SongEditor {
                 } else {
                     const oldBar = this.doc.bar;
                     const newBar = (oldBar + 1) % this.doc.song.barCount;
-                    const lastBar = this.doc.song.barCount - 1;
-
-                    const usePatternBuffers = this.doc.song.barCount <= 32 || this.doc.song.getChannelCount() <= 10;
-
-                    if (usePatternBuffers && oldBar !== 0 && newBar !== lastBar) {
-                        this._renderPatternEditorBuffers();
-                        this._startPatternEditorAnimation(-1);
-                    }
 
                     this.doc.selection.setChannelBar(this.doc.channel, newBar);
                     this.doc.selection.resetBoxSelection();

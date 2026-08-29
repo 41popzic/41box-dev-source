@@ -355,7 +355,7 @@ export class EnvelopeComputer {
                 switch (waveform) {
                     case RandomEnvelopeTypes.time:
                         if (step <= 1) return 1;
-                        const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
+                        const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10)) / (256))) + "", seed);
                         if (inverse) {
                             return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
                         } else {
@@ -377,8 +377,8 @@ export class EnvelopeComputer {
                             return boundAdjust * (step / (step - 1)) * Math.floor(noteHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                         }
                     case RandomEnvelopeTypes.timeSmooth:
-                        const timeHashA: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
-                        const timeHashB: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed + 256) / (256))) + "", seed);
+                        const timeHashA: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10)) / (256))) + "", seed);
+                        const timeHashB: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10) + 256) / (256))) + "", seed);
                         const weightedAverage: number = timeHashA * (1 - ((timeSinceStart * perEnvelopeSpeed) / (256)) % 1) + timeHashB * (((timeSinceStart * perEnvelopeSpeed) / (256)) % 1);
                         if (inverse) {
                             return perEnvelopeUpperBound - boundAdjust * weightedAverage / (hashMax + 1);
@@ -513,6 +513,12 @@ export class EnvelopeComputer {
                     return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1.0 - envelopeSpeed * time / 2, 0)) + perEnvelopeLowerBound);
                 }
             }
+            case EnvelopeType.sidechain:
+                /*if (inverse) {
+                    return boundAdjust / (1.0 + time * envelopeSpeed) + perEnvelopeLowerBound; //swell is twang's inverse... I wonder if it would be worth it to just merge the two :/
+                } else {*/
+                    return perEnvelopeUpperBound - boundAdjust / (2.0 + time * envelopeSpeed);
+                //}
             default: throw new Error("Unrecognized operator envelope type.");
         }
 

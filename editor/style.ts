@@ -153,10 +153,12 @@ html {
 .beepboxEditor {
 	display: grid;
     grid-template-columns: minmax(0, 1fr) max-content;
-    grid-template-rows: max-content 1fr; /* max-content minmax(0, 1fr); Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+    grid-template-rows: max-content 1fr;
     grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 	grid-column-gap: 6px;
 	grid-row-gap: 6px;
+	padding-top: 36px;
+    box-sizing: border-box;
 	position: relative;
 	touch-action: manipulation;
 	cursor: default;
@@ -187,7 +189,7 @@ html {
 }
 
 .pattern-area {
-     opacity: 0;
+     opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -197,7 +199,7 @@ html {
 }
 
 .settings-area {
-    opacity: 0;
+	opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -207,7 +209,7 @@ html {
 }
 
 .editor-song-settings {
-    opacity: 0;
+    opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -217,7 +219,7 @@ html {
 }
 
 .instrument-settings-area {
-    opacity: 0;
+    opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -227,7 +229,7 @@ html {
 }
 
 .trackAndMuteContainer {
-    opacity: 0;
+    opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -237,7 +239,7 @@ html {
 }
 
 .barScrollBar {
-    opacity: 0;
+    opacity: 1;
     -webkit-transition: opacity 0.5s ease-in;
     -moz-transition: opacity 0.5s ease-in;
     -o-transition: opacity 0.5s ease-in;
@@ -245,8 +247,6 @@ html {
     transition: opacity 0.5s ease-in;
     transition-delay: 0.5s;
 }
-
-
 
 .load {
     opacity: 1;
@@ -293,6 +293,33 @@ html {
     grid-template-rows: min-content min-content min-content min-content min-content;
     grid-template-areas: "version-area" "play-pause-area" "menu-area" "song-settings-area" "instrument-settings-area";
 	grid-column-gap: 6px;
+}
+
+.beepboxEditor .other-settings-area {
+	
+	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+
+	margin-top: 10px;
+	margin-bottom: 0px;
+
+	margin-left: 3px !important;
+	margin-right: 3px !important;
+
+	padding-left: 3px !important;
+	padding-right: 3px !important;
+	padding-bottom: 5px;
+	padding-top: 5px;
+
+	overflow-x: clip;
+
+	box-sizing: border-box;
+
+	min-width: 0;
+
+    width: calc(100% - 6px);
+
+	border-radius: 2px;
 }
 
 .beepboxEditor .version-area{ grid-area: version-area; }
@@ -394,7 +421,7 @@ html {
 }
 
 .beepboxEditor .piano-button.pressed, .beepboxEditor .drum-button.pressed {
-	filter: brightness(0.5);
+	filter: brightness(0.7);
 }
 
 .beepboxEditor .customize-instrument {
@@ -527,7 +554,7 @@ html {
 .beepboxEditor .zoomInButton, .beepboxEditor .zoomOutButton {
 	width: var(--button-size);
 	position: absolute;
-	right: 10px;
+	right: 20px;
 }
 .beepboxEditor .zoomInButton {
 	top: 10px;
@@ -692,6 +719,87 @@ html {
 	mask-image: var(--internal-export-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
+}
+
+.beepboxEditor .song-tab-container {
+    display: flex;
+    overflow-x: auto;	
+    align-items: stretch;
+    height: 100%;
+	min-width: 0;
+	flex: 1;
+    gap: 10px;
+}
+
+.beepboxEditor .song-tab {
+	flex-shrink: 0;
+    display: flex;
+    align-items: center;
+	height: 100%;
+    gap: 9px;
+	margin-top: 5px;
+    padding: 0 10px;
+	padding-bottom: 2px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+
+    color: ${ColorConfig.secondaryText};
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .song-tab.active {
+    color: ${ColorConfig.primaryText};
+    background: ${ColorConfig.uiWidgetBackground};
+
+	border: 1px solid color-mix(in srgb, ${ColorConfig.primaryText} 30%, transparent);
+}
+
+.beepboxEditor .song-tab-close {
+    opacity: 0.6;
+	border-radius: 0px;
+	background: ${ColorConfig.uiWidgetBackground}
+	color: ${ColorConfig.secondaryText}
+}
+
+.beepboxEditor .song-tab-new {
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+
+	//opacity: 1;
+
+	background: ${ColorConfig.editorBackground}
+
+}
+
+.beepboxEditor .song-tabs {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;	
+	overflow-y: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    z-index: 10; /*huh*/
+	border-bottom: 2px solid ${ColorConfig.uiWidgetFocus};
+}
+
+.beepboxEditor .song-tabs-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    padding: 0 3px;
+    flex-shrink: 0;
+    font-weight: bold;
+}
+
+.beepboxEditor .song-tabs-logo img {
+    width: 24px;
+    height: 24px;
 }
 
 .beepboxEditor button.preferences::before {
@@ -896,7 +1004,7 @@ html {
 	display: block;
 	height: var(--button-size);
 	border: none;
-	border-radius: 5px;
+	border-radius: 0px;
 	background: ${ColorConfig.uiWidgetBackground};
 	color: inherit;
 	font-size: inherit;
@@ -1034,7 +1142,7 @@ html {
 	text-align-last: center;
 }
 .beepboxEditor .settings-area select {
-       width: 100%;
+    width: 100%;
 }
 
 /* This makes it look better in firefox on my computer... What about others?
@@ -1047,7 +1155,7 @@ html {
 	position: relative;
 	height: var(--button-size);
 	border: none;
-	border-radius: 5px;
+	border-radius: 0px;
 	background: ${ColorConfig.uiWidgetBackground};
 	color: inherit;
 	font-size: inherit;
@@ -1376,6 +1484,7 @@ html {
 	position: absolute;
 	display: block;
   cursor: crosshair;
+  
 }
 
 @keyframes dash-animation {
@@ -1446,6 +1555,7 @@ html {
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
+	
 }
 
 .beepboxEditor .selectRow > :last-child {
@@ -1468,17 +1578,80 @@ html {
 .beepboxEditor .song-settings-area {
 	display: flex;
 	flex-direction: column;
+/*
+	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+
+	margin-top: 10px;
+	margin-bottom: 10px;
+
+	margin-left: 3px !important;
+	margin-right: 3px !important;
+
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+
+	overflow-x: clip;
+
+	box-sizing: border-box;
+	border-radius: 4px;*/
 }
 
 .beepboxEditor .editor-controls {
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
+
+	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+
+	margin-top: 10px;
+	margin-bottom: 10px;
+
+	margin-left: 3px !important;
+	margin-right: 3px !important;
+
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+
+	overflow-x: clip;
+
+	box-sizing: border-box;
+	border-radius: 4px;
+}
+
+.beepboxEditor .editor-controls-alt {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	overflow-x: clip;
 }
 
 .beepboxEditor .instrument-settings-area {
 	display: flex;
 	flex-direction: column;
+	
+	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+
+	margin-top: 10px;
+	margin-bottom: 10px;
+
+	margin-left: 3px !important;
+	margin-right: 3px !important;
+
+	padding-left: 0px !important;
+	padding-right: 10px !important;
+
+	overflow-x: clip;
+
+	box-sizing: border-box;
+
+	min-width: 0;
+
+    width: calc(100% - 6px);
+
+	border-radius: 2px;
 }
 
 .beepboxEditor .editor-right-side-top > *, .beepboxEditor .editor-right-side-bottom > * {
@@ -1509,7 +1682,7 @@ html {
 	transform: translate(-50%, -50%);
 	position: absolute;
 	background: currentColor;
-	border-radius: 3px;
+	border-radius: 1px;
 }
 
 .beepboxEditor input[type=text], .beepboxEditor input[type=number] {
@@ -1592,7 +1765,7 @@ html {
 .beepboxEditor input[type=range]::-webkit-slider-thumb {
 	height: var(--button-size);
 	width: 6px;
-	border-radius: 3px;
+	border-radius: 0px;
 	background: currentColor;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -1613,7 +1786,7 @@ html {
 .beepboxEditor input[type=range]::-moz-range-thumb {
 	height: var(--button-size);
 	width: 6px;
-	border-radius: 3px;
+	border-radius: 1px;
 	border: none;
 	background: currentColor;
 	cursor: pointer;
@@ -1631,7 +1804,7 @@ html {
 .beepboxEditor input[type=range]::-ms-thumb {
 	height: var(--button-size);
 	width: 6px;
-	border-radius: 3px;
+	border-radius: 1px;
 	background: currentColor;
 	cursor: pointer;
 }

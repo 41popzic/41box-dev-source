@@ -54,6 +54,7 @@ var beepbox = (() => {
     EnvelopeType2[EnvelopeType2["rise"] = 13] = "rise";
     EnvelopeType2[EnvelopeType2["blip"] = 14] = "blip";
     EnvelopeType2[EnvelopeType2["fall"] = 15] = "fall";
+    EnvelopeType2[EnvelopeType2["sidechain"] = 16] = "sidechain";
     return EnvelopeType2;
   })(EnvelopeType || {});
   var InstrumentType = /* @__PURE__ */ ((InstrumentType2) => {
@@ -1668,6 +1669,7 @@ var beepbox = (() => {
         { name: "rise", type: 13 /* rise */, speed: 32 },
         { name: "blip", type: 14 /* blip */, speed: 6 },
         { name: "fall", type: 15 /* fall */, speed: 6 }
+        //{ name: "sidechain", type: EnvelopeType.sidechain, speed: 1.0 }
       ]);
     }
     static {
@@ -6585,7 +6587,7 @@ var beepbox = (() => {
           switch (waveform) {
             case 0 /* time */:
               if (step <= 1) return 1;
-              const timeHash = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor(timeSinceStart * perEnvelopeSpeed / 256)) + "", seed);
+              const timeHash = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor(timeSinceStart * (perEnvelopeSpeed / 10) / 256)) + "", seed);
               if (inverse) {
                 return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
               } else {
@@ -6607,8 +6609,8 @@ var beepbox = (() => {
                 return boundAdjust * (step / (step - 1)) * Math.floor(noteHash * step / (hashMax + 1)) / step + perEnvelopeLowerBound;
               }
             case 3 /* timeSmooth */:
-              const timeHashA = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor(timeSinceStart * perEnvelopeSpeed / 256)) + "", seed);
-              const timeHashB = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed + 256) / 256)) + "", seed);
+              const timeHashA = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor(timeSinceStart * (perEnvelopeSpeed / 10) / 256)) + "", seed);
+              const timeHashB = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10) + 256) / 256)) + "", seed);
               const weightedAverage = timeHashA * (1 - timeSinceStart * perEnvelopeSpeed / 256 % 1) + timeHashB * (timeSinceStart * perEnvelopeSpeed / 256 % 1);
               if (inverse) {
                 return perEnvelopeUpperBound - boundAdjust * weightedAverage / (hashMax + 1);
@@ -6744,6 +6746,9 @@ var beepbox = (() => {
             return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1 - envelopeSpeed * time / 2, 0)) + perEnvelopeLowerBound);
           }
         }
+        case 16 /* sidechain */:
+          return perEnvelopeUpperBound - boundAdjust / (2 + time * envelopeSpeed);
+        //}
         default:
           throw new Error("Unrecognized operator envelope type.");
       }

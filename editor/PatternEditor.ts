@@ -58,6 +58,7 @@ export class PatternEditor {
     private readonly _backgroundPitchRows: SVGRectElement[] = [];
     private readonly _backgroundDrumRow: SVGRectElement = SVG.rect();
     private readonly _backgroundModRow: SVGRectElement = SVG.rect();
+    public playheadX: number;
 
     public  _editorWidth: number;
     public  _editorHeight: number;
@@ -131,7 +132,6 @@ export class PatternEditor {
         this._svgNoteBackground = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
         this._svgDrumBackground = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
         this._svgModBackground = SVG.pattern({ id: "patternEditorModBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
-        //this._alternateBeatOverlays = SVG.rect({x: 0, y: 0, fill: "#6e6e6ed2", "fill-opacity": "0.05", "pointer-events": "none",});
         this._svgBackground = SVG.rect({ x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
         this._svgNoteContainer = SVG.svg();
         this._svgPlayhead = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
@@ -194,6 +194,7 @@ export class PatternEditor {
         } else {
             this._svgPlayhead.style.display = "none";
             this._svgBeathead.style.display = "none";
+            this._svg.appendChild(SVG.rect({ x: 0, y: 0, width: 10000, height: 10000, fill: ColorConfig.editorBackground, style: "opacity: 0.3;" }));
         }
 
         this.resetCopiedPins();
@@ -681,7 +682,7 @@ export class PatternEditor {
 
         if (this._doc.synth.playing && Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset) {
             this._svgPlayhead.setAttribute("visibility", "visible");
-            this._svgBeathead.setAttribute("visibility", "visible");
+            //this._svgBeathead.setAttribute("visibility", "visible");
             const modPlayhead: number = this._doc.synth.playhead - playheadBar;
 
             // note flash
@@ -697,12 +698,18 @@ export class PatternEditor {
                 }
             }
 
-            const localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
+            let localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
+            this.playheadX = localPlayhead;
 
-            this._svgPlayhead.style.willChange = "transform";
-            this._svgPlayhead.style.transform = `translateX(${localPlayhead * this._editorWidth - 2}px)`;
+            if (Math.abs(modPlayhead - localPlayhead) > 0.1) {
+                localPlayhead = modPlayhead;
+            } else {
+                localPlayhead += (modPlayhead - localPlayhead) * 0.2;
+            }
+            this._svgPlayhead.setAttribute("x", "" + prettyNumber(localPlayhead * this._editorWidth - 2));
+            //this._svgPlayhead.setAttribute("x", "" + (this._editorWidth / 2));
 
-            const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
+            /*const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
 
             const beatProgress = (localPlayhead * this._doc.song.beatsPerBar) % 1;
 
@@ -723,7 +730,7 @@ export class PatternEditor {
             const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
 
             this._svgBeathead.style.willChange = "transform";
-            this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;
+            this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;*/
         } else {
             this._svgPlayhead.setAttribute("visibility", "hidden");
 
@@ -2763,7 +2770,7 @@ export class PatternEditor {
             let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
 
             this._backgroundPitchRows[j].style.visibility = "visible";
-            this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0.5";
+            this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0.2";
         }
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
@@ -3074,7 +3081,8 @@ export class PatternEditor {
             pathString += "z";
 
             svgElement.setAttribute("d", pathString);
-            }
+            
+        }
     } 
 
     public setPatternSelected(selected: boolean): void {
@@ -3084,12 +3092,9 @@ export class PatternEditor {
         this._patternBorderRight.setAttribute("visibility", visibility);
     }
 
-    public setBarOffset(offset: number, render: boolean = true): void {
+    /*public setBarOffset(offset: number): any {
         this._barOffset = offset;
-        if (render) {
-        this.render();
-        }
-    }
+    }*/ 
     
     private _pitchToPixelHeight(pitch: number): number {
         return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);

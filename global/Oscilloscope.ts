@@ -17,7 +17,7 @@ export class oscilloscopeCanvas {
                     let x = i - (directlinkL.length - 1) + (canvas.width/scale);
                     let yl = (directlinkL[i] * (canvas.height/scale / 2) + (canvas.height/scale / 2));
 
-                    ctx.fillRect((x - 1) * scale, (yl - 1.5) * scale, 2 * scale, 3 * scale);
+                    ctx.fillRect((x - 1) * scale, (yl - 1) * scale, 1 * scale, 1.5 * scale);
                     if (x == 0) break;
                 }
                 ctx.fillStyle = ColorConfig.getComputed("--oscilloscope-line-R"); //less ctx style calls = less expensive??? also avoiding uncached colors
@@ -25,7 +25,7 @@ export class oscilloscopeCanvas {
                     let x = i - (directlinkR.length - 1) + (canvas.width/scale);
                     let yr = (directlinkR[i] * (canvas.height/scale / 2) + (canvas.height/scale / 2));
                     
-                    ctx.fillRect((x - 1)*scale, (yr - 1.5) * scale, 2 * scale, 3 * scale);
+                    ctx.fillRect((x - 1)*scale, (yr - 1)*scale, 1*scale, 1.5*scale);
                     if (x == 0) break;
                 }
             }
