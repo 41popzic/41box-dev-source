@@ -735,12 +735,12 @@ html {
 	flex-shrink: 0;
     display: flex;
     align-items: center;
-	height: 100%;
+	height: 80%;
     gap: 9px;
-	margin-top: 5px;
+	margin-top: 7px;
     padding: 0 10px;
-	padding-bottom: 2px;
-    border-radius: 4px 4px 0 0;
+	padding-bottom: 0px;
+    border-radius: 10px 10px 0 0;
     cursor: pointer;
 
     color: ${ColorConfig.secondaryText};
@@ -802,6 +802,34 @@ html {
 .beepboxEditor .song-tabs-logo img {
     width: 24px;
     height: 24px;
+}
+
+.context-menu {
+    position: fixed;
+    display: none;
+
+    min-width: 160px;
+    padding: 4px;
+
+    background: ${ColorConfig.uiWidgetBackground};
+    border: 1px solid ${ColorConfig.uiWidgetFocus};
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+
+	z-index: 100;
+}
+
+.context-menu-item {
+    display: block;
+    width: 100%;
+
+    padding: 6px 10px;
+
+    text-align: left;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+	
+	color: ${ColorConfig.primaryText}
 }
 
 .beepboxEditor button.preferences::before {
@@ -1557,7 +1585,6 @@ html {
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	
 }
 
 .beepboxEditor .selectRow > :last-child {
@@ -1618,7 +1645,6 @@ html {
 
 	overflow-x: clip;
 
-	box-sizing: border-box;
 	border-radius: 4px;
 }
 

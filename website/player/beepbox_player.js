@@ -509,7 +509,6 @@ var beepbox = (function (exports) {
         { group: "misc", name: "No Dabbing (MB)", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
         { group: "misc", name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { group: "misc", name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        { group: "misc", name: "buh", realName: "whatdafuck", flags: [true, true, false, false, false, false, false, false, false, false, false, false] },
         { group: "misc", name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] },
         { group: "misc", name: "Blues Phrygian", realName: "blues phrygian", flags: [true, true, false, true, true, true, false, false, true, false, true, false] },
     ]);
@@ -15405,7 +15404,7 @@ var beepbox = (function (exports) {
             if (instrumentObject["fadeOutTicks"] != undefined) {
                 let fadeOutTicks = +instrumentObject["fadeOutTicks"];
                 if (jsonFormat !== "41box") {
-                    fadeOutTicks *= Config.partsPerBeat / 24;
+                    fadeOutTicks *= 10;
                 }
                 this.fadeOut = ticksToFadeOutSetting(fadeOutTicks);
             }
@@ -15547,6 +15546,15 @@ var beepbox = (function (exports) {
             }
             if (instrumentObject["ringModHzOffset"] != undefined) {
                 this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["ringModHzOffset"] | 0) / 100));
+            }
+            if (instrumentObject["rmWaveformIndex"] != undefined) {
+                this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["rmWaveformIndex"]);
+            }
+            if (instrumentObject["rmPulseWidth"] != undefined) {
+                this.ringModPulseWidth = clamp(0, Config.pulseWidthRange, Math.round((Config.pulseWidthRange - 1) * (instrumentObject["rmPulseWidth"] | 0) / 100));
+            }
+            if (instrumentObject["rmHzOffset"] != undefined) {
+                this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["rmHzOffset"] | 0) / 100));
             }
             if (instrumentObject["granular"] != undefined) {
                 this.granular = instrumentObject["granular"];
@@ -16762,7 +16770,7 @@ var beepbox = (function (exports) {
                         case 0:
                             if (step <= 1)
                                 return 1;
-                            const timeHash = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
+                            const timeHash = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10)) / (256))) + "", seed);
                             if (inverse) {
                                 return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
                             }
@@ -16788,8 +16796,8 @@ var beepbox = (function (exports) {
                                 return boundAdjust * (step / (step - 1)) * Math.floor(noteHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                             }
                         case 3:
-                            const timeHashA = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
-                            const timeHashB = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed + 256) / (256))) + "", seed);
+                            const timeHashA = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10)) / (256))) + "", seed);
+                            const timeHashB = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * (perEnvelopeSpeed / 10) + 256) / (256))) + "", seed);
                             const weightedAverage = timeHashA * (1 - ((timeSinceStart * perEnvelopeSpeed) / (256)) % 1) + timeHashB * (((timeSinceStart * perEnvelopeSpeed) / (256)) % 1);
                             if (inverse) {
                                 return perEnvelopeUpperBound - boundAdjust * weightedAverage / (hashMax + 1);
@@ -16943,6 +16951,8 @@ var beepbox = (function (exports) {
                         return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1.0 - envelopeSpeed * time / 2, 0)) + perEnvelopeLowerBound);
                     }
                 }
+                case 16:
+                    return perEnvelopeUpperBound - boundAdjust / (2.0 + time * envelopeSpeed);
                 default: throw new Error("Unrecognized operator envelope type.");
             }
         }
@@ -19279,9 +19289,9 @@ var beepbox = (function (exports) {
             this.loopLength = 4;
             this.tempo = 110;
             this.reverb = 0;
-            this.beatsPerBar = 8;
-            this.barCount = 16;
-            this.patternsPerChannel = 16;
+            this.beatsPerBar = 6;
+            this.barCount = 8;
+            this.patternsPerChannel = 9;
             this.rhythm = 3;
             this.layeredInstruments = false;
             this.patternInstruments = false;
@@ -19289,7 +19299,7 @@ var beepbox = (function (exports) {
             for (let i = 0; i < Config.filterMorphCount - 1; i++) {
                 this.eqSubFilters[i] = null;
             }
-            this.title = "Unnamed";
+            this.title = "unnamed";
             this.titleNotifier.forEach(o => o());
             if (andResetChannels) {
                 this.pitchChannelCount = 3;
@@ -23805,7 +23815,7 @@ var beepbox = (function (exports) {
                     if (this.oscEnabled) {
                         if (this.oscRefreshEventTimer <= 0) {
                             events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
-                            this.oscRefreshEventTimer = 2;
+                            this.oscRefreshEventTimer = 1;
                         }
                         else {
                             this.oscRefreshEventTimer--;
@@ -27200,34 +27210,17 @@ var beepbox = (function (exports) {
                     const flangerMixDelta = +instrumentState.flangerMixDelta;
                     let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
 
-                    const flangerBaseDelay =
-                        synth.samplesPerSecond * instrumentState.flangerDelay;
+                    const flangerBaseDelay = synth.samplesPerSecond * instrumentState.flangerDelay;
 
-                    const flangerDepth =
-                        synth.samplesPerSecond *
-                        (instrumentState.flangerDepth / (Config.flangerDepthRange - 1)) *
-                        0.01;
+                    const flangerDepth = synth.samplesPerSecond * (instrumentState.flangerDepth / (Config.flangerDepthRange - 1)) * 0.01;
                     
-                    const flangerRateIndex = Math.round(
-                        instrumentState.flangerRate / (Config.flangerRateRange - 1) *
-                        (${flangerRateValues.length} - 1)
-                    );
+                    const flangerRateIndex = Math.round(instrumentState.flangerRate / (Config.flangerRateRange - 1) * (${flangerRateValues.length} - 1));
                     const flangerRate = ${JSON.stringify(flangerRateValues)}[flangerRateIndex];
-                    const flangerSamplesPerBeat =
-                        synth.getSamplesPerTick() *
-                        Config.partsPerBeat *
-                        Config.ticksPerPart;
+                    const flangerSamplesPerBeat = synth.getSamplesPerTick() * Config.partsPerBeat * Config.ticksPerPart;
 
-                    const flangerRateHz =
-                        flangerRate *
-                        synth.samplesPerSecond /
-                        flangerSamplesPerBeat;
+                    const flangerRateHz = flangerRate * synth.samplesPerSecond / flangerSamplesPerBeat;
 
-                    const flangerPhaseIncrement =
-                        Math.PI * 2.0 *
-                        flangerRateHz /
-                        synth.samplesPerSecond;
-                `;
+                    const flangerPhaseIncrement = Math.PI * 2.0 * flangerRateHz / synth.samplesPerSecond;`;
                 }
                 if (usesEcho) {
                     effectsSource += `

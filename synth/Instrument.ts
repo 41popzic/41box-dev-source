@@ -1036,7 +1036,7 @@ export class Instrument {
             let fadeOutTicks = +instrumentObject["fadeOutTicks"];
 
             if (jsonFormat !== "41box") {
-                fadeOutTicks *= Config.partsPerBeat / 24;
+                fadeOutTicks *= 10;
             }
 
             this.fadeOut = ticksToFadeOutSetting(fadeOutTicks);
@@ -1188,6 +1188,15 @@ export class Instrument {
         }
         if (instrumentObject["ringModHzOffset"] != undefined) {
             this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["ringModHzOffset"] | 0) / 100));
+        }
+        if (instrumentObject["rmWaveformIndex"] != undefined) {
+            this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["rmWaveformIndex"]);
+        }
+        if (instrumentObject["rmPulseWidth"] != undefined) {
+            this.ringModPulseWidth = clamp(0, Config.pulseWidthRange, Math.round((Config.pulseWidthRange - 1) * (instrumentObject["rmPulseWidth"] | 0) / 100));
+        }
+        if (instrumentObject["rmHzOffset"] != undefined) {
+            this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["rmHzOffset"] | 0) / 100));
         }
 
         if (instrumentObject["granular"] != undefined) {

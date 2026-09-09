@@ -680,8 +680,8 @@ export class Song {
         this.loopLength = 4;
         this.tempo = 110;
         this.reverb = 0;
-        this.beatsPerBar = 4;
-        this.barCount = 16;
+        this.beatsPerBar = 6;
+        this.barCount = 8;
         this.patternsPerChannel = 9;
         this.rhythm = 3;
         //this.rhythmEnabled = true;

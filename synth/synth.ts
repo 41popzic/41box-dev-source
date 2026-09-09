@@ -4790,34 +4790,17 @@ if (playSong && !this.countInMetronome) {
                     const flangerMixDelta = +instrumentState.flangerMixDelta;
                     let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
 
-                    const flangerBaseDelay =
-                        synth.samplesPerSecond * instrumentState.flangerDelay;
+                    const flangerBaseDelay = synth.samplesPerSecond * instrumentState.flangerDelay;
 
-                    const flangerDepth =
-                        synth.samplesPerSecond *
-                        (instrumentState.flangerDepth / (Config.flangerDepthRange - 1)) *
-                        0.01;
+                    const flangerDepth = synth.samplesPerSecond * (instrumentState.flangerDepth / (Config.flangerDepthRange - 1)) * 0.01;
                     
-                    const flangerRateIndex = Math.round(
-                        instrumentState.flangerRate / (Config.flangerRateRange - 1) *
-                        (${flangerRateValues.length} - 1)
-                    );
+                    const flangerRateIndex = Math.round(instrumentState.flangerRate / (Config.flangerRateRange - 1) * (${flangerRateValues.length} - 1));
                     const flangerRate = ${JSON.stringify(flangerRateValues)}[flangerRateIndex];
-                    const flangerSamplesPerBeat =
-                        synth.getSamplesPerTick() *
-                        Config.partsPerBeat *
-                        Config.ticksPerPart;
+                    const flangerSamplesPerBeat = synth.getSamplesPerTick() * Config.partsPerBeat * Config.ticksPerPart;
 
-                    const flangerRateHz =
-                        flangerRate *
-                        synth.samplesPerSecond /
-                        flangerSamplesPerBeat;
+                    const flangerRateHz = flangerRate * synth.samplesPerSecond / flangerSamplesPerBeat;
 
-                    const flangerPhaseIncrement =
-                        Math.PI * 2.0 *
-                        flangerRateHz /
-                        synth.samplesPerSecond;
-                `;
+                    const flangerPhaseIncrement = Math.PI * 2.0 * flangerRateHz / synth.samplesPerSecond;`
             }
 
             if (usesEcho) {

@@ -14,7 +14,7 @@ export class SongTabs {
     
     private readonly _41Icon: HTMLImageElement = this._41Logo.firstChild as HTMLImageElement;
 
-    private static readonly STORAGE_KEY = "song-tabs";
+    private static readonly STORAGE_KEY = "songTabs";
 
     public readonly container: HTMLDivElement = div({class: "song-tabs"});
 
@@ -43,11 +43,6 @@ export class SongTabs {
             const newSong = new Song();
             this._createTab("unnamed", newSong.toBase64String());
         });
-
-        document.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-});
-
 
         this._load();
     }
@@ -113,11 +108,9 @@ export class SongTabs {
         this._tabContainer.innerHTML = "";
 
         for (const tab of this._tabs) {
-            const tabElement = button({
-                class: tab.id === this._activeTab
-                    ? "song-tab active"
-                    : "song-tab",
-            });
+            const tabElement = button({ class: tab.id === this._activeTab ? "song-tab active" : "song-tab"});
+
+            tabElement.dataset.tabId = tab.id;
 
             const title = span({}, tab.title);
             const close = span({
@@ -210,5 +203,12 @@ export class SongTabs {
         } else {
             this._createTab("unnamed", song);
         }
+    }
+
+    public duplicateTab(id: string): void {
+        const tab = this._tabs.find(tab => tab.id === id);
+        if (tab == null) return;
+
+        this._createTab(tab.title, tab.song);
     }
 }

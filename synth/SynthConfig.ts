@@ -216,14 +216,12 @@ export interface Key extends BeepBoxOption {
 
 export interface Rhythm extends BeepBoxOption {
     readonly roundUpThresholds: number[] | null;
-    name: string;
-    stepsPerBeat: number;
-    tickPositions?: number[];
+    readonly name: string;
+    readonly stepsPerBeat: number;
 }
 
 export interface ChipWave extends BeepBoxOption {
     readonly expression: number;
-    //readonly group?: string;
     samples: Float32Array;
     isPercussion?: boolean;
     isCustomSampled?: boolean;
