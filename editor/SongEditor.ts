@@ -60,6 +60,7 @@ import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 import { PreferencesPrompt } from "./PreferencesPrompt";
 import { SongTabs } from "./SongTab";
 import { ContextMenu } from "./Context";
+import { NewVersionPrompt } from "./NewVersionPrompt"
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -730,6 +731,9 @@ class CustomAlgorythmCanvas {
 }
 
 export class SongEditor {
+    private static readonly versionStorageKey = "version";
+    private static readonly currentVersion = 4;
+
     public prompt: Prompt | null = null;
 
     public doc: SongDocument = new SongDocument();
@@ -1519,7 +1523,6 @@ export class SongEditor {
     private lastOutVolumeCapR: number = 0;
     public patternUsed: boolean = false;
     private _modRecTimeout: number = -1;
-    
 
     constructor(/*private _doc: SongDocument*/) {
 
@@ -2053,6 +2056,18 @@ export class SongEditor {
                 this._favoriteRhythms = [];
             }
         }
+
+        const savedVersion = localStorage.getItem(SongEditor.versionStorageKey);
+
+        if (savedVersion != SongEditor.currentVersion.toString()) {
+
+            this._openPrompt("newVersion");
+
+            localStorage.setItem(
+                SongEditor.versionStorageKey,
+                SongEditor.currentVersion.toString()
+            );
+        }
     }
 
     private _saveFavoriteRhythms(): void {
@@ -2555,6 +2570,9 @@ export class SongEditor {
                     break;
                 case "layout":
                     this.prompt = new LayoutPrompt(this.doc);
+                    break;
+                case "newVersion":
+                    this.prompt = new NewVersionPrompt(this.doc);
                     break;
                 case "recordingSetup":
                     this.prompt = new RecordingSetupPrompt(this.doc);
