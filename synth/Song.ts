@@ -678,9 +678,9 @@ export class Song {
         this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
-        this.tempo = 110;
+        this.tempo = 111;
         this.reverb = 0;
-        this.beatsPerBar = 6;
+        this.beatsPerBar = 8;
         this.barCount = 8;
         this.patternsPerChannel = 9;
         this.rhythm = 3;
@@ -693,12 +693,12 @@ export class Song {
         }
 
         //This is the tab's display name
-        this.title = "unnamed";
+        this.title = "Unnamed";
         this.titleNotifier.forEach(o => o());
 
         if (andResetChannels) {
             this.pitchChannelCount = 3;
-            this.noiseChannelCount = 2;
+            this.noiseChannelCount = 1;
             this.modChannelCount = 0;
             for (let channelIndex: number = 0; channelIndex < this.getChannelCount(); channelIndex++) {
                 const isNoiseChannel: boolean = channelIndex >= this.pitchChannelCount && channelIndex < this.pitchChannelCount + this.noiseChannelCount;

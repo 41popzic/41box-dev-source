@@ -88,7 +88,6 @@ export class ChannelRow {
 
     private _renderedBarWidth: number = -1;
     private _renderedBarHeight: number = -1;
-    private _renderedSelected: boolean = false;
     private _boxes: Box[] = [];
 
     public readonly container: HTMLElement = HTML.div({ class: "channelRow" });
@@ -110,15 +109,6 @@ export class ChannelRow {
                 this.container.removeChild(this._boxes[x].container);
             }
             this._boxes.length = this._doc.song.barCount;
-        }
-
-        const isSelectedChannel = (this.index === this._doc.channel);
-
-        if (this._renderedSelected !== isSelectedChannel) {
-            this.container.style.background = isSelectedChannel
-                ? "rgba(255, 255, 255, 0.07)"
-                : "";
-            this._renderedSelected = isSelectedChannel;
         }
 
         if (this._renderedBarWidth != barWidth) {

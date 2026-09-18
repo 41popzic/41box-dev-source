@@ -36,7 +36,7 @@ export class TrackEditor {
         this._playhead,
     );
     private readonly _select: HTMLSelectElement = HTML.select({ class: "trackSelectBox", style: "background: none; border: none; appearance: none; border-radius: initial; box-shadow: none; color: transparent; position: absolute; touch-action: none;" });
-    public readonly container: HTMLElement = HTML.div({ class: "noSelection", style: `background-color: ${ColorConfig.editorBackground}; position: relative; overflow: hidden;` },
+    public readonly container: HTMLElement = HTML.div({ class: "noSelection", style: `` },
         this._channelRowContainer,
         this._svg,
         this._select,

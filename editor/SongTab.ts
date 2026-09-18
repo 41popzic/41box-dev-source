@@ -1,5 +1,6 @@
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Song } from "../synth/Song";
+import { SongDocument } from "./SongDocument";
 
 const { button, div, span } = HTML;
 
@@ -10,6 +11,8 @@ export interface SongTabData {
 }
 
 export class SongTabs {
+    private _doc: SongDocument = new SongDocument;
+
     private readonly _41Logo: HTMLDivElement = div({ class: "song-tabs-logo" }, new Image(24, 24));
     
     private readonly _41Icon: HTMLImageElement = this._41Logo.firstChild as HTMLImageElement;
@@ -58,6 +61,7 @@ export class SongTabs {
         this._activeTab = tab.id;
 
         this._whenTabSelected(tab);
+        this._doc.synth.pause();
 
         this._save();
         this._render();
@@ -94,6 +98,7 @@ export class SongTabs {
 
         if (existingTab != null) {
             this._activeTab = existingTab.id;
+            this._doc.synth.pause();
             this._whenTabSelected(existingTab);
             this._save();
             this._render();
@@ -125,6 +130,7 @@ export class SongTabs {
                     this._closeTab(tab.id);
                 } else {
                     this._selectTab(tab.id);
+                    this._doc.synth.pause();
                 }
             });
 
@@ -141,6 +147,7 @@ export class SongTabs {
 
         if (tab != null) {
             this._whenTabSelected(tab);
+            this._doc.synth.pause();
         }
 
         this._save();
@@ -148,10 +155,7 @@ export class SongTabs {
     }
 
     private _closeTab(id: string): void {
-        if (this._tabs.length <= 1) {
-            return;
-        }
-
+        if (this._tabs.length <= 1) return;
         this._tabs = this._tabs.filter(tab => tab.id != id);
 
         if (this._activeTab == id) {
@@ -168,6 +172,7 @@ export class SongTabs {
                 }
             }
         }
+        this._doc.synth.pause();
 
         this._save();
         this._render();
@@ -193,6 +198,7 @@ export class SongTabs {
 
     public selectTab(id: string): void {
         this._selectTab(id);
+        this._doc.synth.pause();
     }
     
     public openSong(song: string): void {
@@ -203,6 +209,7 @@ export class SongTabs {
         } else {
             this._createTab("unnamed", song);
         }
+        this._doc.synth.pause();
     }
 
     public duplicateTab(id: string): void {
@@ -210,5 +217,7 @@ export class SongTabs {
         if (tab == null) return;
 
         this._createTab(tab.title, tab.song);
+        this._doc.synth.pause();
+
     }
 }

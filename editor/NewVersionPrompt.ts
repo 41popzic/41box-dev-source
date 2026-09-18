@@ -21,7 +21,7 @@ public readonly container: HTMLDivElement = div({ class: "prompt noSelection", s
     p({ style: "margin: 0.5em 0;" }, "There have been some big changes to the box, so here's a quick look at what's new"),
 
     div({ style: "text-align: left; margin: 0.5em 0;" },
-        p({ style: "margin: 0.5em;" }, "• Multiple songs can be open at once (see the new tabs system)"),
+        //p({ style: "margin: 0.5em;" }, "• Multiple songs can be open at once (see the new tabs system)"),
         p({ style: "margin: 0.5em;" }, "• Many UI changes have been adopted"),
         p({ style: "margin: 0.5em;" }, "• And lots of other stuff listed in the ", a({ href: "./patch_notes"}, "patch notes"))
     ),

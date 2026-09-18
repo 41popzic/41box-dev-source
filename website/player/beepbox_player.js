@@ -19287,9 +19287,9 @@ var beepbox = (function (exports) {
             this.octave = 0;
             this.loopStart = 0;
             this.loopLength = 4;
-            this.tempo = 110;
+            this.tempo = 111;
             this.reverb = 0;
-            this.beatsPerBar = 6;
+            this.beatsPerBar = 8;
             this.barCount = 8;
             this.patternsPerChannel = 9;
             this.rhythm = 3;
@@ -19299,11 +19299,11 @@ var beepbox = (function (exports) {
             for (let i = 0; i < Config.filterMorphCount - 1; i++) {
                 this.eqSubFilters[i] = null;
             }
-            this.title = "unnamed";
+            this.title = "Unnamed";
             this.titleNotifier.forEach(o => o());
             if (andResetChannels) {
                 this.pitchChannelCount = 3;
-                this.noiseChannelCount = 2;
+                this.noiseChannelCount = 1;
                 this.modChannelCount = 0;
                 for (let channelIndex = 0; channelIndex < this.getChannelCount(); channelIndex++) {
                     const isNoiseChannel = channelIndex >= this.pitchChannelCount && channelIndex < this.pitchChannelCount + this.noiseChannelCount;

@@ -58,8 +58,8 @@ import { AddSamplesPrompt } from "./AddSamplesPrompt";
 import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 // import { Selection } from "./Selection";
 import { PreferencesPrompt } from "./PreferencesPrompt";
-import { SongTabs } from "./SongTab";
-import { ContextMenu } from "./Context";
+//import { SongTabs } from "./SongTab";
+//import { ContextMenu } from "./Context";
 import { NewVersionPrompt } from "./NewVersionPrompt"
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
@@ -742,16 +742,16 @@ export class SongEditor {
     private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this.doc, false, -1);
     private readonly _patternEditor: PatternEditor = new PatternEditor(this.doc, true, 0);
     private readonly _patternEditorNext: PatternEditor = new PatternEditor(this.doc, false, 1);
-    private readonly _tabs: SongTabs = new SongTabs((tab) => { 
+    /*private readonly _tabs: SongTabs = new SongTabs((tab) => { 
             this.doc.setActiveTabId(tab.id);
             this.doc.loadSong(tab.song); 
             this.doc.updateBrowserUrl();
         }, 
         this.doc.song.toBase64String()
-    );
-    private readonly _contextMenu: ContextMenu = new ContextMenu((tabId) => {
-        this._tabs.duplicateTab(tabId);
-    });
+    );*/
+    //private readonly _contextMenu: ContextMenu = new ContextMenu((tabId) => {
+    //    this._tabs.duplicateTab(tabId);
+    //});
 
     private readonly _trackEditor: TrackEditor = new TrackEditor(this.doc, this);
     private readonly _muteEditor: MuteEditor = new MuteEditor(this.doc, this);
@@ -843,7 +843,7 @@ export class SongEditor {
     private readonly _scaleSelect: HTMLSelectElement = select();
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
     private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
-    private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
+    private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "1000", value: "1600", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
     private readonly _songEqFilterEditor: FilterEditor = new FilterEditor(this.doc, false, false, true);
     private readonly _songEqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
@@ -1110,10 +1110,10 @@ export class SongEditor {
     private readonly _feedbackRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "feedback"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
     private readonly _spectrumEditor: SpectrumEditor = new SpectrumEditor(this.doc, null);
     private readonly _spectrumZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
-    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
+    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "spectrum"), this._spectrumZoom, this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this.doc);
     private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
-    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
+    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "harmonics"), this._harmonicsZoom, this._harmonicsEditor.container);
 
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
     private readonly _envelopeSpeedSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["envelope speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEnvelopeSpeed(this.doc, oldValue, newValue), false);
@@ -1472,7 +1472,7 @@ export class SongEditor {
     );
 
     public readonly mainLayer: HTMLDivElement = div({ class: "beepboxEditor", tabIndex: "0" },
-        this._tabs.container,
+        //this._tabs.container,
         this._patternArea,
         this._trackArea,
         this._settingsArea,
@@ -1530,9 +1530,9 @@ export class SongEditor {
         this.doc.modRecordingHandler = () => { this.handleModRecording() };
         new MidiInputHandler(this.doc);
         window.addEventListener("resize", this.whenUpdated);
-        this.doc._whenSongOpened = (song) => {
+        /*this.doc._whenSongOpened = (song) => {
             this._tabs.openSong(song);
-        };
+        };*/
         window.requestAnimationFrame(this.updatePlayButton);
         window.requestAnimationFrame(this._animate);
 
@@ -1701,9 +1701,9 @@ export class SongEditor {
             this._drumsetGroup.appendChild(row);
         }
 
-        this.doc._whenTabChanged = (tabId) => {
+        /*this.doc._whenTabChanged = (tabId) => {
             this._tabs.selectTab(tabId);
-        };
+        };*/
 
         this._modNameRows = [];
         this._modChannelBoxes = [];
@@ -1829,7 +1829,7 @@ export class SongEditor {
         this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
         this._trackArea.addEventListener("mousedown", this.refocusStage);
 
-        window.addEventListener("contextmenu", (event) => {
+        /*window.addEventListener("contextmenu", (event) => {
             event.preventDefault();
 
             const target = event.target as HTMLElement;
@@ -1849,7 +1849,7 @@ export class SongEditor {
 
         window.addEventListener("click", (event) => {
             this._contextMenu.hide();
-        })
+        })*/
 
         // The song volume slider is styled slightly different than the class' default.
         this._volumeSlider.container.style.setProperty("flex-grow", "1");
@@ -4165,7 +4165,7 @@ export class SongEditor {
         // Writeback to mods if control key is held while moving a slider.
         this.handleModRecording();
 
-        this._tabs.updateActiveSong(this.doc.song.toBase64String(), this.doc.song.title);
+        //this._tabs.updateActiveSong(this.doc.song.toBase64String(), this.doc.song.title);
     }
 
     public handleModRecording(): void {
@@ -4973,7 +4973,7 @@ export class SongEditor {
                     this.doc.prefs.layout = "tall";
                     this.doc.prefs.visibleOctaves = 5;
                     this.doc.prefs.closePromptByClickoff = false;
-                    this.doc.prefs.colorTheme = "41box";
+                    this.doc.prefs.colorTheme = "slarmoosbox";
                     this.doc.prefs.frostedGlassBackground = false;
                     this.doc.prefs.instrumentButtonsAtTop = true;
                     this.doc.prefs.instrumentCopyPaste = true;

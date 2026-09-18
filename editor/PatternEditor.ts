@@ -153,8 +153,8 @@ export class PatternEditor {
             this._svgBeathead,
             this._svgPlayhead,
 
-            this._patternBorderLeft,
-            this._patternBorderRight,
+            //this._patternBorderLeft,
+            //this._patternBorderRight,
         );
         this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
 
@@ -194,7 +194,7 @@ export class PatternEditor {
         } else {
             this._svgPlayhead.style.display = "none";
             this._svgBeathead.style.display = "none";
-            this._svg.appendChild(SVG.rect({ x: 0, y: 0, width: 10000, height: 10000, fill: ColorConfig.editorBackground, style: "opacity: 0.3;" }));
+            this._svg.appendChild(SVG.rect({ x: 0, y: 0, width: 10000, height: 10000, fill: ColorConfig.editorBackground, style: "opacity: 0.4;" }));
         }
 
         this.resetCopiedPins();
@@ -680,9 +680,10 @@ export class PatternEditor {
         const playheadBar: number = Math.floor(this._doc.synth.playhead);
         const noteFlashElements: NodeListOf<SVGPathElement> = this._svgNoteContainer.querySelectorAll('.note-flash');
 
-        if (this._doc.synth.playing && Math.floor(this._doc.synth.playhead) == this._doc.bar + this._barOffset) {
+        if (this._doc.synth.playing && ((this._pattern != null && this._doc.song.getPattern(this._doc.channel, Math.floor(this._doc.synth.playhead)) == this._pattern))) {
             this._svgPlayhead.setAttribute("visibility", "visible");
-            //this._svgBeathead.setAttribute("visibility", "visible");
+            this._svgPlayhead.style.opacity = '1';
+            this._svgBeathead.setAttribute("visibility", "hidden");
             const modPlayhead: number = this._doc.synth.playhead - playheadBar;
 
             // note flash
@@ -709,28 +710,54 @@ export class PatternEditor {
             this._svgPlayhead.setAttribute("x", "" + prettyNumber(localPlayhead * this._editorWidth - 2));
             //this._svgPlayhead.setAttribute("x", "" + (this._editorWidth / 2));
 
-            /*const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
+            const currentBeat = Math.floor(localPlayhead * this._doc.song.beatsPerBar);
 
             const beatProgress = (localPlayhead * this._doc.song.beatsPerBar) % 1;
 
             const fadeOpacity = 1 - beatProgress;
 
-            this._svgBeathead.setAttribute(
-                "fill-opacity",
-                String(0.10 * fadeOpacity)
-            );
+            this._svgBeathead.setAttribute("fill-opacity", "" + String(0.10 * fadeOpacity));
 
-            this._svgBeathead.setAttribute(
-                "stroke-opacity",
-                String(0.20 * fadeOpacity)
-            );
+            this._svgBeathead.setAttribute("stroke-opacity", "" + String(0.20 * fadeOpacity));
 
-            this._svgBeathead.setAttribute("visibility", "visible");
+            //this._svgBeathead.setAttribute("visibility", "visible");
 
             const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
 
             this._svgBeathead.style.willChange = "transform";
-            this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;*/
+            this._svgBeathead.style.transform = `translateX(${currentBeat * beatWidth}px)`;
+            this._svgBeathead.setAttribute("visibility", "hidden");
+
+        } else if (this._doc.synth.playing && ((this._doc.song.getPattern(this._doc.channel, Math.floor(this._doc.synth.playhead)) !== this._pattern) || this._pattern === null)) {
+            this._svgPlayhead.setAttribute("visibility", "visible");
+            this._svgBeathead.setAttribute("visibility", "hidden");
+            const modPlayhead: number = this._doc.synth.playhead - playheadBar;
+
+            // note flash
+            for (var i = 0; i < noteFlashElements.length; i++) {
+                var element: SVGPathElement = noteFlashElements[i];
+                const noteStart: number = Number(element.getAttribute("note-start")) / (this._doc.song.beatsPerBar * Config.partsPerBeat)
+                const noteEnd: number = Number(element.getAttribute("note-end")) / (this._doc.song.beatsPerBar * Config.partsPerBeat)
+                if ((modPlayhead >= noteStart) && this._doc.prefs.notesFlashWhenPlayed) {
+                    const dist = noteEnd - noteStart
+                    element.style.opacity = String((1 - (((modPlayhead - noteStart) - (dist / 2)) / (dist / 2))))
+                } else {
+                    element.style.opacity = "0"
+                }
+            }
+
+            let localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
+            this.playheadX = localPlayhead;
+
+            if (Math.abs(modPlayhead - localPlayhead) > 0.1) {
+                localPlayhead = modPlayhead;
+            } else {
+                localPlayhead += (modPlayhead - localPlayhead) * 0.2;
+            }
+            this._svgPlayhead.setAttribute("x", "" + prettyNumber(localPlayhead * this._editorWidth - 2));
+            this._svgPlayhead.style.opacity = '0.2';
+
+            this._svgBeathead.setAttribute("visibility", "hidden");
         } else {
             this._svgPlayhead.setAttribute("visibility", "hidden");
 
@@ -741,7 +768,7 @@ export class PatternEditor {
                 var element: SVGPathElement = noteFlashElements[i];
                 element.style.opacity = "0"
             }
-        }
+        } 
 
         if (this._doc.synth.playing && (this._doc.synth.recording || this._doc.prefs.autoFollow) && this._followPlayheadBar != playheadBar) {
             // When autofollow is enabled, select the current bar (but don't record it in undo history).

@@ -157,7 +157,7 @@ html {
     grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 	grid-column-gap: 6px;
 	grid-row-gap: 6px;
-	padding-top: 36px;
+	padding: 5px;
     box-sizing: border-box;
 	position: relative;
 	touch-action: manipulation;
@@ -267,24 +267,34 @@ html {
 
 .beepboxEditor .pattern-area {
 	grid-area: pattern-area;
+	//margin-top: 10px;
 	height: 481px;
 	display: flex;
 	flex-direction: row;
 	position: relative;
+
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 }
 
 .beepboxEditor .track-area {
 	grid-area: track-area;
 	background-image: url(${getLocalStorageItem("customThemeImage", "")});
+	//margin-top: 10px;
+
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	margin-right: -2px;
 }
 
 .beepboxEditor .loopEditor {
 	height: 20px;
 	position: sticky;
 	bottom: 0;
-	padding: 5px 0;
-	background-color: ${ColorConfig.editorBackground};
-}
+	//padding: 5px 0;
+	//background-color: ${ColorConfig.editorBackground};
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	}
 
 .beepboxEditor .settings-area {
 	grid-area: settings-area;
@@ -297,29 +307,29 @@ html {
 
 .beepboxEditor .other-settings-area {
 	
-	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
 	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
-	margin-top: 10px;
-	margin-bottom: 0px;
+	//margin-top: 10px;
+	margin-bottom: 5px;
 
-	margin-left: 3px !important;
-	margin-right: 3px !important;
+	//margin-left: 2px;
+	//margin-right: 2px;
 
-	padding-left: 3px !important;
-	padding-right: 3px !important;
-	padding-bottom: 5px;
-	padding-top: 5px;
+	//padding-left: 3px;
+	//padding-right: 3px;
+	//padding-bottom: 5px;
+	//padding-top: 5px;
 
 	overflow-x: clip;
 
-	box-sizing: border-box;
+	//box-sizing: border-box;
 
-	min-width: 0;
+	//min-width: 0;
 
-    width: calc(100% - 6px);
+    //width: calc(100% - 6px);
 
-	border-radius: 2px;
+	//border-radius: 2px;
 }
 
 .beepboxEditor .version-area{ grid-area: version-area; }
@@ -722,7 +732,8 @@ html {
 }
 
 .beepboxEditor .song-tab-container {
-    display: flex;
+    //display: flex;
+	display: none;
     overflow-x: auto;	
     align-items: stretch;
     height: 100%;
@@ -733,27 +744,27 @@ html {
 
 .beepboxEditor .song-tab {
 	flex-shrink: 0;
-    display: flex;
+    //display: flex;
+	display: none;
     align-items: center;
 	height: 80%;
     gap: 9px;
 	margin-top: 7px;
     padding: 0 10px;
 	padding-bottom: 0px;
-    border-radius: 10px 10px 0 0;
+    border-radius: 4px 4px 0 0;
     cursor: pointer;
 
-    color: ${ColorConfig.secondaryText};
-    background: ${ColorConfig.editorBackground};
+    color: ${ColorConfig.textSelection};
+	background: ${ColorConfig.editorBackground};
 }
 
 .beepboxEditor .song-tab.active {
-    color: ${ColorConfig.primaryText};
+    color: ${ColorConfig.secondaryText};
     background: ${ColorConfig.uiWidgetBackground};
 
-	border-left: 2px solid ${ColorConfig.uiWidgetFocus};
-	border-right: 2px solid ${ColorConfig.uiWidgetFocus};
-
+	border-left: 1px solid ${ColorConfig.uiWidgetFocus};
+	border-right: 1px solid ${ColorConfig.uiWidgetFocus};
 }
 
 .beepboxEditor .song-tab-close {
@@ -776,7 +787,8 @@ html {
 }
 
 .beepboxEditor .song-tabs {
-    display: flex;
+    //display: flex;
+	display: none;
     align-items: center;
     overflow-x: auto;	
 	overflow-y: none;
@@ -790,7 +802,8 @@ html {
 }
 
 .beepboxEditor .song-tabs-logo {
-    display: flex;
+    //display: flex;
+	display: none;
     align-items: center;
     gap: 6px;
     height: 100%;
@@ -821,6 +834,9 @@ html {
 .context-menu-item {
     display: block;
     width: 100%;
+
+	//display: flex;
+	display: none;
 
     padding: 6px 10px;
 
@@ -933,7 +949,7 @@ html {
 	margin: auto;
 	text-align: center;
 	background: ${ColorConfig.editorBackground};
-	border-radius: 15px;
+	border-radius: 5px;
 	border: 4px solid ${ColorConfig.uiWidgetBackground};
 	color: ${ColorConfig.primaryText};
 	padding: 20px;
@@ -1611,11 +1627,11 @@ html {
 	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
 	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
-	margin-top: 10px;
+	//margin-top: 10px;
 	margin-bottom: 10px;
 
-	margin-left: 3px !important;
-	margin-right: 3px !important;
+	margin-left: 2px !important;
+	margin-right: 2px !important;
 
 	padding-left: 0px !important;
 	padding-right: 0px !important;
@@ -1631,21 +1647,21 @@ html {
 	display: flex;
 	flex-direction: column;
 
-	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
 	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
-	margin-top: 10px;
+	//margin-top: 10px;
 	margin-bottom: 10px;
 
-	margin-left: 3px !important;
-	margin-right: 3px !important;
+	//margin-left: 2px !important;
+	//margin-right: 2px !important;
 
 	padding-left: 0px !important;
 	padding-right: 0px !important;
 
 	overflow-x: clip;
 
-	border-radius: 4px;
+	//border-radius: 4px;
 }
 
 .beepboxEditor .editor-controls-alt {
@@ -1659,17 +1675,11 @@ html {
 	display: flex;
 	flex-direction: column;
 	
-	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
+	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
 	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
-	margin-top: 10px;
-	margin-bottom: 10px;
-
-	margin-left: 3px !important;
-	margin-right: 3px !important;
-
-	padding-left: 0px !important;
-	padding-right: 10px !important;
+	//margin-left: 2px !important;
+	//margin-right: 2px !important;
 
 	overflow-x: clip;
 
@@ -1677,9 +1687,9 @@ html {
 
 	min-width: 0;
 
-    width: calc(100% - 6px);
+    //width: calc(100% - 6px);
 
-	border-radius: 2px;
+	//border-radius: 2px;
 }
 
 .beepboxEditor .editor-right-side-top > *, .beepboxEditor .editor-right-side-bottom > * {
@@ -1706,7 +1716,7 @@ html {
 .beepboxEditor .pitchShiftMarker::before {
 	content: "";
 	width: 2px;
-	height: 20px;
+	height: 16px;
 	transform: translate(-50%, -50%);
 	position: absolute;
 	background: currentColor;
@@ -1885,7 +1895,7 @@ li.select2-results__option[role=group] > strong:hover {
 	.beepboxEditor {
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: min-content 6px min-content min-content;
-		grid-template-areas: "pattern-area" "." "track-area" "settings-area";
+		grid-template-areas: "pattern-area" "track-area" "settings-area";
 		grid-row-gap: 0;
 	}
 	.beepboxEditor .settings-area {
