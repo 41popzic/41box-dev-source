@@ -3,6 +3,8 @@
 import { Config } from "../synth/SynthConfig";
 import { EditorConfig, isMobile } from "./EditorConfig";
 import { Synth } from "../synth/synth";
+import { Pattern } from "../synth/Pattern";
+import { Channel } from "../synth/Channel";
 import { Song } from "../synth/Song";
 import { SongRecovery, generateUid, errorAlert } from "./SongRecovery";
 import { ColorConfig } from "./ColorConfig";
@@ -13,8 +15,6 @@ import { Preferences } from "./Preferences";
 import { Change } from "./Change";
 import { ChangeNotifier } from "./ChangeNotifier";
 import { ChangeSong, setDefaultInstruments, discardInvalidPatternInstruments, ChangeHoldingModRecording } from "./changes";
-import { Channel } from "../synth/Channel";
-import { Pattern } from "../synth/Pattern";
 
 interface HistoryState {
     canUndo: boolean;
@@ -25,8 +25,6 @@ interface HistoryState {
     recoveryUid: string;
     prompt: string | null;
     selection: { x0: number, x1: number, y0: number, y1: number, start: number, end: number };
-    tabId: string | null;
-    song: string;
 }
 
 export class SongDocument {
@@ -67,11 +65,6 @@ export class SongDocument {
     private _recordedNewSong: boolean = false;
     public _waitingToUpdateState: boolean = false;
 
-    private _activeTabId: string | null = null;
-
-    public _whenTabChanged: ((tabId: string) => void) | null = null;
-    public _whenSongOpened: ((song: string) => void) | null = null;
-
     constructor() {
         this.notifier.watch(this._validateDocState);
 
@@ -108,7 +101,7 @@ export class SongDocument {
         let state: HistoryState | null = this._getHistoryState();
         if (state == null) {
             // When the page is first loaded, indicate that undo is NOT possible.
-            state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+            state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON() };
         }
         if (state.recoveryUid == undefined) state.recoveryUid = generateUid();
         this._replaceState(state, songString);
@@ -174,14 +167,6 @@ export class SongDocument {
         }
     }
 
-    public updateBrowserUrl(): void {
-        const state: HistoryState | null = this._getHistoryState();
-
-        if (state == null) throw new Error("History state is null.");
-
-        this._replaceState(state, this.song.toBase64String());
-    }
-
     private _pushState(state: HistoryState, hash: string): void {
         if (this.prefs.displayBrowserUrl) {
             window.history.pushState(state, "", "#" + hash);
@@ -238,28 +223,44 @@ export class SongDocument {
 			// Changes to the song while it's recording to could mess up the recording so just abort the recording.
 			this.performance.abortRecording();
 		}
-        if (window.history.state == null && window.location.hash != "") {
-            this._whenSongOpened?.(window.location.hash);
-            return;
-        }
+		
+		if (window.history.state == null && window.location.hash != "") {
+			// The user changed the hash directly.
+			this._sequenceNumber++;
+			this._resetSongRecoveryUid();
+			const state: HistoryState = {canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON()};
+			try {
+				new ChangeSong(this, this._getHash());
+			} catch (error) {
+				errorAlert(error);
+			}
+			this.prompt = state.prompt;
+			if (this.prefs.displayBrowserUrl) {
+				this._replaceState(state, this.song.toBase64String());
+			} else {
+				this._pushState(state, this.song.toBase64String());
+			}
+			this.forgetLastChange();
+			this.notifier.notifyWatchers();
+			// Stop playing, and go to start when pasting new song in.
+			this.synth.pause();
+			this.synth.goToBar(0);
+			return;
+		}
+			
 		const state: HistoryState | null = this._getHistoryState();
 		if (state == null) throw new Error("History state is null.");
 			
-		// Abort if we've already handled the current state.
+		// Abort if we've already handled the current state. 
 		if (state.sequenceNumber == this._sequenceNumber) return;
-
-        if (state.tabId != null && state.tabId != this._activeTabId) {
-            this._activeTabId = state.tabId;
-            this._whenTabChanged?.(state.tabId);
-        }
-
+			
 		this.bar = state.bar;
 		this.channel = state.channel;
 		this.viewedInstrument[this.channel] = state.instrument;
 		this._sequenceNumber = state.sequenceNumber;
 		this.prompt = state.prompt;
 		try {
-			new ChangeSong(this, state.song);
+			new ChangeSong(this, this._getHash());
 		} catch (error) {
 			errorAlert(error);
 		}
@@ -363,7 +364,7 @@ export class SongDocument {
         } else {
             this._recovery.saveVersion(this._recoveryUid, this.song.title, hash);
         }
-        let state: HistoryState = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+        let state: HistoryState = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
         if (this._stateShouldBePushed) {
             this._pushState(state, hash);
         } else {
@@ -400,7 +401,7 @@ export class SongDocument {
         this.prompt = prompt;
         const hash: string = this.song.toBase64String();
         this._sequenceNumber++;
-        const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+        const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
         this._pushState(state, hash);
     }
 
@@ -492,21 +493,5 @@ export class SongDocument {
     public getBaseVisibleOctave(channel: number): number {
         const visibleOctaveCount: number = this.getVisibleOctaveCount();
         return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
-    }
-
-    public loadSong(songString: string): void {
-        this.song = new Song(songString);
-
-        this.synth.setSong(this.song);
-        this.synth.snapToStart();
-
-        this.bar = 0;
-        this.channel = 0;
-
-        this.notifier.changed();
-    }
-
-    public setActiveTabId(id: string | null): void {
-        this._activeTabId = id;
     }
 }

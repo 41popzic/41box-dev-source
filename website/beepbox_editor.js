@@ -39391,16 +39391,31 @@ li.select2-results__option[role=group] > strong:hover {
             this._stateShouldBePushed = false;
             this._recordedNewSong = false;
             this._waitingToUpdateState = false;
-            this._activeTabId = null;
-            this._whenTabChanged = null;
-            this._whenSongOpened = null;
             this._whenHistoryStateChanged = () => {
-                var _a, _b;
                 if (this.synth.recording) {
                     this.performance.abortRecording();
                 }
                 if (window.history.state == null && window.location.hash != "") {
-                    (_a = this._whenSongOpened) === null || _a === void 0 ? void 0 : _a.call(this, window.location.hash);
+                    this._sequenceNumber++;
+                    this._resetSongRecoveryUid();
+                    const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON() };
+                    try {
+                        new ChangeSong(this, this._getHash());
+                    }
+                    catch (error) {
+                        errorAlert(error);
+                    }
+                    this.prompt = state.prompt;
+                    if (this.prefs.displayBrowserUrl) {
+                        this._replaceState(state, this.song.toBase64String());
+                    }
+                    else {
+                        this._pushState(state, this.song.toBase64String());
+                    }
+                    this.forgetLastChange();
+                    this.notifier.notifyWatchers();
+                    this.synth.pause();
+                    this.synth.goToBar(0);
                     return;
                 }
                 const state = this._getHistoryState();
@@ -39408,17 +39423,13 @@ li.select2-results__option[role=group] > strong:hover {
                     throw new Error("History state is null.");
                 if (state.sequenceNumber == this._sequenceNumber)
                     return;
-                if (state.tabId != null && state.tabId != this._activeTabId) {
-                    this._activeTabId = state.tabId;
-                    (_b = this._whenTabChanged) === null || _b === void 0 ? void 0 : _b.call(this, state.tabId);
-                }
                 this.bar = state.bar;
                 this.channel = state.channel;
                 this.viewedInstrument[this.channel] = state.instrument;
                 this._sequenceNumber = state.sequenceNumber;
                 this.prompt = state.prompt;
                 try {
-                    new ChangeSong(this, state.song);
+                    new ChangeSong(this, this._getHash());
                 }
                 catch (error) {
                     errorAlert(error);
@@ -39508,7 +39519,7 @@ li.select2-results__option[role=group] > strong:hover {
                 else {
                     this._recovery.saveVersion(this._recoveryUid, this.song.title, hash);
                 }
-                let state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+                let state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
                 if (this._stateShouldBePushed) {
                     this._pushState(state, hash);
                 }
@@ -39549,7 +39560,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.synth.anticipatePoorPerformance = isMobile;
             let state = this._getHistoryState();
             if (state == null) {
-                state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+                state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON() };
             }
             if (state.recoveryUid == undefined)
                 state.recoveryUid = generateUid();
@@ -39607,12 +39618,6 @@ li.select2-results__option[role=group] > strong:hover {
                 window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({ state, hash }));
                 window.history.replaceState(null, "", location.pathname);
             }
-        }
-        updateBrowserUrl() {
-            const state = this._getHistoryState();
-            if (state == null)
-                throw new Error("History state is null.");
-            this._replaceState(state, this.song.toBase64String());
         }
         _pushState(state, hash) {
             if (this.prefs.displayBrowserUrl) {
@@ -39688,7 +39693,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.prompt = prompt;
             const hash = this.song.toBase64String();
             this._sequenceNumber++;
-            const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON(), tabId: this._activeTabId, song: this.song.toBase64String(), };
+            const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
             this._pushState(state, hash);
         }
         undo() {
@@ -39762,17 +39767,6 @@ li.select2-results__option[role=group] > strong:hover {
         getBaseVisibleOctave(channel) {
             const visibleOctaveCount = this.getVisibleOctaveCount();
             return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
-        }
-        loadSong(songString) {
-            this.song = new Song(songString);
-            this.synth.setSong(this.song);
-            this.synth.snapToStart();
-            this.bar = 0;
-            this.channel = 0;
-            this.notifier.changed();
-        }
-        setActiveTabId(id) {
-            this._activeTabId = id;
         }
     }
     SongDocument._maximumUndoHistory = 300;
