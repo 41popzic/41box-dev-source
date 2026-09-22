@@ -428,7 +428,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="13" width="22" height="5" fill="currentColor"/>
 			  </svg>
 			  `),
-		div("Custom [EXPERIMENTAL]"),
+		div("Custom"),
 		),
 	);
 
@@ -618,7 +618,7 @@ export class PreferencesPrompt implements Prompt {
 			option({ value: "light classic" }, "BeepBox Light"),
 		),
         optgroup({ label: "Misc"},
-            option({ value: "custom", hidden: "true" }, "Custom"),
+            option({ value: "custom" }, "Custom"),
         )
 	);
 
