@@ -956,7 +956,7 @@ html {
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	box-shadow: 5px 5px 20px 10px rgba(0,0,0,0.5);
+	box-shadow: 5px 5px 20px 10px rgba(87, 87, 87, 0.08);
 }
 
 .beepboxEditor .prompt > *:not(:first-child):not(.cancelButton) {
@@ -993,6 +993,9 @@ html {
 	cursor: pointer;
 	color: ${ColorConfig.secondaryText};
 	width: 25%;
+
+	transform: scale(0.9);
+	margin: -5px;
 }
 
 .beepboxEditor .layout-option input {
@@ -1723,7 +1726,7 @@ html {
 	border-radius: 1px;
 }
 
-.beepboxEditor input[type=text], .beepboxEditor input[type=number] {
+.beepboxEditor input[type=text], .beepboxEditor input[type=number], .beepboxEditor textarea {
 	font-size: inherit;
 	font-weight: inherit;
 	font-family: inherit;

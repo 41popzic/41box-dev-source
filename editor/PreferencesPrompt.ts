@@ -326,7 +326,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="13" width="11" height="5" fill="currentColor"/>
 			  </svg>
 			  `),
-		div("Small+ (MB)"),
+		div("Small+"),
 		),
 		label({ class: "layout-option" },
 			  input({ type: "radio", name: "layout", value: "long" }),
@@ -364,7 +364,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="7" y="2" width="10" height="16" fill="currentColor"/>
 			  </svg>
 			  `),
-		div("Wide (JB)"),
+		div("Wide"),
 		),
 		label({ class: "layout-option" },
 			  input({ type: "radio", name: "layout", value: "wide long" }),
@@ -377,7 +377,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="13" width="12" height="5" fill="currentColor"/>
 			  </svg>
 			  `),
-		div("Wide Long (AB)"),
+		div("Wide Long"),
 		),
 		label({ class: "layout-option" },
 			  input({ type: "radio", name: "layout", value: "flipped long" }),
@@ -390,7 +390,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="14" width="22" height="4" fill="currentColor"/>
 			  </svg>
 			  `),
-			  div("Flipped Long (AB)"),
+			  div("Flipped Long"),
 		),
 		label({ class: "layout-option" },
 			  input({ type: "radio", name: "layout", value: "focused long" }),
@@ -402,7 +402,7 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="13" width="17" height="5" fill="currentColor"/>
 			  </svg>
 			  `),
-			  div("Focused long (AB)"),
+			  div("Focused long"),
 		),
 		label({ class: "layout-option" },
 			  input({ type: "radio", name: "layout", value: "switched long" }),
@@ -415,9 +415,112 @@ export class PreferencesPrompt implements Prompt {
 			  <rect x="2" y="13" width="12" height="5" fill="currentColor"/>
 			  </svg>
 			  `),
-			  div("Switched Long (41)"),
+			  div("Switched Long"),
+		),
+		label({ class: "layout-option" },
+			  input({ type: "radio", name: "layout", value: "custom" }),
+			  SVG(`\
+			  <svg viewBox="-1 -1 28 22">
+			  <rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
+			  <rect x="2" y="2" width="12" height="10" fill="currentColor"/>
+			  <rect x="15" y="2" width="4" height="10" fill="currentColor"/>
+			  <rect x="20" y="2" width="4" height="10" fill="currentColor"/>
+			  <rect x="2" y="13" width="22" height="5" fill="currentColor"/>
+			  </svg>
+			  `),
+		div("Custom [EXPERIMENTAL]"),
 		),
 	);
+
+	//private readonly _customLayoutEditButton: HTMLButtonElement = button({ class: "editCustomLayout", style: "width:20em; height: 2em"}, "Edit Custom Layout");
+
+	private readonly _resetButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size);" }, "Reset to defaults");
+	
+	// only way it worked I think -41popzic
+	private readonly _layoutInput: HTMLTextAreaElement = Object.assign(document.createElement("textarea"), {
+		rows: 24, style: "resize: none; width: 45em; text-align: left", value: localStorage.getItem("customLayout") || 
+				`\
+
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					display: flex;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area instrument-settings-area"
+						"play-pause-area instrument-settings-area"
+						"menu-area instrument-settings-area"
+						"song-settings-area instrument-settings-area";
+				}				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: \${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: \${ColorConfig.uiWidgetBackground};
+					border: 3px solid \${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: \${ColorConfig.editorBackground};
+				}
+			}
+		`,});
 
 	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
 		optgroup({ label: "41Box Themes"},
@@ -570,6 +673,7 @@ export class PreferencesPrompt implements Prompt {
 
 	private readonly _appearanceAreaButton: HTMLButtonElement = button({ class: "appearanceAreaButton", style: "width:16%;" }, "Appearance");
 	private readonly _themeAreaButton: HTMLButtonElement = button({ class: "themeAreaButton", style: "width:16%;" }, "Theme");
+	private readonly _layoutAreaButton: HTMLButtonElement = button({ class: "layoutAreaButton", style: "width:16%;" }, "Layout");
 	private readonly _generalAreaButton: HTMLButtonElement = button({ class: "generalAreaButton", style: "width:16%;" }, "General");
 	private readonly _recordingAreaButton: HTMLButtonElement = button({ class: "recordingAreaButton", style: "width:16%;" }, "Recording");
 	private readonly _keybindAreaButton: HTMLButtonElement = button({ class: "keybindAreaButton", style: "width:16%;" }, "Shortcuts");
@@ -646,13 +750,7 @@ export class PreferencesPrompt implements Prompt {
 
 	private readonly _themeArea: HTMLDivElement = div({ style: "display: none; overflow-y: visible; overflow-x: hidden;" },
 		h2("Theme"),
-		div({ style: "text-align: left;" },
-			h3({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, "Layout"),
-			div({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;" },
-				div({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, ""),
-				div({ style: "width: 90%; height: 30em; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._layoutForm),
-				div({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, ""),
-			),			
+		div({ style: "text-align: left;" },	
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
 				"Color palette:",
 				div({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeSelect),
@@ -670,6 +768,37 @@ export class PreferencesPrompt implements Prompt {
 				div({ style: "width: 50%; text-align: center;" }, this._customThemeFileInput2)
 			),
 			div({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._customThemeFileReset),
+		)
+	);
+
+	private readonly _layoutArea: HTMLDivElement = div({ style: "display: none; overflow-y: visible; overflow-x: hidden;" },
+		h2("Layout"),
+		div({ style: "text-align: left;" },
+			h3({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, "Layout"),
+			div({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;" },
+				div({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, ""),
+				div({ style: "width: 90%; height: 30em; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._layoutForm),
+				div({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, ""),
+			),		
+			h2("Custom Layout"),
+			/*div({ style: "text-align: left; margin-top: 0.5em; margin-bottom: 0.5em;" },
+				"You can find a list of custom themes made by other users on the ",
+				a({ target: "_blank", href: "https://docs.google.com/spreadsheets/d/1dGjEcLgJrPwzBExPmwA9pbE_KVQ3jNrnTBrd46d2IKo/edit" }, "custom theme sheet."),
+			),
+			div(),*/
+			p({ style: "text-align: left; margin: 0; margin-left: 1em; margin-bottom: 5px;" },
+				"Replace the text below with your custom layout data to load it:",
+			),
+			div({ style: "display: grid; place-items: left"}, 
+				this._layoutInput
+			), 
+			div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+				this._resetButton
+			),
+			div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+			//this._okayButtonLayout,
+			),
+			//this._cancelButton,
 		)
 	);
 
@@ -780,12 +909,14 @@ export class PreferencesPrompt implements Prompt {
 			this._generalAreaButton,
 			this._appearanceAreaButton,
 			this._themeAreaButton,
+			this._layoutAreaButton,
 			this._recordingAreaButton,
 			this._keybindAreaButton,
 		),
 		this._generalArea,
 		this._appearanceArea,
 		this._themeArea,
+		this._layoutArea,
 		this._recordingArea,
 		this._keybindArea,
         div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
@@ -868,6 +999,10 @@ export class PreferencesPrompt implements Prompt {
 
 		this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
 		this._themeAreaButton.addEventListener("click", this._renderThemeArea);
+		this._layoutAreaButton.addEventListener("click", this._renderLayoutArea);
+		//this._customLayoutEditButton.addEventListener("click", this.);
+        this._layoutInput.addEventListener("change", this._whenLayoutChanged);
+        this._resetButton.addEventListener("click", this._reset);
 		this._generalAreaButton.addEventListener("click", this._renderGeneralArea);
 		this._recordingAreaButton.addEventListener("click", this._renderRecordingArea);
 		this._keybindAreaButton.addEventListener("click", this._renderKeybindArea);
@@ -896,15 +1031,30 @@ export class PreferencesPrompt implements Prompt {
         this.container.removeEventListener("keydown", this._whenKeyPressed);
     }
 
+    private _whenLayoutChanged = (): void => {
+        localStorage.setItem("customLayout", this._layoutInput.value);
+        //window.localStorage.setItem("layout", "custom");
+        //this._doc.layout = "custom";
+	}
+
+    private _reset = (): void => {
+        window.localStorage.removeItem("layout");
+        window.localStorage.removeItem("customLayout");
+        //window.localStorage.removeItem("customLayouts");
+        this._close();
+    }
+
     private _whenKeyPressed = (event: KeyboardEvent): void => {
 		if (this._recordRebind != "") {
 			this._shortcuts[this._recordRebind].keyCode = event.keyCode;
 			this._recordRebind = "";
 			this._renderShortcuts();
 		}
+/*
         if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
             this._confirm();
-        }
+        } // Nothing happens for now because the custom layout input requires the enter key.
+			*/ 
     }
 
     private _confirm = (): void => {
@@ -975,12 +1125,14 @@ export class PreferencesPrompt implements Prompt {
 		this._doc.prefs.save();
 		Layout.setLayout(this._doc.prefs.layout);
 		this._close();
+		setTimeout(() => { window.location.reload(); }, 50);
 	}
 
 	private _renderAppearanceArea = (event: Event): void => {
 		event.preventDefault();
 		this._appearanceArea.style.display = "";
 		this._themeArea.style.display = "none";
+		this._layoutArea.style.display = "none";
 		this._generalArea.style.display = "none";
 		this._recordingArea.style.display = "none";
 		this._keybindArea.style.display = "none";
@@ -990,6 +1142,17 @@ export class PreferencesPrompt implements Prompt {
 		event.preventDefault();
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "";
+		this._layoutArea.style.display = "none";
+		this._generalArea.style.display = "none";
+		this._recordingArea.style.display = "none";
+		this._keybindArea.style.display = "none";
+	}
+
+	private _renderLayoutArea = (event: Event): void => {
+		event.preventDefault();
+		this._appearanceArea.style.display = "none";
+		this._themeArea.style.display = "none";
+		this._layoutArea.style.display = "";
 		this._generalArea.style.display = "none";
 		this._recordingArea.style.display = "none";
 		this._keybindArea.style.display = "none";
@@ -999,6 +1162,7 @@ export class PreferencesPrompt implements Prompt {
 		event.preventDefault();
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
+		this._layoutArea.style.display = "none";
 		this._generalArea.style.display = "";
 		this._recordingArea.style.display = "none";
 		this._keybindArea.style.display = "none";
@@ -1008,6 +1172,7 @@ export class PreferencesPrompt implements Prompt {
 		event.preventDefault();
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
+		this._layoutArea.style.display = "none";
 		this._generalArea.style.display = "none";
 		this._recordingArea.style.display = "";
 		this._keybindArea.style.display = "none";
@@ -1017,6 +1182,7 @@ export class PreferencesPrompt implements Prompt {
 		event.preventDefault();
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
+		this._layoutArea.style.display = "none";
 		this._generalArea.style.display = "none";
 		this._recordingArea.style.display = "none";
 		this._keybindArea.style.display = "";

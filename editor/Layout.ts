@@ -743,6 +743,8 @@ export class Layout {
 				}
 			}
 		`,
+	"custom": `${localStorage.getItem("customLayout") || ``}`,
+
 
     }
 
