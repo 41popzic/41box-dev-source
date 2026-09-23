@@ -1898,7 +1898,7 @@ li.select2-results__option[role=group] > strong:hover {
 	.beepboxEditor {
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: min-content 6px min-content min-content;
-		grid-template-areas: "pattern-area" "track-area" "settings-area";
+		grid-template-areas: "pattern-area" "." "track-area" "settings-area";
 		grid-row-gap: 0;
 	}
 	.beepboxEditor .settings-area {

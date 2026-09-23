@@ -438,7 +438,7 @@ export class PreferencesPrompt implements Prompt {
 	
 	// only way it worked I think -41popzic
 	private readonly _layoutInput: HTMLTextAreaElement = Object.assign(document.createElement("textarea"), {
-		rows: 24, style: "resize: none; width: 45em; text-align: left", value: localStorage.getItem("customLayout") || 
+		rows: 24, style: "resize: none; width: 100%; text-align: left", value: localStorage.getItem("customLayout") || 
 				`\
 
 			@media (min-width: 711px) {
@@ -450,7 +450,7 @@ export class PreferencesPrompt implements Prompt {
 				.beepboxEditor {
 					width: 100%;
 					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-columns: minmax(0, 1fr) 390px;
 					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
 					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 				}
@@ -789,7 +789,7 @@ export class PreferencesPrompt implements Prompt {
 			p({ style: "text-align: left; margin: 0; margin-left: 1em; margin-bottom: 5px;" },
 				"Replace the text below with your custom layout data to load it:",
 			),
-			div({ style: "display: grid; place-items: left"}, 
+			div({ style: "display: grid; place-items: center; margin: 0 20px;"}, 
 				this._layoutInput
 			), 
 			div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },

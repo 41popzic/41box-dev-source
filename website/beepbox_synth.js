@@ -583,7 +583,7 @@ var beepbox = (() => {
       this.tempoMin = 1;
     }
     static {
-      this.tempoMax = 1e3;
+      this.tempoMax = 500;
     }
     static {
       this.octaveMin = -2;

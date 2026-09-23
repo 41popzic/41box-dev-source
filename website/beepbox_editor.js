@@ -604,7 +604,7 @@ var beepbox = (() => {
       this.tempoMin = 1;
     }
     static {
-      this.tempoMax = 1e3;
+      this.tempoMax = 500;
     }
     static {
       this.octaveMin = -2;
@@ -18300,7 +18300,7 @@ li.select2-results__option[role=group] > strong:hover {
 	.beepboxEditor {
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: min-content 6px min-content min-content;
-		grid-template-areas: "pattern-area" "track-area" "settings-area";
+		grid-template-areas: "pattern-area" "." "track-area" "settings-area";
 		grid-row-gap: 0;
 	}
 	.beepboxEditor .settings-area {
@@ -33703,7 +33703,7 @@ li.select2-results__option[role=group] > strong:hover {
 				.beepboxEditor {
 					width: 100%;
 					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-columns: minmax(0, 1fr) 390px;
 					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
 					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 				}
@@ -55561,7 +55561,7 @@ You should be redirected to the song at:<br /><br />
       );
       this._select = HTML.select({ class: "trackSelectBox", style: "background: none; border: none; appearance: none; border-radius: initial; box-shadow: none; color: transparent; position: absolute; touch-action: none;" });
       this.container = HTML.div(
-        { class: "noSelection", style: `` },
+        { class: "noSelection", style: `background-color: ${ColorConfig.editorBackground}; position: relative; overflow: hidden;` },
         this._channelRowContainer,
         this._svg,
         this._select,
@@ -58413,7 +58413,7 @@ You should be redirected to the song at:<br /><br />
       // only way it worked I think -41popzic
       this._layoutInput = Object.assign(document.createElement("textarea"), {
         rows: 24,
-        style: "resize: none; width: 45em; text-align: left",
+        style: "resize: none; width: 100%; text-align: left",
         value: localStorage.getItem("customLayout") || `
 			@media (min-width: 711px) {
 				#beepboxEditorContainer {
@@ -58424,7 +58424,7 @@ You should be redirected to the song at:<br /><br />
 				.beepboxEditor {
 					width: 100%;
 					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-columns: minmax(0, 1fr) 390px;
 					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
 					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 				}
@@ -58792,7 +58792,7 @@ You should be redirected to the song at:<br /><br />
             "Replace the text below with your custom layout data to load it:"
           ),
           div26(
-            { style: "display: grid; place-items: left" },
+            { style: "display: grid; place-items: center; margin: 0 20px;" },
             this._layoutInput
           ),
           div26(
@@ -59973,7 +59973,7 @@ You should be redirected to the song at:<br /><br />
       this._scaleSelect = select14();
       this._keySelect = buildOptions2(select14(), Config.keys.map((key) => key.name).reverse());
       this._octaveStepper = input19({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
-      this._tempoSlider = new Slider(input19({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "1000", value: "1600", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
+      this._tempoSlider = new Slider(input19({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "100", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
       this._tempoStepper = input19({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
       this._songEqFilterEditor = new FilterEditor(this.doc, false, false, true);
       this._songEqFilterZoom = button27({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customSongEQFilterSettings"), "onclick") }, "+");
