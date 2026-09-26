@@ -318,11 +318,11 @@ export class Preferences {
 		this.showFifth = window.localStorage.getItem("showFifth") != "false";
 		this.showThird = window.localStorage.getItem("showThird") != "false";
 		this.advancedColorScheme = window.localStorage.getItem("advancedColorScheme") == "true";
-		this.rainbowLoop = window.localStorage.getItem("rainbowLoop") != "false";
+		this.rainbowLoop = window.localStorage.getItem("rainbowLoop") == "true";
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
 		this.showChannels = window.localStorage.getItem("showChannels") == "true";
-		window.localStorage.removeItem("showScrollBar"); // yessir !!!
+		//window.localStorage.removeItem("showScrollBar");
 		this.showScrollBar = true;
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";

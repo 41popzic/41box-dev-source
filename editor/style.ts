@@ -157,7 +157,7 @@ html {
     grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 	grid-column-gap: 6px;
 	grid-row-gap: 6px;
-	padding: 5px;
+	//padding: 5px;
     box-sizing: border-box;
 	position: relative;
 	touch-action: manipulation;
@@ -274,7 +274,7 @@ html {
 	position: relative;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 }
 
 .beepboxEditor .track-area {
@@ -283,7 +283,7 @@ html {
 	//margin-top: 10px;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 	margin-right: -2px;
 }
 
@@ -308,7 +308,7 @@ html {
 .beepboxEditor .other-settings-area {
 	
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 5px;
@@ -1628,7 +1628,7 @@ html {
 	flex-direction: column;
 /*
 	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 10px;
@@ -1651,7 +1651,7 @@ html {
 	flex-direction: column;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 10px;
@@ -1679,7 +1679,7 @@ html {
 	flex-direction: column;
 	
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-left: 2px !important;
 	//margin-right: 2px !important;

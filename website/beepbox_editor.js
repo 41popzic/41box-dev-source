@@ -14216,7 +14216,7 @@ html {
     grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 	grid-column-gap: 6px;
 	grid-row-gap: 6px;
-	padding: 5px;
+	//padding: 5px;
     box-sizing: border-box;
 	position: relative;
 	touch-action: manipulation;
@@ -14333,7 +14333,7 @@ html {
 	position: relative;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 }
 
 .beepboxEditor .track-area {
@@ -14342,7 +14342,7 @@ html {
 	//margin-top: 10px;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 	margin-right: -2px;
 }
 
@@ -14367,7 +14367,7 @@ html {
 .beepboxEditor .other-settings-area {
 	
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 5px;
@@ -15687,7 +15687,7 @@ html {
 	flex-direction: column;
 /*
 	background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 10px;
@@ -15710,7 +15710,7 @@ html {
 	flex-direction: column;
 
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-top: 10px;
 	margin-bottom: 10px;
@@ -15738,7 +15738,7 @@ html {
 	flex-direction: column;
 	
 	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
+	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 
 	//margin-left: 2px !important;
 	//margin-right: 2px !important;
@@ -32153,11 +32153,10 @@ li.select2-results__option[role=group] > strong:hover {
             this.showFifth = window.localStorage.getItem("showFifth") != "false";
             this.showThird = window.localStorage.getItem("showThird") != "false";
             this.advancedColorScheme = window.localStorage.getItem("advancedColorScheme") == "true";
-            this.rainbowLoop = window.localStorage.getItem("rainbowLoop") != "false";
+            this.rainbowLoop = window.localStorage.getItem("rainbowLoop") == "true";
             this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
             this.showLetters = window.localStorage.getItem("showLetters") != "false";
             this.showChannels = window.localStorage.getItem("showChannels") == "true";
-            window.localStorage.removeItem("showScrollBar");
             this.showScrollBar = true;
             this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
             this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
@@ -55308,7 +55307,7 @@ You should be redirected to the song at:<br /><br />
             this._feedbackAmplitudeSlider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this.doc, (oldValue, newValue) => new ChangeFeedbackAmplitude(this.doc, oldValue, newValue), false);
             this._feedbackRow2 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "feed. vol."), this._feedbackAmplitudeSlider.container);
             this._addEnvelopeButton = button({ type: "button", class: "add-envelope" });
-            this._customInstrumentSettingsGroup = div({ class: "editor-controls-alt" }, this._panSliderRow, this._panDropdownGroup, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, this._customWaveDraw, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._spectrumRow, this._harmonicsRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, this._unisonSelectRow, this._unisonDropdownGroup, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "effects")), div({ class: "effects-menu" }, this._effectsSelect)), this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._granularContainerRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, this._ringModContainerRow, this._flangerMixRow, this._flangerDepthRow, this._flangerDelayRow, this._flangerRateRow, this._flangerFeedbackRow, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "envelopes")), this._envelopeDropdown, this._addEnvelopeButton), this._envelopeDropdownGroup, this.envelopeEditor.container);
+            this._customInstrumentSettingsGroup = div({ class: "editor-controls-alt" }, this._panSliderRow, this._panDropdownGroup, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._customWaveDraw, this._spectrumRow, this._harmonicsRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, this._unisonSelectRow, this._unisonDropdownGroup, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "effects")), div({ class: "effects-menu" }, this._effectsSelect)), this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._granularContainerRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, this._ringModContainerRow, this._flangerMixRow, this._flangerDepthRow, this._flangerDelayRow, this._flangerRateRow, this._flangerFeedbackRow, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "envelopes")), this._envelopeDropdown, this._addEnvelopeButton), this._envelopeDropdownGroup, this.envelopeEditor.container);
             this._instrumentCopyGroup = div({ class: "editor-controls-alt" }, div({ class: "selectRow" }, this._instrumentCopyButton, this._instrumentPasteButton));
             this._instrumentExportGroup = div({ class: "editor-controls-alt" }, div({ class: "selectRow" }, this._instrumentExportButton, this._instrumentImportButton));
             this._instrumentSettingsTextRow = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Instrument Settings");
