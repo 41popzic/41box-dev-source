@@ -55056,7 +55056,7 @@ You should be redirected to the song at:<br /><br />
             this._scaleSelect = select();
             this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
-            this._tempoSlider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "100", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
+            this._tempoSlider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
             this._tempoStepper = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
             this._songEqFilterEditor = new FilterEditor(this.doc, false, false, true);
             this._songEqFilterZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
