@@ -49,7 +49,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, } from "./changes";
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
@@ -1588,7 +1588,26 @@ export class SongEditor {
 
         //this._rhythmActionSelect.appendChild(commonGroup);
 
-        //this._snapButton.onclick = () => this.doc.selection.forceRhythm(); // This was mainly a test
+        const rhythmEnabled = this.doc.synth.song.rhythmEnabled;
+
+        this._rhythmInput.disabled = !rhythmEnabled;
+
+        if (rhythmEnabled) {
+            this._rhythmDisabledLabel.style.display = "none";
+            this._rhythmInput.style.color = "";
+
+            this._rhythmInput.style.removeProperty("appearance");
+            this._rhythmInput.style.removeProperty("-moz-appearance");
+        } else {
+            this._rhythmDisabledLabel.style.display = "block";
+            this._rhythmDisabledLabel.style.color = "#c77";
+            this._rhythmInput.style.color = "transparent";
+
+            this._rhythmInput.style.setProperty("appearance", "textfield");
+            this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
+        }
+
+        this._rhythmActionOption.textContent = rhythmEnabled ? "disable subgrid" : "enable subgrid";
 
         this._vibratoSelect.appendChild(option({ hidden: true, value: 5 }, "custom"));
 
@@ -5526,19 +5545,21 @@ export class SongEditor {
         const isFactorOfPartsPerBeat = rhythm > 0 && Config.partsPerBeat % rhythm === 0; // Factors of partsPerBeat greater than 12
         switch (this._rhythmActionSelect.value) {
             case "forceRhythm":
-                if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
+                if (this.doc.synth.song.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                     this.doc.selection.forceRhythm();
                 }
                 break;
             case "forceRhythmAll":
-                if (this._patternEditor.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
+                if (this.doc.synth.song.rhythmEnabled && (rhythm <= 12 || isFactorOfPartsPerBeat)) {
                     this.doc.selection.forceRhythmAllPatterns();
                 }
                 break;
             case "toggleRhythm":
-                this._patternEditor.rhythmEnabled = !this._patternEditor.rhythmEnabled;
+                const rhythmEnabled = !this.doc.synth.song.rhythmEnabled;
 
-                if (this._patternEditor.rhythmEnabled) {
+                this.doc.record(new ChangeRhythmEnabled(this.doc, rhythmEnabled));
+
+                if (rhythmEnabled) {
                     this._rhythmInput.disabled = false;
 
                     this._rhythmDisabledLabel.style.display = "none";
@@ -5557,10 +5578,7 @@ export class SongEditor {
                     this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
                 }
 
-                this._rhythmActionOption.textContent =
-                    this._patternEditor.rhythmEnabled
-                        ? "disable subgrid"
-                        : "enable subgrid";
+                this._rhythmActionOption.textContent = rhythmEnabled ? "disable subgrid" : "enable subgrid";
                 break;
 
             case "toggleFavoriteRhythm": {

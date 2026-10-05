@@ -3668,6 +3668,18 @@ export class ChangeRhythm extends ChangeGroup {
     }
 }
 
+export class ChangeRhythmEnabled extends ChangeGroup {
+    constructor(doc: SongDocument, newValue: boolean) {
+        super();
+
+        if (doc.song.rhythmEnabled != newValue) {
+            doc.song.rhythmEnabled = newValue;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
 export class ChangePaste extends ChangeGroup {
     constructor(doc: SongDocument, pattern: Pattern, notes: any[], selectionStart: number, selectionEnd: number, oldPartDuration: number) {
         super();

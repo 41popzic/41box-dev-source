@@ -120,7 +120,6 @@ export class PatternEditor {
     private _renderedNoiseChannelCount: number = -1;
     private _renderedModChannelCount: number = -1;
     private _followPlayheadBar: number = -1;
-    public   rhythmEnabled: boolean = true;
 
     private readonly _patternBorderLeft = SVG.line({x1: 0, y1: 0, x2: 0, y2: 0, stroke: ColorConfig.loopAccent, "stroke-width": 2, "pointer-events": "none", visibility: "hidden",});
 
@@ -239,8 +238,11 @@ export class PatternEditor {
     }
 
     private _getMaxDivision(): number {
-        if (this.controlMode && this._mouseHorizontal)
+        if (!this._doc.synth.song.rhythmEnabled) { 
+            return 1 
+        } else if (this.controlMode && this._mouseHorizontal) {
             return Config.partsPerBeat;
+        } else { 
         const rhythmStepsPerBeat: number = Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
         if (rhythmStepsPerBeat % 4 == 0) {
             // Beat is divisible by 2 (and 4).
@@ -253,18 +255,17 @@ export class PatternEditor {
             return Config.partsPerBeat / 2;
         }
         return Config.partsPerBeat;
+        }
     }
 
     private _getMinDivision(): number {
         if (this.controlMode && this._mouseHorizontal)
             return 1;
-
-        if (!this.rhythmEnabled)
-            return 1;
-
-        return Math.round(
-            Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat
-        );
+        if (!this._doc.synth.song.rhythmEnabled) { 
+            return 1 
+        } else { 
+            return Math.round(Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat); 
+        } 
     }
 
     private _snapToMinDivision(input: number): number {
