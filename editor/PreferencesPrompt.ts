@@ -441,6 +441,7 @@ export class PreferencesPrompt implements Prompt {
 		rows: 24, style: "resize: none; width: 100%; text-align: left", value: localStorage.getItem("customLayout") || 
 				`\
 
+			
 			@media (min-width: 711px) {
 				#beepboxEditorContainer {
 					max-width: initial;
@@ -519,8 +520,7 @@ export class PreferencesPrompt implements Prompt {
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
 					background-color: \${ColorConfig.editorBackground};
 				}
-			}
-		`,});
+			}`,});
 
 	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
 		optgroup({ label: "41Box Themes"},
