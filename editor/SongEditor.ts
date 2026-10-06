@@ -857,7 +857,7 @@ export class SongEditor {
         span({ class: "tip", style: "font-size: small;", onclick: () => this._openPrompt("RingModHz") }, "r. hertz "),
         div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.ringModHzNum),
     ), this._ringModHzSlider.container);
-    private readonly _ringModWaveText: HTMLSpanElement = span({ class: "tip", onclick: () => this._openPrompt("ringModChipWave") }, "wave: ")
+    private readonly _ringModWaveText: HTMLSpanElement = span({ class: "tip", onclick: () => this._openPrompt("ringModChipWave") }, "wave ")
     private readonly _ringModWaveSelectRow: HTMLDivElement = div({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, this._ringModPulsewidthSlider.container, div({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
     private readonly _ringModContainerRow: HTMLDivElement = div({ class: "", style: "display:flex; flex-direction:column;" },
         this._ringModRow,
@@ -956,7 +956,7 @@ export class SongEditor {
     private readonly _chipWaveStartOffsetStepper = input({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
     private readonly _chipWavePlayBackwardsBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
     // advloop addition
-    private readonly _chipWaveSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "wave: "), div({ class: "selectContainer" }, this._chipWaveSelect));
+    private readonly _chipWaveSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "wave "), div({ class: "selectContainer" }, this._chipWaveSelect));
     private readonly _chipNoiseSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipNoise") }, "noise: "), div({ class: "selectContainer" }, this._chipNoiseSelect));
     private readonly _visualLoopControlsButton: HTMLButtonElement = button({ style: "margin-left: 0em; padding-left: 0.2em; height: 1.5em; max-width: 12px;", onclick: () => this._openPrompt("visualLoopControls") }, "+");
     private readonly _useChipWaveAdvancedLoopControlsRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", style: "flex-shrink: 0;", onclick: () => this._openPrompt("loopControls") }, "loop controls: "), this._useChipWaveAdvancedLoopControlsBox);
