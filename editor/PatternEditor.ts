@@ -756,7 +756,7 @@ export class PatternEditor {
                 localPlayhead += (modPlayhead - localPlayhead) * 0.2;
             }
             this._svgPlayhead.setAttribute("x", "" + prettyNumber(localPlayhead * this._editorWidth - 2));
-            this._svgPlayhead.style.opacity = '0.2';
+            this._svgPlayhead.style.opacity = '0.3';
 
             this._svgBeathead.setAttribute("visibility", "hidden");
         } else {

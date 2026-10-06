@@ -50778,7 +50778,7 @@ You should be redirected to the song at:<br /><br />
             localPlayhead += (modPlayhead - localPlayhead) * 0.2;
           }
           this._svgPlayhead.setAttribute("x", "" + prettyNumber(localPlayhead * this._editorWidth - 2));
-          this._svgPlayhead.style.opacity = "0.2";
+          this._svgPlayhead.style.opacity = "0.3";
           this._svgBeathead.setAttribute("visibility", "hidden");
         } else {
           this._svgPlayhead.setAttribute("visibility", "hidden");
@@ -60780,6 +60780,21 @@ You should be redirected to the song at:<br /><br />
           this._zoomOutButton.style.display = "none";
         }
         this._patternEditor.render();
+        const rhythmEnabled = this.doc.synth.song.rhythmEnabled;
+        this._rhythmInput.disabled = !rhythmEnabled;
+        if (rhythmEnabled) {
+          this._rhythmDisabledLabel.style.display = "none";
+          this._rhythmInput.style.color = "";
+          this._rhythmInput.style.removeProperty("appearance");
+          this._rhythmInput.style.removeProperty("-moz-appearance");
+        } else {
+          this._rhythmDisabledLabel.style.display = "block";
+          this._rhythmDisabledLabel.style.color = "#c77";
+          this._rhythmInput.style.color = "transparent";
+          this._rhythmInput.style.setProperty("appearance", "textfield");
+          this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
+        }
+        this._rhythmActionOption.textContent = rhythmEnabled ? "disable subgrid" : "enable subgrid";
         const textOnIcon = ColorConfig.getComputed("--text-enabled-icon");
         const textOffIcon = ColorConfig.getComputed("--text-disabled-icon");
         const channel = this.doc.song.channels[this.doc.channel];

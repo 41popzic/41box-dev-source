@@ -2756,6 +2756,29 @@ export class SongEditor {
 
         this._patternEditor.render();
 
+        const rhythmEnabled = this.doc.synth.song.rhythmEnabled;
+
+        this._rhythmInput.disabled = !rhythmEnabled;
+
+        if (rhythmEnabled) {
+            this._rhythmDisabledLabel.style.display = "none";
+            this._rhythmInput.style.color = "";
+
+            this._rhythmInput.style.removeProperty("appearance");
+            this._rhythmInput.style.removeProperty("-moz-appearance");
+        } else {
+            this._rhythmDisabledLabel.style.display = "block";
+            this._rhythmDisabledLabel.style.color = "#c77";
+            this._rhythmInput.style.color = "transparent";
+
+            this._rhythmInput.style.setProperty("appearance", "textfield");
+            this._rhythmInput.style.setProperty("-moz-appearance", "textfield");
+        }
+
+        this._rhythmActionOption.textContent = rhythmEnabled ? "disable subgrid" : "enable subgrid";
+
+        // Wasn't sure where exactly to put the above -popzic
+
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
         // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
