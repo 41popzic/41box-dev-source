@@ -989,7 +989,7 @@ export class Config {
     public static readonly phaserMaxStages: number = 32; 
     public static readonly flangerDelayRange: number = 24;
     public static readonly flangerDepthRange: number = 32;
-    public static readonly flangerRateRange: number = 56;
+    public static readonly flangerRateRange: number = 57;
     public static readonly flangerFeedbackRange: number = 32;
     public static readonly flangerMixRange: number = 51;
     public static readonly beatsPerBarMin: number = 1;
@@ -2280,61 +2280,62 @@ export function drawNoiseSpectrum(wave: Float32Array, waveLength: number, lowOct
 
 export const flangerRateValues: ReadonlyArray<number> = [
     0,        // 1
-    0.015625, // 2
-    0.03125,  // 3
-    0.046875, // 4
-    0.0625,   // 5
-    0.09375,  // 6
-    0.125,    // 7
-    0.1667,   // 8
-    0.2,      // 9
-    0.25,     // 10
-    0.33,     // 11
-    0.4,      // 12
-    0.5,      // 13
-    0.66,     // 14
-    0.75,     // nah i'm too lazy to do all of this
-    0.8,
-    0.9,
-    1,
-    1.1,
-    1.2,
-    1.3,
-    1.4,
-    1.5,
-    1.6,
-    1.7,
-    1.8,
-    1.9,
-    2,
-    2.1,
-    2.2,
-    2.3,
-    2.4,
-    2.5,
-    2.6,
-    2.7,
-    2.8,
-    2.9,
-    3,
-    3.1,
-    3.2,
-    3.3,
-    3.4,
-    3.5,
-    3.6,
-    3.7,
-    3.8,
-    3.9,
-    4,
-    4.15,
-    4.3,
-    4.5,
-    4.8,
-    5,
-    5.5,
-    6,
-    8,  // 56
+    0.0078125,// 2
+    0.015625, // 3
+    0.03125,  // 4
+    0.046875, // 5
+    0.0625,   // 6
+    0.09375,  // 7
+    0.125,    // 8
+    0.1667,   // 9
+    0.2,      // 10
+    0.25,     // 11
+    0.33,     // 12
+    0.4,      // 13
+    0.5,      // 14
+    0.66,     // 15
+    0.75,     // 16
+    0.8,      // 17
+    0.9,      // 18
+    1,        // 19
+    1.1,      // 20
+    1.2,      // 21
+    1.3,      // 22
+    1.4,      // 23
+    1.5,      // 24
+    1.6,      // 25
+    1.7,      // 26
+    1.8,      // 27
+    1.9,      // 28
+    2,        // 29
+    2.1,      // 30
+    2.2,      // 31
+    2.3,      // 32
+    2.4,      // 33
+    2.5,      // 34
+    2.6,      // 35
+    2.7,      // 36
+    2.8,      // 37
+    2.9,      // 38
+    3,        // 39
+    3.1,      // 40
+    3.2,      // 41
+    3.3,      // 42
+    3.4,      // 43
+    3.5,      // 44
+    3.6,      // 45
+    3.7,      // 46
+    3.8,      // 47
+    3.9,      // 48
+    4,        // 49
+    4.15,     // 50
+    4.3,      // 51
+    4.5,      // 52
+    4.8,      // 53
+    5,        // 54
+    5.5,      // 55
+    6,        // 56
+    8,        // 57
 ];
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {

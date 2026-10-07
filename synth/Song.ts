@@ -681,7 +681,7 @@ export class Song {
         this.tempo = 111;
         this.reverb = 0;
         this.beatsPerBar = 8;
-        this.barCount = 8;
+        this.barCount = 16;
         this.patternsPerChannel = 9;
         this.rhythm = 3;
         this.rhythmEnabled = true;
@@ -2601,9 +2601,10 @@ export class Song {
                         instrument.reverb = legacyGlobalReverb;
                     }
                     // @jummbus - Enabling pan effect on song import no matter what to make it a default.
-                    //if (instrument.pan != Config.panCenter) {
+                    // I decided to disable panning on default
+                    if (instrument.pan != Config.panCenter) {
                     instrument.effects |= 1 << EffectType.panning;
-                    //}
+                    }
                     if (instrument.vibrato != Config.vibratos.dictionary["none"].index) {
                         // Enable vibrato if it was used.
                         instrument.effects |= 1 << EffectType.vibrato;

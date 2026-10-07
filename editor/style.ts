@@ -1606,6 +1606,13 @@ html {
 	justify-content: space-between;
 }
 
+.beepboxEditor .effectContainer {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 50%, black);
+	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
+	border-radius: 6px;
+	margin: 3px 0;
+}
+
 .beepboxEditor .selectRow > :last-child {
 	width: 62.5%;
 	flex-shrink: 0;

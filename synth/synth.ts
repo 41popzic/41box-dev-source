@@ -4788,7 +4788,7 @@ if (playSong && !this.countInMetronome) {
                     let flangerPhase = instrumentState.flangerPhase;
                     let flangerMix = +instrumentState.flangerMix;
                     const flangerMixDelta = +instrumentState.flangerMixDelta;
-                    let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
+                    let flangerFeedback = (instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1)) * 0.9685; // Couldn't find any other way to limit the feedback.
 
                     const flangerBaseDelay = synth.samplesPerSecond * instrumentState.flangerDelay;
 

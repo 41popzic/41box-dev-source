@@ -2798,7 +2798,7 @@ export class PatternEditor {
             let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
 
             this._backgroundPitchRows[j].style.visibility = "visible";
-            this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0.2";
+            this._backgroundPitchRows[j].style.opacity = scale[j] ? "1" : "0";
         }
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {

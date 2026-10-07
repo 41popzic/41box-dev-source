@@ -9,6 +9,7 @@ const { button, div, p, h2, h3 } = HTML;
 
 export class TipPrompt implements Prompt {
 	private readonly _closeButton: HTMLButtonElement = button({ class: "cancelButton" });
+    private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%; margin-left: auto; margin-top: 0em;" }, "Okay");
 
 	public readonly container: HTMLDivElement;
 
@@ -49,6 +50,12 @@ export class TipPrompt implements Prompt {
 					p("Reverb is like a continuous echo effect. A little bit helps instruments sound more natural. Adding a lot of reverb can add sense of depth or mystery, but too much reverb can kinda \"smear\" sounds so that it's harder to distinguish notes or instruments, especially for lower \"bass\" notes."),
 				);
 			} break;
+			case "reverbMix": {
+				message = div(
+					h2("Reverb Mix"),
+					p("This setting controls the wet/dry mix of the reverb effect."),
+				);
+			} break;
 			case "rhythm": {
 				message = div(
 					h2("Subgrid"),
@@ -59,7 +66,7 @@ export class TipPrompt implements Prompt {
 			case "instrumentIndex": {
 				message = div(
 					h2("Instrument Number"),
-					p("In the \"Channel Settings\" option from Slarmoo's Box's \"Edit\" menu, there are a few ways to enable multiple instruments per channel."),
+					p("In the \"Channel Settings\" option from 41Box's \"Edit\" menu, there are a few ways to enable multiple instruments per channel."),
 					p("First, you could enable multiple simultaneous instruments per channel. All of the channel's instruments will play all of the notes in the channel at the same time, and you can click an instrument number to view and edit its settings."),
 					p("Second, you could enable different instruments per pattern. Only one of the instruments will play at any given time, but you can click the instrument number to change which instrument is used for the currently selected pattern(s)."),
 					p("Finally, you can enable them both, in which case you can click an instrument number once to view it, and again to toggle whether the instrument is used for the currently selected pattern(s)."),
@@ -115,13 +122,13 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Detune"),
 					p("This setting can be used to finely control the pitch of your instrument. It is in units of 'cents', 100 of which equal a pitch shift of one semitone."),
-					p("Careful - you can quickly get very dissonant sounding songs by using this setting."),
+					p("Careful; you can quickly get very dissonant sounding songs by using this setting."),
 				);
 			} break;
 			case "instrumentType": {
 				message = div(
 					h2("Instrument Type"),
-					p("Slarmoo's Box comes with many instrument presets, try them out! You can also create your own custom instruments!"),
+					p("41Box comes with many instrument presets, try them out! You can also create your own custom instruments!"),
 					p("There are also options for generating random instruments towards the top of the instrument type menu and for copying and pasting instrument settings in preferences."),
 				);
 			} break;
@@ -162,13 +169,13 @@ export class TipPrompt implements Prompt {
 			case "chipWave": {
 				message = div(
 					h2("Chip Wave"),
-					p("Slarmoo's Box comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
+					p("41Box comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
 				);
 			} break;
 			case "chipNoise": {
 				message = div(
 					h2("Noise"),
-					p("Slarmoo's Box comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
+					p("41Box comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
 				);
 			} break;
 			case "supersawDynamism": {
@@ -209,9 +216,9 @@ export class TipPrompt implements Prompt {
 			case "chords": {
 				message = div(
 					h2("Chords"),
-					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in Slarmoo's Box's pattern editor by adding notes above or below another note."),
+					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in 41Box's pattern editor by adding notes above or below another note."),
 					p("This setting determines how chords are played. The standard option is \"simultaneous\" which starts playing all of the pitches in a chord at the same instant. The \"strum\" option is similar, but plays the notes starting at slightly different times. The \"arpeggio\" option is used in \"chiptune\" style music and plays a single tone that rapidly alternates between all of the pitches in the chord. The \"monophonic\" option allows you to have only one tone in a chord play at a time. "),
-					p("Some Slarmoo's Box instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
+					p("Some 41Box instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
 				);
 			} break;
 			case "vibrato": {
@@ -301,7 +308,7 @@ export class TipPrompt implements Prompt {
 			case "effects": {
 				message = div(
 					h2("Effects"),
-					p("Slarmoo's Box has many different kinds of special effects you can add to instruments. You can turn on multiple effects at once, and they can be configured individually. Try them all out!"),
+					p("41Box has many different kinds of special effects you can add to instruments. You can turn on multiple effects at once, and they can be configured individually. Try them all out!"),
 				);
 			} break;
 			case "drumsetEnvelope": {
@@ -323,16 +330,28 @@ export class TipPrompt implements Prompt {
 					p("The chorus effect combines multiple copies of the instrument's sound and adds a bit of vibrato to simulate an ensemble of instruments or voices. Drag the slider to control how much chorus is added."),
 				);
 			} break;
+			case "chorusMix": {
+				message = div(
+					h2("Chorus Mix"),
+					p("This setting controls the wet/dry mix of the Chorus effect."),
+				);
+			} break;
+			case "echo": {
+				message = div(
+					h2("Echo"),
+					p("The echo effect repeats the instrument's sound after a delay, and each echo is a little bit quieter than the last."),
+				);
+			} break;
 			case "echoSustain": {
 				message = div(
 					h2("Echo Volume"),
-					p("The echo effect repeats the instrument's sound after a delay. Each echo is a little bit quieter than the last, and this setting controls how much quieter."),
+					p("This setting controls the volume of each echo."),
 				);
 			} break;
 			case "echoDelay": {
 				message = div(
 					h2("Echo Delay"),
-					p("The echo effect repeats the instrument's sound after a delay, and this setting controls how long the delay is."),
+					p("This setting controls the length of each echo delay."),
 				);
 			} break;
 			case "pitchShift": {
@@ -356,6 +375,12 @@ export class TipPrompt implements Prompt {
 					p("First, most chords don't sound right when combined with heavy distortion. The only chords commonly used with distorted electric guitars are \"power chords\" which consist of a root note, a \"fifth\" note above that, and/or any octaves of those two notes."),
 					p("Second, the distortion sound depends a lot on filtering. In particular, I recommend enabling the note filter effect, and adding both high-pass and low-pass points to the note filter. (Note filters are applied first, then distortion which transforms the sound based on that filtering, then the EQ filter is applied last.)"),
 					p("Finally, I recommend adjusting the fade-out setting to allow the end of each note to overlap a little bit with the beginning of the next, but not too much!"),
+				);
+			} break;
+			case "distortionMix": {
+				message = div(
+					h2("Distortion Mix"),
+					p("This setting controls the wet/dry mix of the distortion effect."),
 				);
 			} break;
 			case "bitcrusherQuantization": {
@@ -463,7 +488,7 @@ export class TipPrompt implements Prompt {
 			case "aliases": {
 				message = div(
 					h2("Aliasing"),
-					p("Slarmoo's Box applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
+					p("41Box applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
 					p("When this setting is ticked that technique is disabled, so you may hear strange audio artifacts especially at high pitches and when bending notes. However, this can lend a grungy sound to an instrument that could be desirable."),
 				);
 			} break;
@@ -486,7 +511,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Low-Pass Filter Cutoff Frequency"),
 					p("The lowest setting feels \"muffled\" or \"dark\", and the highest setting feels \"harsh\" or \"bright\"."),
-					p("Most sounds include a range of frequencies from low to high. Slarmoo's Box instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
+					p("Most sounds include a range of frequencies from low to high. 41Box instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
 					p("This cutoff setting also determines which frequency resonates when the resonance peak setting is used."),
 				);
 			} break;
@@ -655,7 +680,12 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Granular Synthesis"),
 					p(`This effect is based on granular synthesis! It takes random points from a wave and rearranges them to form "sonic clouds".`),
-					p(`This particular slider controls the wet/dry mix of the granulation.`)
+				);
+			} break;
+			case "granularMix": {
+				message = div(
+					h2("Granular Mix"),
+					p("This setting controls the wet/dry mix of the granular effect."),
 				);
 			} break;
 			case "grainSize": {
@@ -676,6 +706,12 @@ export class TipPrompt implements Prompt {
 					p(`This setting controls the range of randomization for grain sizes. `),
 				);
 			} break;
+			case "flanger": {
+				message = div(
+					h2("Flanger"),
+					p(`This effect creates a sweep-like sound! It takes the audio and duplicates it by the depth, and the depth is modulated, creating a swoosh-like sound.`),
+				);
+			} break;	
 			case "flangerMix": {
 				message = div(
 					h2("Flanger Mix"),
@@ -739,11 +775,13 @@ export class TipPrompt implements Prompt {
 		this.container = div({ class: "prompt", style: "width: 300px;" },
 			message,
 			this._closeButton,
+			this._okayButton,
 		);
 
 		setTimeout(() => this._closeButton.focus());
 
 		this._closeButton.addEventListener("click", this._close);
+		this._okayButton.addEventListener("click", this._close);
 	}
 
 	private _close = (): void => {

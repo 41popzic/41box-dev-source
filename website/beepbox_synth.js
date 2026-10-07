@@ -653,7 +653,7 @@ var beepbox = (() => {
       this.flangerDepthRange = 32;
     }
     static {
-      this.flangerRateRange = 56;
+      this.flangerRateRange = 57;
     }
     static {
       this.flangerFeedbackRange = 32;
@@ -3386,76 +3386,118 @@ var beepbox = (() => {
   var flangerRateValues = [
     0,
     // 1
-    0.015625,
+    78125e-7,
     // 2
-    0.03125,
+    0.015625,
     // 3
-    0.046875,
+    0.03125,
     // 4
-    0.0625,
+    0.046875,
     // 5
-    0.09375,
+    0.0625,
     // 6
-    0.125,
+    0.09375,
     // 7
-    0.1667,
+    0.125,
     // 8
-    0.2,
+    0.1667,
     // 9
-    0.25,
+    0.2,
     // 10
-    0.33,
+    0.25,
     // 11
-    0.4,
+    0.33,
     // 12
-    0.5,
+    0.4,
     // 13
-    0.66,
+    0.5,
     // 14
+    0.66,
+    // 15
     0.75,
-    // nah i'm too lazy to do all of this
+    // 16
     0.8,
+    // 17
     0.9,
+    // 18
     1,
+    // 19
     1.1,
+    // 20
     1.2,
+    // 21
     1.3,
+    // 22
     1.4,
+    // 23
     1.5,
+    // 24
     1.6,
+    // 25
     1.7,
+    // 26
     1.8,
+    // 27
     1.9,
+    // 28
     2,
+    // 29
     2.1,
+    // 30
     2.2,
+    // 31
     2.3,
+    // 32
     2.4,
+    // 33
     2.5,
+    // 34
     2.6,
+    // 35
     2.7,
+    // 36
     2.8,
+    // 37
     2.9,
+    // 38
     3,
+    // 39
     3.1,
+    // 40
     3.2,
+    // 41
     3.3,
+    // 42
     3.4,
+    // 43
     3.5,
+    // 44
     3.6,
+    // 45
     3.7,
+    // 46
     3.8,
+    // 47
     3.9,
+    // 48
     4,
+    // 49
     4.15,
+    // 50
     4.3,
+    // 51
     4.5,
+    // 52
     4.8,
+    // 53
     5,
+    // 54
     5.5,
+    // 55
     6,
-    8
     // 56
+    8
+    // 57
   ];
   function getArpeggioPitchIndex(pitchCount, useFastTwoNoteArp, arpeggio) {
     let arpeggioPattern = Config.arpeggioPatterns[pitchCount - 1];
@@ -4842,7 +4884,7 @@ var beepbox = (() => {
       this.type = type;
       this.preset = type;
       this.volume = 0;
-      this.effects = 1 << 2 /* panning */;
+      this.effects = 0;
       this.chorus = Config.chorusRange - 1;
       this.reverb = 0;
       this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
@@ -4873,8 +4915,8 @@ var beepbox = (() => {
       this.grainRange = 40;
       this.flangerDelay = 8;
       this.flangerDepth = 12;
-      this.flangerRate = 2;
-      this.flangerFeedback = 13;
+      this.flangerRate = 3;
+      this.flangerFeedback = 6;
       this.flangerMix = 26;
       this.pan = Config.panCenter;
       this.panDelay = 0;
@@ -9232,7 +9274,7 @@ var beepbox = (() => {
       this.tempo = 111;
       this.reverb = 0;
       this.beatsPerBar = 8;
-      this.barCount = 8;
+      this.barCount = 16;
       this.patternsPerChannel = 9;
       this.rhythm = 3;
       this.rhythmEnabled = true;
@@ -10886,7 +10928,9 @@ var beepbox = (() => {
               } else if (effectsIncludeReverb(instrument.effects)) {
                 instrument.reverb = legacyGlobalReverb;
               }
-              instrument.effects |= 1 << 2 /* panning */;
+              if (instrument.pan != Config.panCenter) {
+                instrument.effects |= 1 << 2 /* panning */;
+              }
               if (instrument.vibrato != Config.vibratos.dictionary["none"].index) {
                 instrument.effects |= 1 << 9 /* vibrato */;
               }
@@ -16751,7 +16795,7 @@ var beepbox = (() => {
                     let flangerPhase = instrumentState.flangerPhase;
                     let flangerMix = +instrumentState.flangerMix;
                     const flangerMixDelta = +instrumentState.flangerMixDelta;
-                    let flangerFeedback = instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1);
+                    let flangerFeedback = (instrumentState.flangerFeedback / (Config.flangerFeedbackRange - 1)) * 0.9685; // Couldn't find any other way to limit the feedback.
 
                     const flangerBaseDelay = synth.samplesPerSecond * instrumentState.flangerDelay;
 

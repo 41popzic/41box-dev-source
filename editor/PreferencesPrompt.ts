@@ -12,7 +12,7 @@ import { KeyboardLayout } from "./KeyboardLayout";
 import { Piano } from "./Piano";
 import { Layout } from "./Layout";
 
-const { button, label, div, p, h2, h3, form, input, select, option, optgroup } = HTML;
+const { button, label, div, p, h2, h3, form, input, select, option } = HTML;
 
 function buildOptions(menu: HTMLSelectElement, items: ReadonlyArray<string | number>): HTMLSelectElement {
 	for (let index: number = 0; index < items.length; index++) {
@@ -523,7 +523,7 @@ export class PreferencesPrompt implements Prompt {
 			}`,});
 
 	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
-		optgroup({ label: "41Box Themes"},
+		/*optgroup({ label: "41Box Themes"},
             option({ value: "41box" }, "Inter Toxic"),
             option({ value: "inter-energized" }, "Inter Energized"),
             option({ value: "inter-nebula" }, "Inter Nebula"),
@@ -535,7 +535,7 @@ export class PreferencesPrompt implements Prompt {
             option({ value: "dark classic" }, "BeepBox Dark"),
             option({ value: "dark competition" }, "BeepBox Competition Dark"),
         ),
-        optgroup({ label: "JummBox Themes" },
+        optgroup({ label: "JummBox Themes" },*/
 			option({ value: "forest" }, "Forest"),
 			option({ value: "canyon" }, "Canyon"),
 			option({ value: "midnight" }, "Midnight"),
@@ -557,7 +557,7 @@ export class PreferencesPrompt implements Prompt {
 			option({ value: "blutonium" }, "Blutonium"),
 			option({ value: "greyscale" }, "Greyscale"),
 			option({ value: "slushie" }, "Slushie"),
-		),
+		/*),
         optgroup({ label: "ModBox Themes"},
 			option({ value: "modbox classic" }, "Modbox"),
 			option({ value: "modbox 2" }, "Modbox 2.0"),
@@ -619,7 +619,7 @@ export class PreferencesPrompt implements Prompt {
 		),
         optgroup({ label: "Misc"},
             option({ value: "custom" }, "Custom"),
-        )
+        )*/
 	);
 
 	private readonly _customThemeFileInput: HTMLInputElement = input({ type: "file", accept: "image/*", text: "choose editor background image"});

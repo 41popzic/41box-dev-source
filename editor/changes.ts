@@ -781,7 +781,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
         const selectiveRandom: SelectiveInstrumentSettings = usesSelectiveRandom ? doc.prefs.selectiveRandom : new SelectiveInstrumentSettings();
         if (!usesSelectiveRandom) selectiveRandom.instrumentType = true;
         if (selectiveRandom.effects) {
-            instrument.effects = 1 << EffectType.panning; // disable all existing effects except panning, which should always be on.
+            instrument.effects = 0; // disable all existing effects except panning, which should always be on.
             instrument.aliases = false;
         }
         if (selectiveRandom.envelopes) instrument.envelopeCount = 0;
@@ -897,7 +897,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.effects |= 1 << EffectType.reverb;
                     instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);                
                 }
-           
+             
             }
 
             // Configure this to whatever you'd like.
@@ -928,7 +928,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "chorus", weight: 2 },
                     { item: "block", weight: 2 },
                     { item: "bow", weight: 2 },
-                    // { item: "custom", weight: 10 },
+                    // { item: "custom", weight: 10 }, // awh no custom unison?????
                 ])].index;
 
                 if (instrument.unison != Config.unisons.dictionary["none"].index && Math.random() > 0.4)
@@ -2107,7 +2107,7 @@ export class ChangeChannelCount extends Change {
                                 const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
                                 instrument.fromJsonObject(preset.settings, isNoise, isMod, doc.song.rhythm == 0 || doc.song.rhythm == 2, doc.song.rhythm >= 2);
                                 instrument.preset = presetValue;
-                                instrument.effects |= 1 << EffectType.panning;
+                                //instrument.effects |= 1 << EffectType.panning;
                             } else {
                                 instrument.setTypeAndReset(InstrumentType.mod, isNoise, isMod);
                             }
@@ -3466,7 +3466,7 @@ export class ChangeAddChannelInstrument extends Change {
         const instrument: Instrument = new Instrument(isNoise, isMod);
         instrument.fromJsonObject(preset.settings, isNoise, isMod, false, false, 1);
         instrument.preset = presetValue;
-        instrument.effects |= 1 << EffectType.panning;
+        //instrument.effects |= 1 << EffectType.panning;
         instrument.volume = 0;
         channel.instruments.push(instrument);
         if (!isMod) { // Mod channels lose information when changing set instrument
@@ -4625,20 +4625,11 @@ export function setDefaultInstruments(song: Song): void {
 
             {
                 switch (channelIndex) {
-                    case 0:
-                        presetName = "square wave";
-                        break;
-                    case 1:
-                        presetName = "square wave";
-                        break;
-                    case 2:
-                        presetName = "square wave";
-                        break;
                     case 3:
-                        presetName = "chiseled noise";
+                        presetName = "colored noise";
                         break;
                     case 4:
-                        presetName = "colored noise";
+                        presetName = "chiseled noise";
                         break;
                     default:
                         presetName = "square wave";
@@ -4659,7 +4650,7 @@ export function setDefaultInstruments(song: Song): void {
             );
 
             instrument.preset = presetValue;
-            instrument.effects |= 1 << EffectType.panning;
+            //instrument.effects |= 1 << EffectType.panning;
         }
     }
 }

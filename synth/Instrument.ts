@@ -389,7 +389,7 @@ export class Instrument {
         this.type = type;
         this.preset = type;
         this.volume = 0;
-        this.effects = (1 << EffectType.panning); // Panning enabled by default in JB.
+        this.effects = 0;
         this.chorus = Config.chorusRange - 1;
         this.reverb = 0;
         this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
@@ -426,8 +426,8 @@ export class Instrument {
 
         this.flangerDelay = 8;
         this.flangerDepth = 12;
-        this.flangerRate = 2;
-        this.flangerFeedback = 13;
+        this.flangerRate = 3;
+        this.flangerFeedback = 6;
         this.flangerMix = 26;
 
         this.pan = Config.panCenter;
