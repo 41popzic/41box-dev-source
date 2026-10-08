@@ -460,6 +460,7 @@ export class Song {
                 let chorusIndex: number = Config.modulators.dictionary["chorus"].index;
                 let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
                 let reverbIndex: number = Config.modulators.dictionary["reverb"].index;
+                let reverbDelayIndex: number = Config.modulators.dictionary["reverbDelay"].index;
                 let panningIndex: number = Config.modulators.dictionary["pan"].index;
                 let panDelayIndex: number = Config.modulators.dictionary["pan delay"].index;
                 let distortionIndex: number = Config.modulators.dictionary["distortion"].index;
@@ -491,6 +492,9 @@ export class Song {
                         break;
                     case reverbIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbIndex].convertRealFactor;
+                        break;
+                    case reverbDelayIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverbDelay - Config.modulators[reverbDelayIndex].convertRealFactor;
                         break;
                     case panningIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pan - Config.modulators[panningIndex].convertRealFactor;
@@ -984,6 +988,7 @@ export class Song {
                 }
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
+                    buffer.push(base64IntToCharCode[instrument.reverbDelay]);
                 }
                 // if (effectsIncludeNoteRange(instrument.effects)) {
                 //     buffer.push(base64IntToCharCode[instrument.noteRange]);
@@ -2755,8 +2760,7 @@ export class Song {
                         if (fromBeepBox) {
                             // BeepBox has 4 chorus values vs. JB's 8
                             instrument.chorus = clamp(0, (Config.chorusRange / 2) + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) * 2;
-                        }
-                        else {
+                        } else {
                             instrument.chorus = clamp(0, Config.chorusRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
                     }
@@ -2774,8 +2778,10 @@ export class Song {
                     if (effectsIncludeReverb(instrument.effects)) {
                         if (fromBeepBox) {
                             instrument.reverb = clamp(0, Config.reverbRange, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * Config.reverbRange / 3.0));
+                            instrument.reverbDelay = 0;
                         } else {
                             instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                            if (!beforeFour) instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                         }
                     }
                     if (effectsIncludeGranular(instrument.effects)) {

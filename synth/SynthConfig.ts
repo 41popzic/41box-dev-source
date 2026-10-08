@@ -173,6 +173,7 @@ export const enum EnvelopeComputeIndex {
     //flangerDepth,
     //flangerRate,
     flangerMix,
+    reverbDelay,
 
     //Add more here
 
@@ -970,7 +971,7 @@ export class Config {
     public static readonly tempoMax: number = 500;
     public static readonly octaveMin: number = -2;
     public static readonly octaveMax: number = 2;
-    public static readonly echoDelayRange: number = 24;
+    public static readonly echoDelayRange: number = 48;
     public static readonly echoDelayStepTicks: number = 40;
     public static readonly echoSustainRange: number = 8;
     public static readonly echoShelfHz: number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes.
@@ -978,8 +979,12 @@ export class Config {
     public static readonly reverbShelfHz: number = 8000.0; // The cutoff freq of the shelf filter that is used to decay reverb.
     public static readonly reverbShelfGain: number = Math.pow(2.0, -1.5);
     public static readonly reverbRange: number = 32;
+    public static readonly reverbPreDelayBufferSize: number = 131072;
+    public static readonly reverbPreDelayBufferMask: number = Config.reverbPreDelayBufferSize - 1;
     public static readonly reverbDelayBufferSize: number = 16384; // TODO: Compute a buffer size based on sample rate.
     public static readonly reverbDelayBufferMask: number = Config.reverbDelayBufferSize - 1; // TODO: Compute a buffer size based on sample rate.
+    public static readonly reverbDelayRange: number = 48; // The delay between dry and wet
+    public static readonly reverbDelayStepTicks: number = Config.echoDelayStepTicks; // hehe I stole echo
     public static readonly phaserMixRange: number = 32; 
     public static readonly phaserFeedbackRange: number = 32; 
     public static readonly phaserFreqRange: number = 32; 
@@ -1861,7 +1866,7 @@ export class Config {
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         */
         { name: "flangerMix", computeIndex: EnvelopeComputeIndex.flangerMix, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.flanger, compatibleInstruments: null },
-
+        { name: "reverbDelay", computeIndex: EnvelopeComputeIndex.reverbDelay, displayName: "reverb delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.reverb, compatibleInstruments: null },
 
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
@@ -2019,6 +2024,8 @@ export class Config {
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         {name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: Config.flangerMixRange - 1, newNoteVol: Math.ceil((Config.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: EffectType.flanger, maxIndex: 0, 
             promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"]},
+        { name: "reverb delay", pianoName: "Reverb Delay", maxRawVol: Config.reverbDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.reverb, maxIndex: 0,
+            promptName: "Reverb Delay", promptDesc: [ "This setting controls the delay of your reverb on your instrument", "At $LO, your instrument will have no reverb. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
         ]);
 }
 

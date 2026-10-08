@@ -49,7 +49,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, ChangeReverbDelay, } from "./changes";
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
@@ -848,10 +848,16 @@ export class SongEditor {
     private readonly _chorusRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chorusMix") }, "mix"), this._chorusSlider.container);
     private readonly _chorusContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ style: "padding-bottom: 1em;", class: "tip", onclick: () => this._openPrompt("chorus") }, "chorus"), this._chorusRow)
 
-    private readonly _reverbSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeReverb(this.doc, oldValue, newValue), false);
+    public readonly reverbDelayNum: HTMLParagraphElement = div({ style: "font-size: 80%; ", id: "reverbDelayNum" });
+    private readonly _reverbSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange + 0, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeReverb(this.doc, oldValue, newValue), false);
     private readonly _reverbRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverbMix") }, "mix"), this._reverbSlider.container);
-    private readonly _reverbContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ style: "padding-bottom: 1em;", class: "tip", onclick: () => this._openPrompt("reverb") }, "reverb"), this._reverbRow)
-    
+    private readonly _reverbDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbDelayRange - 0, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeReverbDelay(this.doc, oldValue, newValue), true);
+    private readonly _reverbDelayRow: HTMLDivElement = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex;  text-align: left; flex-direction:column; align-items:center;" },
+        span({ class: "tip", style: "font-size: small;", onclick: () => this._openPrompt("reverbDelay") }, "delay "),
+        div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbDelayNum),
+    ), this._reverbDelaySlider.container);
+    private readonly _reverbContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ style: "padding-bottom: 1em;", class: "tip", onclick: () => this._openPrompt("reverb") }, "reverb"), this._reverbRow, this._reverbDelayRow)
+
     private readonly _ringModWaveSelect: HTMLSelectElement = buildOptions(select({}), Config.operatorWaves.map(wave => wave.name));
     private readonly _ringModPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "pulse width" }), this.doc, (oldValue: number, newValue: number) => new ChangeRingModPulseWidth(this.doc, oldValue, newValue), true);
     private readonly _ringModSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeRingMod(this.doc, oldValue, newValue), false);
@@ -895,10 +901,14 @@ export class SongEditor {
     );
     private readonly _granularContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ style: "padding-bottom: 1em;", class: "tip", onclick: () => this._openPrompt("granular") }, "granular"), this._granularContainerRow)
 
+    public readonly echoDelayNum: HTMLParagraphElement = div({ style: "font-size: 80%; ", id: "echoDelayNum" });
     private readonly _echoSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
     private readonly _echoSustainRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "mix"), this._echoSustainSlider.container);
-    private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), false);
-    private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "delay"), this._echoDelaySlider.container);
+    private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), true);
+    private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" },
+        span({ class: "tip", style: "font-size: small;", onclick: () => this._openPrompt("echoDelay") }, "delay "),
+        div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.echoDelayNum),
+    ), this._echoDelaySlider.container);
     private readonly _echoContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ style: "padding-bottom: 1em;", class: "tip", onclick: () => this._openPrompt("echo") }, "echo"), this._echoSustainRow, this._echoDelayRow)
 
     private readonly _rhythmInput: HTMLInputElement = input({ type: "number", min: "1", max: "32", style: "width: 5em;" });
@@ -2456,6 +2466,8 @@ export class SongEditor {
                 return this._decimalOffsetSlider;
             case Config.modulators.dictionary["reverb"].index:
                 return this._reverbSlider;
+            case Config.modulators.dictionary["reverb delay"].index:
+                return this._reverbDelaySlider;
             case Config.modulators.dictionary["distortion"].index:
                 return this._distortionSlider;
             case Config.modulators.dictionary["note volume"].index:
@@ -3337,7 +3349,7 @@ export class SongEditor {
                 this._echoDelayRow.style.display = ""; // For good measures
                 this._echoDelaySlider.updateValue(instrument.echoDelay);
                 this._echoContainer.style.display = "";
-                this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
+                //this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
             } else {
                 this._echoSustainRow.style.display = "none";
                 this._echoDelayRow.style.display = "none";
@@ -3375,11 +3387,14 @@ export class SongEditor {
 
             if (effectsIncludeReverb(instrument.effects)) {
                 this._reverbRow.style.display = ""; // For good measures
+                this._reverbDelayRow.style.display = "";
                 this._reverbContainer.style.display = "";
                 this._reverbSlider.updateValue(instrument.reverb);
+                this._reverbDelaySlider.updateValue(instrument.reverbDelay);
             } else {
                 this._reverbRow.style.display = "none"; // For good measures
                 this._reverbContainer.style.display = "none";
+                this._reverbDelayRow.style.display = "none";
             }
 
             if (effectsIncludeRingModulation(instrument.effects)) {
@@ -3467,6 +3482,8 @@ export class SongEditor {
             this._pwmSliderInputBox.value = instrument.pulseWidth + "";
             this._detuneSliderInputBox.value = (instrument.detune - Config.detuneCenter) + "";
             this.ringModHzNum.innerHTML = " (" + calculateRingModHertz(instrument.ringModulationHz / (Config.ringModHzRange - 1)) + ")";
+            this.reverbDelayNum.innerHTML = " " + prettyNumber(Math.round((instrument.reverbDelay + 0) * Config.reverbDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
+            this.echoDelayNum.innerHTML = " " + prettyNumber(Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
             this.grainSizeNum.innerHTML = " (" + instrument.grainSize * Config.grainSizeStep + ")";
             this.grainRangeNum.innerHTML = " (" + instrument.grainRange * Config.grainSizeStep + ")";
             this._instrumentVolumeSlider.updateValue(instrument.volume);
@@ -3949,9 +3966,11 @@ export class SongEditor {
                         }
                         if (anyInstrumentReverbs) {
                             settingList.push("reverb");
+                            settingList.push("reverb delay");
                         }
                         if (!allInstrumentReverbs) {
                             unusedSettingList.push("+ reverb");
+                            unusedSettingList.push("+ reverb delay")
                         }
                         if (anyInstrumentRingMods) {
                             settingList.push("ring modulation");

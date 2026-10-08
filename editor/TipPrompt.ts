@@ -56,6 +56,12 @@ export class TipPrompt implements Prompt {
 					p("This setting controls the wet/dry mix of the reverb effect."),
 				);
 			} break;
+			case "reverbDelay": {
+				message = div(
+					h2("Reverb Delay"),
+					p("This setting controls the delay of the reverb effect."),
+				);
+			} break;
 			case "rhythm": {
 				message = div(
 					h2("Subgrid"),

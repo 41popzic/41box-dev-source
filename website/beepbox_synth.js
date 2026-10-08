@@ -592,7 +592,7 @@ var beepbox = (() => {
       this.octaveMax = 2;
     }
     static {
-      this.echoDelayRange = 24;
+      this.echoDelayRange = 48;
     }
     static {
       this.echoDelayStepTicks = 40;
@@ -618,6 +618,12 @@ var beepbox = (() => {
       this.reverbRange = 32;
     }
     static {
+      this.reverbPreDelayBufferSize = 131072;
+    }
+    static {
+      this.reverbPreDelayBufferMask = _Config.reverbPreDelayBufferSize - 1;
+    }
+    static {
       this.reverbDelayBufferSize = 16384;
     }
     static {
@@ -626,6 +632,14 @@ var beepbox = (() => {
     }
     static {
       // TODO: Compute a buffer size based on sample rate.
+      this.reverbDelayRange = 48;
+    }
+    static {
+      // The delay between dry and wet
+      this.reverbDelayStepTicks = _Config.echoDelayStepTicks;
+    }
+    static {
+      // hehe I stole echo
       this.phaserMixRange = 32;
     }
     static {
@@ -2410,7 +2424,8 @@ var beepbox = (() => {
         { name: "phaserFeedback", computeIndex: EnvelopeComputeIndex.phaserFeedback, displayName: "phaser feedback",  perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         */
-        { name: "flangerMix", computeIndex: 56 /* flangerMix */, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* flanger */, compatibleInstruments: null }
+        { name: "flangerMix", computeIndex: 56 /* flangerMix */, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* flanger */, compatibleInstruments: null },
+        { name: "reverbDelay", computeIndex: 57 /* reverbDelay */, displayName: "reverb delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 0 /* reverb */, compatibleInstruments: null }
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
         /*
@@ -3174,6 +3189,18 @@ var beepbox = (() => {
           maxIndex: 0,
           promptName: "Flanger Mix",
           promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"]
+        },
+        {
+          name: "reverb delay",
+          pianoName: "Reverb Delay",
+          maxRawVol: _Config.reverbDelayRange,
+          newNoteVol: 0,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 0 /* reverb */,
+          maxIndex: 0,
+          promptName: "Reverb Delay",
+          promptDesc: ["This setting controls the delay of your reverb on your instrument", "At $LO, your instrument will have no reverb. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
         }
       ]);
     }
@@ -4807,6 +4834,7 @@ var beepbox = (() => {
       this.grainRange = 40;
       this.chorus = 0;
       this.reverb = 0;
+      this.reverbDelay = 0;
       this.echoSustain = 0;
       this.echoDelay = 0;
       //public phaserFreq: number = 0;
@@ -4887,6 +4915,7 @@ var beepbox = (() => {
       this.effects = 0;
       this.chorus = Config.chorusRange - 1;
       this.reverb = 0;
+      this.reverbDelay = 0;
       this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
       this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
       this.eqFilter.reset();
@@ -4916,7 +4945,7 @@ var beepbox = (() => {
       this.flangerDelay = 8;
       this.flangerDepth = 12;
       this.flangerRate = 3;
-      this.flangerFeedback = 6;
+      this.flangerFeedback = 13;
       this.flangerMix = 26;
       this.pan = Config.panCenter;
       this.panDelay = 0;
@@ -5247,6 +5276,7 @@ var beepbox = (() => {
       }
       if (effectsIncludeReverb(this.effects)) {
         instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+        instrumentObject["reverbDelay"] = this.reverbDelay;
       }
       if (this.type != 4 /* drumset */) {
         instrumentObject["fadeInSeconds"] = Math.round(1e4 * fadeInSettingToSeconds(this.fadeIn)) / 1e4;
@@ -5635,8 +5665,10 @@ var beepbox = (() => {
       }
       if (instrumentObject["reverb"] != void 0) {
         this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
+        this.reverbDelay = clamp(0, Config.reverbDelayRange, instrumentObject["reverbDelay"] | 0);
       } else {
         this.reverb = legacyGlobalReverb;
+        this.reverbDelay = 0;
       }
       if (instrumentObject["pulseWidth"] != void 0) {
         this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
@@ -6357,7 +6389,7 @@ var beepbox = (() => {
       this._modifiedEnvelopeIndices = [];
       this._modifiedEnvelopeCount = 0;
       this.lowpassCutoffDecayVolumeCompensation = 1;
-      const length = 57 /* length */;
+      const length = 58 /* length */;
       for (let i = 0; i < length; i++) {
         this.envelopeStarts[i] = 1;
         this.envelopeEnds[i] = 1;
@@ -7361,6 +7393,10 @@ var beepbox = (() => {
       this.reverbShelfPrevInput1 = 0;
       this.reverbShelfPrevInput2 = 0;
       this.reverbShelfPrevInput3 = 0;
+      this.reverbDelay = 0;
+      this.reverbPreDelayLineL = null;
+      this.reverbPreDelayLineR = null;
+      this.reverbPreDelayPos = 0;
       //public phaserSamples: Float32Array | null = null;
       //public phaserPrevInputs: Float32Array | null = null;
       //public phaserFeedbackMult: number = 0.0;
@@ -7426,6 +7462,12 @@ var beepbox = (() => {
       if (effectsIncludeReverb(instrument.effects)) {
         if (this.reverbDelayLine == null) {
           this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
+        }
+        if (this.reverbPreDelayLineL == null) {
+          this.reverbPreDelayLineL = new Float32Array(Config.reverbPreDelayBufferSize);
+        }
+        if (this.reverbPreDelayLineR == null) {
+          this.reverbPreDelayLineR = new Float32Array(Config.reverbPreDelayBufferSize);
         }
       }
       if (effectsIncludeGranular(instrument.effects)) {
@@ -7498,6 +7540,7 @@ var beepbox = (() => {
       this.reverbShelfPrevInput1 = 0;
       this.reverbShelfPrevInput2 = 0;
       this.reverbShelfPrevInput3 = 0;
+      this.reverbDelay = 0;
       this.flangerDelayPos = 0;
       this.flangerPhase = 0;
       if (this.flangerDelayLineL != null) {
@@ -7530,7 +7573,9 @@ var beepbox = (() => {
         for (let i = 0; i < this.echoDelayLineR.length; i++) this.echoDelayLineR[i] = 0;
       }
       if (this.reverbDelayLineDirty) {
-        for (let i = 0; i < this.reverbDelayLine.length; i++) this.reverbDelayLine[i] = 0;
+        this.reverbDelayLine.fill(0);
+        this.reverbPreDelayLineL.fill(0);
+        this.reverbPreDelayLineR.fill(0);
       }
       if (this.granularDelayLineDirty) {
         for (let i = 0; i < this.granularDelayLine.length; i++) this.granularDelayLine[i] = 0;
@@ -7981,6 +8026,7 @@ var beepbox = (() => {
         this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
         this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
         this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
+        this.reverbDelay = instrument.reverbDelay;
       }
       if (this.tonesAddedInThisTick) {
         this.attentuationProgress = 0;
@@ -9029,6 +9075,7 @@ var beepbox = (() => {
             let chorusIndex = Config.modulators.dictionary["chorus"].index;
             let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
             let reverbIndex = Config.modulators.dictionary["reverb"].index;
+            let reverbDelayIndex = Config.modulators.dictionary["reverbDelay"].index;
             let panningIndex = Config.modulators.dictionary["pan"].index;
             let panDelayIndex = Config.modulators.dictionary["pan delay"].index;
             let distortionIndex = Config.modulators.dictionary["distortion"].index;
@@ -9059,6 +9106,9 @@ var beepbox = (() => {
                 break;
               case reverbIndex:
                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbIndex].convertRealFactor;
+                break;
+              case reverbDelayIndex:
+                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverbDelay - Config.modulators[reverbDelayIndex].convertRealFactor;
                 break;
               case panningIndex:
                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pan - Config.modulators[panningIndex].convertRealFactor;
@@ -9528,6 +9578,7 @@ var beepbox = (() => {
           }
           if (effectsIncludeReverb(instrument.effects)) {
             buffer.push(base64IntToCharCode[instrument.reverb]);
+            buffer.push(base64IntToCharCode[instrument.reverbDelay]);
           }
           if (effectsIncludeGranular(instrument.effects)) {
             buffer.push(base64IntToCharCode[instrument.granular]);
@@ -11077,8 +11128,10 @@ var beepbox = (() => {
               if (effectsIncludeReverb(instrument.effects)) {
                 if (fromBeepBox) {
                   instrument.reverb = clamp(0, Config.reverbRange, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * Config.reverbRange / 3));
+                  instrument.reverbDelay = 0;
                 } else {
                   instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                  if (!beforeFour) instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
               }
               if (effectsIncludeGranular(instrument.effects)) {
@@ -16834,27 +16887,34 @@ var beepbox = (() => {
 				let echoShelfPrevInputR = +instrumentState.echoShelfPrevInputR;`;
         }
         if (usesReverb) {
-          effectsSource += `
-				
-				const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.
-				const reverbDelayLine = instrumentState.reverbDelayLine;
-				instrumentState.reverbDelayLineDirty = true;
-				let reverbDelayPos = instrumentState.reverbDelayPos & reverbMask;
-				
-				let reverb = +instrumentState.reverbMult;
-				const reverbDelta = +instrumentState.reverbMultDelta;
-				
-				const reverbShelfA1 = +instrumentState.reverbShelfA1;
-				const reverbShelfB0 = +instrumentState.reverbShelfB0;
-				const reverbShelfB1 = +instrumentState.reverbShelfB1;
-				let reverbShelfSample0 = +instrumentState.reverbShelfSample0;
-				let reverbShelfSample1 = +instrumentState.reverbShelfSample1;
-				let reverbShelfSample2 = +instrumentState.reverbShelfSample2;
-				let reverbShelfSample3 = +instrumentState.reverbShelfSample3;
-				let reverbShelfPrevInput0 = +instrumentState.reverbShelfPrevInput0;
-				let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
-				let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
-				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`;
+          effectsSource += `      
+                const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.
+                const reverbDelayLine = instrumentState.reverbDelayLine;
+                instrumentState.reverbDelayLineDirty = true;
+                let reverbDelayPos = instrumentState.reverbDelayPos & reverbMask;
+
+                const reverbPreDelayLineL = instrumentState.reverbPreDelayLineL;
+                const reverbPreDelayLineR = instrumentState.reverbPreDelayLineR;
+                const preDelayMask = Config.reverbPreDelayBufferMask >>> 0;
+                let reverbPreDelayPos = instrumentState.reverbPreDelayPos & preDelayMask;
+                
+                let reverb = +instrumentState.reverbMult;
+                const reverbDelta = +instrumentState.reverbMultDelta;
+
+                const reverbDelay = +instrumentState.reverbDelay;
+                
+                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 0 ? synth.getSamplesPerTick() * 45 : 0);
+                const reverbShelfA1 = +instrumentState.reverbShelfA1;
+                const reverbShelfB0 = +instrumentState.reverbShelfB0;
+                const reverbShelfB1 = +instrumentState.reverbShelfB1;
+                let reverbShelfSample0 = +instrumentState.reverbShelfSample0;
+                let reverbShelfSample1 = +instrumentState.reverbShelfSample1;
+                let reverbShelfSample2 = +instrumentState.reverbShelfSample2;
+                let reverbShelfSample3 = +instrumentState.reverbShelfSample3;
+                let reverbShelfPrevInput0 = +instrumentState.reverbShelfPrevInput0;
+                let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
+                let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
+                let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`;
         }
         effectsSource += `
 				
@@ -17159,16 +17219,26 @@ var beepbox = (() => {
 					// Delay lengths:  3041     + 3385     + 4481  +  5477 = 16384 = 2^14
 					// Buffer offsets: 3041    -> 6426   -> 10907 -> 16384
 					const reverbDelayPos1 = (reverbDelayPos +  3041) & reverbMask;
-					const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
-					const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
-					const reverbSample0 = (reverbDelayLine[reverbDelayPos]);
-					const reverbSample1 = reverbDelayLine[reverbDelayPos1];
-					const reverbSample2 = reverbDelayLine[reverbDelayPos2];
-					const reverbSample3 = reverbDelayLine[reverbDelayPos3];
-					const reverbTemp0 = -(reverbSample0 + sampleL) + reverbSample1;
-					const reverbTemp1 = -(reverbSample0 + sampleR) - reverbSample1;
-					const reverbTemp2 = -reverbSample2 + reverbSample3;
-					const reverbTemp3 = -reverbSample2 - reverbSample3;
+                    const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
+                    const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
+                    const reverbSample0 = reverbDelayLine[reverbDelayPos];
+                    const reverbSample1 = reverbDelayLine[reverbDelayPos1];
+                    const reverbSample2 = reverbDelayLine[reverbDelayPos2];
+                    const reverbSample3 = reverbDelayLine[reverbDelayPos3];
+
+                    reverbPreDelayLineL[reverbPreDelayPos] = sampleL;
+                    reverbPreDelayLineR[reverbPreDelayPos] = sampleR;
+
+                    const preDelayPos = (reverbPreDelayPos - reverbPreDelaySamples) & preDelayMask;
+                    const delayedSampleL = reverbPreDelayLineL[preDelayPos];
+                    const delayedSampleR = reverbPreDelayLineR[preDelayPos];
+
+                    reverbPreDelayPos = (reverbPreDelayPos + 1) & preDelayMask;
+
+                    const reverbTemp0 = -(reverbSample0 + delayedSampleL) + reverbSample1;
+                    const reverbTemp1 = -(reverbSample0 + delayedSampleR) - reverbSample1;
+                    const reverbTemp2 = -reverbSample2 + reverbSample3;
+                    const reverbTemp3 = -reverbSample2 - reverbSample3;
 					const reverbShelfInput0 = (reverbTemp0 + reverbTemp2) * reverb;
 					const reverbShelfInput1 = (reverbTemp1 + reverbTemp3) * reverb;
 					const reverbShelfInput2 = (reverbTemp0 - reverbTemp2) * reverb;
@@ -17326,30 +17396,35 @@ var beepbox = (() => {
         }
         if (usesReverb) {
           effectsSource += `
-				
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
-				instrumentState.reverbDelayPos = reverbDelayPos;
-				instrumentState.reverbMult = reverb;
-				
-				if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
-				if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
-				if (!Number.isFinite(reverbShelfSample2) || Math.abs(reverbShelfSample2) < epsilon) reverbShelfSample2 = 0.0;
-				if (!Number.isFinite(reverbShelfSample3) || Math.abs(reverbShelfSample3) < epsilon) reverbShelfSample3 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput0) || Math.abs(reverbShelfPrevInput0) < epsilon) reverbShelfPrevInput0 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput1) || Math.abs(reverbShelfPrevInput1) < epsilon) reverbShelfPrevInput1 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput2) || Math.abs(reverbShelfPrevInput2) < epsilon) reverbShelfPrevInput2 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput3) || Math.abs(reverbShelfPrevInput3) < epsilon) reverbShelfPrevInput3 = 0.0;
-				instrumentState.reverbShelfSample0 = reverbShelfSample0;
-				instrumentState.reverbShelfSample1 = reverbShelfSample1;
-				instrumentState.reverbShelfSample2 = reverbShelfSample2;
-				instrumentState.reverbShelfSample3 = reverbShelfSample3;
-				instrumentState.reverbShelfPrevInput0 = reverbShelfPrevInput0;
-				instrumentState.reverbShelfPrevInput1 = reverbShelfPrevInput1;
-				instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
-				instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;`;
+                            
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
+
+                Synth.sanitizeDelayLine(reverbPreDelayLineL, reverbPreDelayPos, preDelayMask);
+                Synth.sanitizeDelayLine(reverbPreDelayLineR, reverbPreDelayPos, preDelayMask);
+
+                instrumentState.reverbDelayPos = reverbDelayPos;
+                instrumentState.reverbPreDelayPos = reverbPreDelayPos;
+                instrumentState.reverbMult = reverb;
+                
+                if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
+                if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
+                if (!Number.isFinite(reverbShelfSample2) || Math.abs(reverbShelfSample2) < epsilon) reverbShelfSample2 = 0.0;
+                if (!Number.isFinite(reverbShelfSample3) || Math.abs(reverbShelfSample3) < epsilon) reverbShelfSample3 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput0) || Math.abs(reverbShelfPrevInput0) < epsilon) reverbShelfPrevInput0 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput1) || Math.abs(reverbShelfPrevInput1) < epsilon) reverbShelfPrevInput1 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput2) || Math.abs(reverbShelfPrevInput2) < epsilon) reverbShelfPrevInput2 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput3) || Math.abs(reverbShelfPrevInput3) < epsilon) reverbShelfPrevInput3 = 0.0;
+                instrumentState.reverbShelfSample0 = reverbShelfSample0;
+                instrumentState.reverbShelfSample1 = reverbShelfSample1;
+                instrumentState.reverbShelfSample2 = reverbShelfSample2;
+                instrumentState.reverbShelfSample3 = reverbShelfSample3;
+                instrumentState.reverbShelfPrevInput0 = reverbShelfPrevInput0;
+                instrumentState.reverbShelfPrevInput1 = reverbShelfPrevInput1;
+                instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
+                instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;`;
         }
         effectsSource += "}";
         effectsFunction = new Function("Config", "Synth", effectsSource)(Config, _Synth);

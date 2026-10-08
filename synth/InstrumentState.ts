@@ -497,6 +497,10 @@ export class InstrumentState {
     public reverbShelfPrevInput1: number = 0.0;
     public reverbShelfPrevInput2: number = 0.0;
     public reverbShelfPrevInput3: number = 0.0;
+    public reverbDelay: number = 0.0;
+    public reverbPreDelayLineL: Float32Array | null = null;
+    public reverbPreDelayLineR: Float32Array | null = null;
+    public reverbPreDelayPos: number = 0;
 
     //public phaserSamples: Float32Array | null = null;
     //public phaserPrevInputs: Float32Array | null = null;
@@ -573,6 +577,14 @@ export class InstrumentState {
             // TODO: Make reverb delay line sample rate agnostic. Maybe just double buffer size for 96KHz? Adjust attenuation and shelf cutoff appropriately?
             if (this.reverbDelayLine == null) {
                 this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
+            }
+
+            if (this.reverbPreDelayLineL == null) {
+                this.reverbPreDelayLineL = new Float32Array(Config.reverbPreDelayBufferSize);
+            }
+
+            if (this.reverbPreDelayLineR == null) {
+                this.reverbPreDelayLineR = new Float32Array(Config.reverbPreDelayBufferSize);
             }
         }
         /*if (effectsIncludePhaser(instrument.effects)) {
@@ -660,7 +672,7 @@ export class InstrumentState {
         this.reverbShelfPrevInput1 = 0.0;
         this.reverbShelfPrevInput2 = 0.0;
         this.reverbShelfPrevInput3 = 0.0;
-        
+        this.reverbDelay = 0.0;        
         //if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
         //if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
         
@@ -703,7 +715,9 @@ export class InstrumentState {
             for (let i: number = 0; i < this.echoDelayLineR!.length; i++) this.echoDelayLineR![i] = 0.0;
         }
         if (this.reverbDelayLineDirty) {
-            for (let i: number = 0; i < this.reverbDelayLine!.length; i++) this.reverbDelayLine![i] = 0.0;
+            this.reverbDelayLine!.fill(0.0);
+            this.reverbPreDelayLineL!.fill(0.0);
+            this.reverbPreDelayLineR!.fill(0.0);
         }
         if (this.granularDelayLineDirty) {
             for (let i: number = 0; i < this.granularDelayLine!.length; i++) this.granularDelayLine![i] = 0.0;
@@ -1346,6 +1360,7 @@ export class InstrumentState {
             this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
             this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
             this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
+            this.reverbDelay = instrument.reverbDelay;
         }
 
         if (this.tonesAddedInThisTick) {

@@ -282,6 +282,7 @@ export class Instrument {
     public grainRange: number = 40;
     public chorus: number = 0;
     public reverb: number = 0;
+    public reverbDelay: number = 0;
     public echoSustain: number = 0;
     public echoDelay: number = 0;
 
@@ -392,6 +393,7 @@ export class Instrument {
         this.effects = 0;
         this.chorus = Config.chorusRange - 1;
         this.reverb = 0;
+        this.reverbDelay = 0;
         this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
         this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
         this.eqFilter.reset();
@@ -427,7 +429,7 @@ export class Instrument {
         this.flangerDelay = 8;
         this.flangerDepth = 12;
         this.flangerRate = 3;
-        this.flangerFeedback = 6;
+        this.flangerFeedback = 13;
         this.flangerMix = 26;
 
         this.pan = Config.panCenter;
@@ -797,6 +799,7 @@ export class Instrument {
         }
         if (effectsIncludeReverb(this.effects)) {
             instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+            instrumentObject["reverbDelay"] = this.reverbDelay;
         }
 
         if (this.type != InstrumentType.drumset) {
@@ -1263,8 +1266,10 @@ export class Instrument {
 
         if (instrumentObject["reverb"] != undefined) {
             this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
+            this.reverbDelay = clamp(0, Config.reverbDelayRange,instrumentObject["reverbDelay"] | 0);
         } else {
             this.reverb = legacyGlobalReverb;
+            this.reverbDelay = 0;
         }
 
         if (instrumentObject["pulseWidth"] != undefined) {

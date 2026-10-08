@@ -4829,27 +4829,35 @@ if (playSong && !this.countInMetronome) {
             }
 
             if (usesReverb) { //TODO: reverb wet/dry?
-                effectsSource += `
-				
-				const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.
-				const reverbDelayLine = instrumentState.reverbDelayLine;
-				instrumentState.reverbDelayLineDirty = true;
-				let reverbDelayPos = instrumentState.reverbDelayPos & reverbMask;
-				
-				let reverb = +instrumentState.reverbMult;
-				const reverbDelta = +instrumentState.reverbMultDelta;
-				
-				const reverbShelfA1 = +instrumentState.reverbShelfA1;
-				const reverbShelfB0 = +instrumentState.reverbShelfB0;
-				const reverbShelfB1 = +instrumentState.reverbShelfB1;
-				let reverbShelfSample0 = +instrumentState.reverbShelfSample0;
-				let reverbShelfSample1 = +instrumentState.reverbShelfSample1;
-				let reverbShelfSample2 = +instrumentState.reverbShelfSample2;
-				let reverbShelfSample3 = +instrumentState.reverbShelfSample3;
-				let reverbShelfPrevInput0 = +instrumentState.reverbShelfPrevInput0;
-				let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
-				let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
-				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`
+                effectsSource += `      
+                const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.
+                const reverbDelayLine = instrumentState.reverbDelayLine;
+                instrumentState.reverbDelayLineDirty = true;
+                let reverbDelayPos = instrumentState.reverbDelayPos & reverbMask;
+
+                const reverbPreDelayLineL = instrumentState.reverbPreDelayLineL;
+                const reverbPreDelayLineR = instrumentState.reverbPreDelayLineR;
+                const preDelayMask = Config.reverbPreDelayBufferMask >>> 0;
+                let reverbPreDelayPos = instrumentState.reverbPreDelayPos & preDelayMask;
+                
+                let reverb = +instrumentState.reverbMult;
+                const reverbDelta = +instrumentState.reverbMultDelta;
+
+                const reverbDelay = +instrumentState.reverbDelay;
+                
+                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 0 ? synth.getSamplesPerTick() * 45 : 0);
+                const reverbShelfA1 = +instrumentState.reverbShelfA1;
+                const reverbShelfB0 = +instrumentState.reverbShelfB0;
+                const reverbShelfB1 = +instrumentState.reverbShelfB1;
+                let reverbShelfSample0 = +instrumentState.reverbShelfSample0;
+                let reverbShelfSample1 = +instrumentState.reverbShelfSample1;
+                let reverbShelfSample2 = +instrumentState.reverbShelfSample2;
+                let reverbShelfSample3 = +instrumentState.reverbShelfSample3;
+                let reverbShelfPrevInput0 = +instrumentState.reverbShelfPrevInput0;
+                let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
+                let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
+                let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`
+                
             }
 
             effectsSource += `
@@ -5190,16 +5198,26 @@ if (playSong && !this.countInMetronome) {
 					// Delay lengths:  3041     + 3385     + 4481  +  5477 = 16384 = 2^14
 					// Buffer offsets: 3041    -> 6426   -> 10907 -> 16384
 					const reverbDelayPos1 = (reverbDelayPos +  3041) & reverbMask;
-					const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
-					const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
-					const reverbSample0 = (reverbDelayLine[reverbDelayPos]);
-					const reverbSample1 = reverbDelayLine[reverbDelayPos1];
-					const reverbSample2 = reverbDelayLine[reverbDelayPos2];
-					const reverbSample3 = reverbDelayLine[reverbDelayPos3];
-					const reverbTemp0 = -(reverbSample0 + sampleL) + reverbSample1;
-					const reverbTemp1 = -(reverbSample0 + sampleR) - reverbSample1;
-					const reverbTemp2 = -reverbSample2 + reverbSample3;
-					const reverbTemp3 = -reverbSample2 - reverbSample3;
+                    const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
+                    const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
+                    const reverbSample0 = reverbDelayLine[reverbDelayPos];
+                    const reverbSample1 = reverbDelayLine[reverbDelayPos1];
+                    const reverbSample2 = reverbDelayLine[reverbDelayPos2];
+                    const reverbSample3 = reverbDelayLine[reverbDelayPos3];
+
+                    reverbPreDelayLineL[reverbPreDelayPos] = sampleL;
+                    reverbPreDelayLineR[reverbPreDelayPos] = sampleR;
+
+                    const preDelayPos = (reverbPreDelayPos - reverbPreDelaySamples) & preDelayMask;
+                    const delayedSampleL = reverbPreDelayLineL[preDelayPos];
+                    const delayedSampleR = reverbPreDelayLineR[preDelayPos];
+
+                    reverbPreDelayPos = (reverbPreDelayPos + 1) & preDelayMask;
+
+                    const reverbTemp0 = -(reverbSample0 + delayedSampleL) + reverbSample1;
+                    const reverbTemp1 = -(reverbSample0 + delayedSampleR) - reverbSample1;
+                    const reverbTemp2 = -reverbSample2 + reverbSample3;
+                    const reverbTemp3 = -reverbSample2 - reverbSample3;
 					const reverbShelfInput0 = (reverbTemp0 + reverbTemp2) * reverb;
 					const reverbShelfInput1 = (reverbTemp1 + reverbTemp3) * reverb;
 					const reverbShelfInput2 = (reverbTemp0 - reverbTemp2) * reverb;
@@ -5387,30 +5405,35 @@ if (playSong && !this.countInMetronome) {
 
             if (usesReverb) {
                 effectsSource += `
-				
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
-				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
-				instrumentState.reverbDelayPos = reverbDelayPos;
-				instrumentState.reverbMult = reverb;
-				
-				if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
-				if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
-				if (!Number.isFinite(reverbShelfSample2) || Math.abs(reverbShelfSample2) < epsilon) reverbShelfSample2 = 0.0;
-				if (!Number.isFinite(reverbShelfSample3) || Math.abs(reverbShelfSample3) < epsilon) reverbShelfSample3 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput0) || Math.abs(reverbShelfPrevInput0) < epsilon) reverbShelfPrevInput0 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput1) || Math.abs(reverbShelfPrevInput1) < epsilon) reverbShelfPrevInput1 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput2) || Math.abs(reverbShelfPrevInput2) < epsilon) reverbShelfPrevInput2 = 0.0;
-				if (!Number.isFinite(reverbShelfPrevInput3) || Math.abs(reverbShelfPrevInput3) < epsilon) reverbShelfPrevInput3 = 0.0;
-				instrumentState.reverbShelfSample0 = reverbShelfSample0;
-				instrumentState.reverbShelfSample1 = reverbShelfSample1;
-				instrumentState.reverbShelfSample2 = reverbShelfSample2;
-				instrumentState.reverbShelfSample3 = reverbShelfSample3;
-				instrumentState.reverbShelfPrevInput0 = reverbShelfPrevInput0;
-				instrumentState.reverbShelfPrevInput1 = reverbShelfPrevInput1;
-				instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
-				instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;`
+                            
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
+                Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
+
+                Synth.sanitizeDelayLine(reverbPreDelayLineL, reverbPreDelayPos, preDelayMask);
+                Synth.sanitizeDelayLine(reverbPreDelayLineR, reverbPreDelayPos, preDelayMask);
+
+                instrumentState.reverbDelayPos = reverbDelayPos;
+                instrumentState.reverbPreDelayPos = reverbPreDelayPos;
+                instrumentState.reverbMult = reverb;
+                
+                if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
+                if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
+                if (!Number.isFinite(reverbShelfSample2) || Math.abs(reverbShelfSample2) < epsilon) reverbShelfSample2 = 0.0;
+                if (!Number.isFinite(reverbShelfSample3) || Math.abs(reverbShelfSample3) < epsilon) reverbShelfSample3 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput0) || Math.abs(reverbShelfPrevInput0) < epsilon) reverbShelfPrevInput0 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput1) || Math.abs(reverbShelfPrevInput1) < epsilon) reverbShelfPrevInput1 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput2) || Math.abs(reverbShelfPrevInput2) < epsilon) reverbShelfPrevInput2 = 0.0;
+                if (!Number.isFinite(reverbShelfPrevInput3) || Math.abs(reverbShelfPrevInput3) < epsilon) reverbShelfPrevInput3 = 0.0;
+                instrumentState.reverbShelfSample0 = reverbShelfSample0;
+                instrumentState.reverbShelfSample1 = reverbShelfSample1;
+                instrumentState.reverbShelfSample2 = reverbShelfSample2;
+                instrumentState.reverbShelfSample3 = reverbShelfSample3;
+                instrumentState.reverbShelfPrevInput0 = reverbShelfPrevInput0;
+                instrumentState.reverbShelfPrevInput1 = reverbShelfPrevInput1;
+                instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
+                instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;`
             }
 
             effectsSource += "}";

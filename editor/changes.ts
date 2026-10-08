@@ -4958,6 +4958,16 @@ export class ChangeReverb extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeReverbDelay extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.reverbDelay = newValue;
+        doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeSongReverb extends Change {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super();
