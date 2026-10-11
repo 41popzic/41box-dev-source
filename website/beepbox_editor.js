@@ -15675,7 +15675,7 @@ html {
 }
 
 .beepboxEditor .effectContainer {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 70%, black);
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 50%, black);
 	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
 	border-radius: 6px;
 	margin: 4px 0;
@@ -15685,7 +15685,6 @@ html {
 .beepboxEditor .effectTitle {
 	color: ${ColorConfig.pitchChannels};
 	font-weight: 1000;
-	font-style: oblique 1deg;
 }
 
 .beepboxEditor .selectRow > :last-child {
@@ -17804,7 +17803,7 @@ li.select2-results__option[role=group] > strong:hover {
             }
             if (this.type != 4) {
                 instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
-                instrumentObject["fadeOutTicks"] = fadeOutSettingToTicks(this.fadeOut);
+                instrumentObject["fadeOutTicks"] = fadeOutSettingToTicks(this.fadeOut) / 10;
             }
             if (this.type != 10) {
                 instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
@@ -18025,9 +18024,7 @@ li.select2-results__option[role=group] > strong:hover {
             }
             if (instrumentObject["fadeOutTicks"] != undefined) {
                 let fadeOutTicks = +instrumentObject["fadeOutTicks"];
-                if (jsonFormat !== "41box") {
-                    fadeOutTicks *= 10;
-                }
+                fadeOutTicks *= 10;
                 this.fadeOut = ticksToFadeOutSetting(fadeOutTicks);
             }
             {

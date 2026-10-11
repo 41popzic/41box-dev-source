@@ -816,7 +816,7 @@ export class Instrument {
 
         if (this.type != InstrumentType.drumset) {
             instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
-            instrumentObject["fadeOutTicks"] = fadeOutSettingToTicks(this.fadeOut);
+            instrumentObject["fadeOutTicks"] = fadeOutSettingToTicks(this.fadeOut) / 10;
         }
 
         if (this.type != InstrumentType.mod) {
@@ -1051,10 +1051,7 @@ export class Instrument {
         }
         if (instrumentObject["fadeOutTicks"] != undefined) {
             let fadeOutTicks = +instrumentObject["fadeOutTicks"];
-
-            if (jsonFormat !== "41box") {
-                fadeOutTicks *= 10;
-            }
+            fadeOutTicks *= 10;
 
             this.fadeOut = ticksToFadeOutSetting(fadeOutTicks);
         }

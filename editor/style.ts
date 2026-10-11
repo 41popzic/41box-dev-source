@@ -1607,7 +1607,7 @@ html {
 }
 
 .beepboxEditor .effectContainer {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 70%, black);
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 50%, black);
 	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
 	border-radius: 6px;
 	margin: 4px 0;
@@ -1617,7 +1617,6 @@ html {
 .beepboxEditor .effectTitle {
 	color: ${ColorConfig.pitchChannels};
 	font-weight: 1000;
-	font-style: oblique 1deg;
 }
 
 .beepboxEditor .selectRow > :last-child {

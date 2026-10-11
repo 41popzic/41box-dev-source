@@ -58,6 +58,7 @@ import { AddSamplesPrompt } from "./AddSamplesPrompt";
 import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 // import { Selection } from "./Selection";
 import { PreferencesPrompt } from "./PreferencesPrompt";
+//import { AlertPrompt } from "./AlertPrompt";
 //import { SongTabs } from "./SongTab";
 //import { ContextMenu } from "./Context";
 
@@ -2604,6 +2605,9 @@ export class SongEditor {
 
         if (promptName) {
             switch (promptName) {
+                //case "alertPrompt":
+                //    this.prompt = new AlertPrompt(this.doc)
+                //    break;
                 case "export":
                     this.prompt = new ExportPrompt(this.doc);
                     break;
