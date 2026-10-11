@@ -22605,7 +22605,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 this.rhythm = clamp(0, Config.rhythms.length - 1, newRhythm);
                                 if (fromJummBox && beforeThree || fromBeepBox) {
-                                    const rhythmObj = (_a = Config.rhythms[this.rhythm]) !== null && _a !== void 0 ? _a : Config.rhythms[1];
+                                    const rhythmObj = (_a = Config.rhythms[this.rhythm]) !== null && _a !== void 0 ? _a : Config.rhythms[3];
                                     if (rhythmObj.stepsPerBeat == 3 || rhythmObj.stepsPerBeat == 6) {
                                         useSlowerArpSpeed = true;
                                     }
@@ -24081,7 +24081,6 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 channelIndex = 0;
                                 let bitStringLengthLength = validateRange(1, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                console.log("[41Box debug] Patterns tag begins at:", charIndex - 1);
                                 while (bitStringLengthLength > 0) {
                                     bitStringLength = bitStringLength << 6;
                                     bitStringLength += base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
