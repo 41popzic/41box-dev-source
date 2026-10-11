@@ -1877,7 +1877,7 @@ export class Song {
                     let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     this.rhythm = clamp(0, Config.rhythms.length - 1, newRhythm);
                     if (fromJummBox && beforeThree || fromBeepBox) {
-                        const rhythmObj = Config.rhythms[this.rhythm] ?? Config.rhythms[1]; // fallback ÷4
+                    const rhythmObj = Config.rhythms[this.rhythm] ?? Config.rhythms[3]; // fallback ÷4
 
                         if (rhythmObj.stepsPerBeat == 3 || rhythmObj.stepsPerBeat == 6) {
                             useSlowerArpSpeed = true;
@@ -1887,7 +1887,7 @@ export class Song {
                         }
                     }   
                 } else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeFive)) {
-                    const rhythmMap = [3, 3, 2, 3, 5, 7, 11, 23];
+                    const rhythmMap = [3, 3, 2, 3, 5, 7, 11, 23]; // Lined up to match the 41Box rhythms
                     this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]] ?? 3);
                 } else {
                     const oldRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -3373,7 +3373,6 @@ export class Song {
                 } else {
                     channelIndex = 0;
                     let bitStringLengthLength: number = validateRange(1, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    console.log("[41Box debug] Patterns tag begins at:", charIndex - 1);
                     while (bitStringLengthLength > 0) {
                         bitStringLength = bitStringLength << 6;
                         bitStringLength += base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -3803,7 +3802,7 @@ export class Song {
             default: {
                 throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
             } break;
-    }
+        }
 
 
         if (Config.willReloadForCustomSamples) {
