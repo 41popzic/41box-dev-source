@@ -62,6 +62,12 @@ export class TipPrompt implements Prompt {
 					p("This setting controls the delay of the reverb effect."),
 				);
 			} break;
+			case "reverbShelf": {
+				message = div(
+					h2("Reverb Shelf"),
+					p("This setting controls the shelf of the reverb effect."),
+				);
+			} break;
 			case "rhythm": {
 				message = div(
 					h2("Subgrid"),
@@ -124,6 +130,12 @@ export class TipPrompt implements Prompt {
 					p(`This setting controls which note of the chord your instrument will play. `),
 				);
 			} break;
+			case "strumSpeedSlider": {
+				message = div(
+					h2("Strum Speed"),
+					p("This setting controls the speed of the strum, which means how long it takes for each note to play consecutively."),
+				);
+			} break;
 			case "detune": {
 				message = div(
 					h2("Detune"),
@@ -170,6 +182,12 @@ export class TipPrompt implements Prompt {
 					p("Usually, when one note ends at the same time another begins, the old note will fade out and the new note will fade in based on the fade in/out settings, but this setting can override that, connecting the end of one note to the beginning of the next."),
 					p("The \"interrupt\" transition makes the wave suddenly change from the old note's frequency to the new note's frequency without any fading, but still restarts envelopes at the beginning of the new note. The \"continue\" transition is similar but it doesn't even restart envelopes, and can be used to make each of the notes in a chord start or stop at different times!"),
 					p("The \"slide\" transition makes the pitch shift quickly but not instantaneously from the old note's frequency to the new note's frequency, and softly restarts envelopes. The \"slide in pattern\" transition is the same except it doesn't connect the last note in a pattern to the first note in the next pattern."),
+				);
+			} break;
+			case "slideSpeedSlider": {
+				message = div(
+					h2("Slide Speed"),
+					p("This setting controls the speed of the slide transition, which means how long it takes to slide from one note to the other."),
 				);
 			} break;
 			case "chipWave": {

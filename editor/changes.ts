@@ -895,7 +895,10 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 }
                 if (Math.random() < 0.5) {
                     instrument.effects |= 1 << EffectType.reverb;
-                    instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);                
+                    instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);           
+                    instrument.reverbDelay = selectCurvedDistribution(1, Config.reverbDelayRange - 1, 1, 1);
+                    instrument.reverbShelfHz = selectCurvedDistribution(1, Config.reverbShelfHzRange, 1, 1);
+                    instrument.reverbShelfGain = selectCurvedDistribution(1, Config.reverbShelfGainRange, 1, 1)
                 }
              
             }
@@ -3621,6 +3624,28 @@ export class ChangeLoop extends Change {
     }
 }
 
+export class ChangeSlideSpeed extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        if (oldValue != newValue) this._didSomething();
+
+        newValue = Config.maxSlideTicks + 1 - newValue;
+        this._instrument.slideTicks = newValue;
+        //doc.synth.unsetMod(Config.modulators.dictionary["slide speed"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+    }
+}
+
+export class ChangeStrumSpeed extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.strumParts = newValue;
+        //doc.synth.unsetMod(Config.modulators.dictionary["strum speed"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangePitchAdded extends UndoableChange {
     private _doc: SongDocument;
     private _note: Note;
@@ -4962,7 +4987,27 @@ export class ChangeReverbDelay extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.reverbDelay = newValue;
-        doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
+        //doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeReverbShelfHz extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.reverbShelfHz = newValue;
+        //doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeReverbShelfGain extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.reverbShelfGain = newValue;
+        //doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

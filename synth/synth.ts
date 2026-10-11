@@ -4589,9 +4589,9 @@ if (playSong && !this.countInMetronome) {
 
             if (usesGranular) {
                 effectsSource += `
-                let granularWet = instrumentState.granularMix;
+                let granularWet = instrumentState.granularMix / 2; // Gralunar is *2 as fast on 41Box for some reason???
                 const granularMixDelta = instrumentState.granularMixDelta;
-                let granularDry = 1.0 - granularWet; 
+                let granularDry = 1.0 - (granularWet * 2); 
                 const granularDelayLine = instrumentState.granularDelayLine;
                 const granularGrains = instrumentState.granularGrains;
                 let granularGrainCount = instrumentState.granularGrainsLength;
@@ -4844,8 +4844,10 @@ if (playSong && !this.countInMetronome) {
                 const reverbDelta = +instrumentState.reverbMultDelta;
 
                 const reverbDelay = +instrumentState.reverbDelay;
+
+                //const reverbFeedback = 0.45;
                 
-                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 0 ? synth.getSamplesPerTick() * 45 : 0);
+                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 1 ? synth.getSamplesPerTick() * 80 : 0);
                 const reverbShelfA1 = +instrumentState.reverbShelfA1;
                 const reverbShelfB0 = +instrumentState.reverbShelfB0;
                 const reverbShelfB1 = +instrumentState.reverbShelfB1;
@@ -5235,8 +5237,8 @@ if (playSong && !this.countInMetronome) {
 					reverbDelayLine[reverbDelayPos3] = reverbShelfSample2 * delayInputMult;
 					reverbDelayLine[reverbDelayPos ] = reverbShelfSample3 * delayInputMult;
 					reverbDelayPos = (reverbDelayPos + 1) & reverbMask;
-					sampleL += reverbSample1 + reverbSample2 + reverbSample3;
-					sampleR += reverbSample0 + reverbSample2 - reverbSample3;
+					sampleL += (reverbSample1 + reverbSample2 + reverbSample3) * 1;
+					sampleR += (reverbSample0 + reverbSample2 - reverbSample3) * 1;
 					reverb += reverbDelta;`
             }
 

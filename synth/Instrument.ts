@@ -283,6 +283,8 @@ export class Instrument {
     public chorus: number = 0;
     public reverb: number = 0;
     public reverbDelay: number = 0;
+    public reverbShelfHz: number = 32;
+    public reverbShelfGain: number = 6;
     public echoSustain: number = 0;
     public echoDelay: number = 0;
 
@@ -296,6 +298,8 @@ export class Instrument {
     public flangerRate: number = 0;
     public flangerFeedback: number = 0;
     public flangerMix: number = 0;
+
+    public slideTicks: number = 0;
 
     public algorithm: number = 0;
     public feedbackType: number = 0;
@@ -394,6 +398,8 @@ export class Instrument {
         this.chorus = Config.chorusRange - 1;
         this.reverb = 0;
         this.reverbDelay = 0;
+        this.reverbShelfHz = 32;
+        this.reverbShelfGain = 6;
         this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
         this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
         this.eqFilter.reset();
@@ -431,6 +437,9 @@ export class Instrument {
         this.flangerRate = 3;
         this.flangerFeedback = 13;
         this.flangerMix = 26;
+
+        this.slideTicks = 3;
+        this.strumParts = 10;
 
         this.pan = Config.panCenter;
         this.panDelay = 0;
@@ -714,6 +723,7 @@ export class Instrument {
         if (effectsIncludeTransition(this.effects)) {
             instrumentObject["transition"] = Config.transitions[this.transition].name;
             instrumentObject["clicklessTransition"] = this.clicklessTransition;
+            if (Config.transitions[this.transition].slides == true) instrumentObject["slideTicks"] = this.slideTicks;
         }
         if (effectsIncludeChord(this.effects)) {
             instrumentObject["chord"] = this.getChord().name;
@@ -795,11 +805,13 @@ export class Instrument {
             instrumentObject["flangerDepth"] = this.flangerDepth;
             instrumentObject["flangerRate"] = this.flangerRate;
             instrumentObject["flangerFeedback"] = this.flangerFeedback;
-            instrumentObject["flangerMix"] = Math.round(100  * this.flangerMix / (Config.flangerMixRange - 1));
+            instrumentObject["flangerMix"] = Math.round(100 * this.flangerMix / (Config.flangerMixRange - 1));
         }
         if (effectsIncludeReverb(this.effects)) {
             instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
             instrumentObject["reverbDelay"] = this.reverbDelay;
+            instrumentObject["reverbShelfHz"] = this.reverbShelfHz;
+            instrumentObject["reverbShelfGain"] = this.reverbShelfGain;
         }
 
         if (this.type != InstrumentType.drumset) {
@@ -1030,7 +1042,9 @@ export class Instrument {
                 this.effects = (this.effects | (1 << EffectType.transition));
             }
         }
-
+        if (instrumentObject["slideTicks"] != undefined) {
+            this.slideTicks = instrumentObject["slideTicks"];
+        }  
         // Overrides legacy settings in transition above.
         if (instrumentObject["fadeInSeconds"] != undefined) {
             this.fadeIn = secondsToFadeInSetting(+instrumentObject["fadeInSeconds"]);
@@ -1266,10 +1280,14 @@ export class Instrument {
 
         if (instrumentObject["reverb"] != undefined) {
             this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
-            this.reverbDelay = clamp(0, Config.reverbDelayRange,instrumentObject["reverbDelay"] | 0);
+            this.reverbDelay = clamp(0, Config.reverbDelayRange - 1, Math.round((Config.reverbDelayRange - 1) * (instrumentObject["reverbDelay"] | 0) / 100));
+            this.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, instrumentObject["reverbShelfHz"] ?? 32);
+            this.reverbShelfGain = clamp(0, Config.reverbShelfGainRange, instrumentObject["reverbShelfGain"] ?? 6);
         } else {
             this.reverb = legacyGlobalReverb;
             this.reverbDelay = 0;
+            this.reverbShelfHz = 32;
+            this.reverbShelfGain = 6;
         }
 
         if (instrumentObject["pulseWidth"] != undefined) {

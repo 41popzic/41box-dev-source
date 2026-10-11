@@ -69,7 +69,6 @@ export const enum EnvelopeType {
     rise,
     blip,
     fall, //slarmoo's box 1.2
-    sidechain, //41box 1.3
     //add new envelope types here
 }
 
@@ -173,7 +172,6 @@ export const enum EnvelopeComputeIndex {
     //flangerDepth,
     //flangerRate,
     flangerMix,
-    reverbDelay,
 
     //Add more here
 
@@ -910,7 +908,6 @@ export class Config {
     // public static thurmboxImportUrl: string = "https://file.garden/ZMQ0Om5nmTe-x2hq/PandoraArchive%20Samples/";
 
     public static readonly scales: DictionaryArray<Scale> = toNameMap([
-
         //                                                                 C     Db    D     Eb     E     F     F#    G     Ab    A     Bb    B    C (repeats)    
         { group: "standard", name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] }, // Free
         { group: "standard", name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] }, // Major
@@ -971,19 +968,23 @@ export class Config {
     public static readonly tempoMax: number = 500;
     public static readonly octaveMin: number = -2;
     public static readonly octaveMax: number = 2;
-    public static readonly echoDelayRange: number = 48;
+    public static readonly echoDelayRange: number = 24;
     public static readonly echoDelayStepTicks: number = 40;
     public static readonly echoSustainRange: number = 8;
     public static readonly echoShelfHz: number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes.
     public static readonly echoShelfGain: number = Math.pow(2.0, -0.5);
-    public static readonly reverbShelfHz: number = 8000.0; // The cutoff freq of the shelf filter that is used to decay reverb.
-    public static readonly reverbShelfGain: number = Math.pow(2.0, -1.5);
+    //public static readonly reverbShelfHz: number = 8000; // The cutoff freq of the shelf filter that is used to decay reverb.
+    public static readonly reverbShelfHzRange: number = 52;
+    public static readonly reverbShelfHzStepTicks: number = 250;
+    //public static readonly reverbShelfGain: number = Math.pow(2.0, -1.5);
+    public static readonly reverbShelfGainRange: number = 27;
+    public static readonly reverbShelfGainStepDb: number = 0.5;
     public static readonly reverbRange: number = 32;
     public static readonly reverbPreDelayBufferSize: number = 131072;
     public static readonly reverbPreDelayBufferMask: number = Config.reverbPreDelayBufferSize - 1;
     public static readonly reverbDelayBufferSize: number = 16384; // TODO: Compute a buffer size based on sample rate.
     public static readonly reverbDelayBufferMask: number = Config.reverbDelayBufferSize - 1; // TODO: Compute a buffer size based on sample rate.
-    public static readonly reverbDelayRange: number = 48; // The delay between dry and wet
+    public static readonly reverbDelayRange: number = 24; // The delay between dry and wet
     public static readonly reverbDelayStepTicks: number = Config.echoDelayStepTicks; // hehe I stole echo
     public static readonly phaserMixRange: number = 32; 
     public static readonly phaserFeedbackRange: number = 32; 
@@ -997,6 +998,8 @@ export class Config {
     public static readonly flangerRateRange: number = 57;
     public static readonly flangerFeedbackRange: number = 32;
     public static readonly flangerMixRange: number = 51;
+    public static readonly maxSlideTicks: number = 48;
+    public static readonly maxStrumSpeed: number = 48;
     public static readonly beatsPerBarMin: number = 1;
     public static readonly beatsPerBarMax: number = 64;
     public static readonly barCountMin: number = 1;
@@ -1041,8 +1044,8 @@ export class Config {
         { name: "÷30", stepsPerBeat: 30, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 		{ name: "÷31", stepsPerBeat: 31, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 		{ name: "÷32", stepsPerBeat: 32, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		//{ name: "÷120", stepsPerBeat: 120, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-        //{ name: "÷240", stepsPerBeat: 240, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+		{ name: "÷120", stepsPerBeat: 120, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷240", stepsPerBeat: 240, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
     ]);
 
 
@@ -1280,8 +1283,8 @@ export class Config {
         { name: "extraterrestrial", voices: 6, spread: 15.2,     offset: -6,      expression: 0.35,  sign:  0.7 }, // slarmoo's box
         { name: "bow",              voices: 9, spread: 0.006,    offset:  0,      expression: 0.15,  sign:  0.5 }, // slarmoo's box
 
-        { name: "triple octave",    voices: 4, spread: 18,       offset:  18,     expression: 0.6,   sign:  1.0 }, // jukebox 
-        { name: "triple fifth",     voices: 4, spread: 10.6,     offset:  10.5,   expression: 0.6,   sign:  1.0 }, // 41box
+        { name: "triple octave",    voices: 3, spread: 12,       offset:  12,     expression: 0.5,   sign:  1.0 }, // jukebox 
+        { name: "triple fifth",     voices: 3, spread: 7,        offset:  7,      expression: 0.5,   sign:  1.0 }, // 41box
 
         { name: "vary",             voices: 2, spread: 0.002,    offset:  0.0,    expression: 0.85,  sign:  1.6 }, // midbox
         { name: "hold",             voices: 2, spread: 0.003,    offset:  0.0,    expression: 0.8,   sign: -2.5 }, // midbox
@@ -1297,9 +1300,6 @@ export class Config {
         { name: "deep shift",       voices: 2, spread: 12.03,    offset: -17.01,  expression: 0.85,  sign:  1.2 }, // midbox
         { name: "buried",           voices: 2, spread: 0.036,    offset: -36.0,   expression: 1.4,   sign:  1.0 }, // midbox
         { name: "corrupt",          voices: 2, spread: 18.0,     offset:  48.0,   expression: 0.7,   sign:  0.7 }, // midbox
-
-        { name: "double octave",    voices: 3, spread: 12,       offset:  12,     expression: 0.7,   sign:  1.0 }, // jukebox 
-        { name: "double fifth",     voices: 3, spread: 7,        offset:  7,      expression: 0.7,   sign:  1.0 }, // 41box
 
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
@@ -1866,7 +1866,6 @@ export class Config {
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         */
         { name: "flangerMix", computeIndex: EnvelopeComputeIndex.flangerMix, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.flanger, compatibleInstruments: null },
-        { name: "reverbDelay", computeIndex: EnvelopeComputeIndex.reverbDelay, displayName: "reverb delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.reverb, compatibleInstruments: null },
 
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
@@ -2024,8 +2023,6 @@ export class Config {
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         {name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: Config.flangerMixRange - 1, newNoteVol: Math.ceil((Config.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: EffectType.flanger, maxIndex: 0, 
             promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"]},
-        { name: "reverb delay", pianoName: "Reverb Delay", maxRawVol: Config.reverbDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.reverb, maxIndex: 0,
-            promptName: "Reverb Delay", promptDesc: [ "This setting controls the delay of your reverb on your instrument", "At $LO, your instrument will have no reverb. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
         ]);
 }
 

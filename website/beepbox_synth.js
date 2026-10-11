@@ -531,19 +531,21 @@ var beepbox = (function (exports) {
     Config.tempoMax = 500;
     Config.octaveMin = -2;
     Config.octaveMax = 2;
-    Config.echoDelayRange = 48;
+    Config.echoDelayRange = 24;
     Config.echoDelayStepTicks = 40;
     Config.echoSustainRange = 8;
     Config.echoShelfHz = 4000.0;
     Config.echoShelfGain = Math.pow(2.0, -0.5);
-    Config.reverbShelfHz = 8000.0;
-    Config.reverbShelfGain = Math.pow(2.0, -1.5);
+    Config.reverbShelfHzRange = 52;
+    Config.reverbShelfHzStepTicks = 250;
+    Config.reverbShelfGainRange = 27;
+    Config.reverbShelfGainStepDb = 0.5;
     Config.reverbRange = 32;
     Config.reverbPreDelayBufferSize = 131072;
     Config.reverbPreDelayBufferMask = _a.reverbPreDelayBufferSize - 1;
     Config.reverbDelayBufferSize = 16384;
     Config.reverbDelayBufferMask = _a.reverbDelayBufferSize - 1;
-    Config.reverbDelayRange = 48;
+    Config.reverbDelayRange = 24;
     Config.reverbDelayStepTicks = _a.echoDelayStepTicks;
     Config.phaserMixRange = 32;
     Config.phaserFeedbackRange = 32;
@@ -557,6 +559,8 @@ var beepbox = (function (exports) {
     Config.flangerRateRange = 57;
     Config.flangerFeedbackRange = 32;
     Config.flangerMixRange = 51;
+    Config.maxSlideTicks = 48;
+    Config.maxStrumSpeed = 48;
     Config.beatsPerBarMin = 1;
     Config.beatsPerBarMax = 64;
     Config.barCountMin = 1;
@@ -601,6 +605,8 @@ var beepbox = (function (exports) {
         { name: "÷30", stepsPerBeat: 30, roundUpThresholds: null },
         { name: "÷31", stepsPerBeat: 31, roundUpThresholds: null },
         { name: "÷32", stepsPerBeat: 32, roundUpThresholds: null },
+        { name: "÷120", stepsPerBeat: 120, roundUpThresholds: null },
+        { name: "÷240", stepsPerBeat: 240, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
     Config.instrumentTypeHasSpecialInterval = [true, true, false, false, false, true, false, false, false, false, false];
@@ -795,8 +801,8 @@ var beepbox = (function (exports) {
         { name: "block", voices: 9, spread: 6, offset: 6, expression: 0.15, sign: 0.8 },
         { name: "extraterrestrial", voices: 6, spread: 15.2, offset: -6, expression: 0.35, sign: 0.7 },
         { name: "bow", voices: 9, spread: 0.006, offset: 0, expression: 0.15, sign: 0.5 },
-        { name: "triple octave", voices: 4, spread: 18, offset: 18, expression: 0.6, sign: 1.0 },
-        { name: "triple fifth", voices: 4, spread: 10.6, offset: 10.5, expression: 0.6, sign: 1.0 },
+        { name: "triple octave", voices: 3, spread: 12, offset: 12, expression: 0.5, sign: 1.0 },
+        { name: "triple fifth", voices: 3, spread: 7, offset: 7, expression: 0.5, sign: 1.0 },
         { name: "vary", voices: 2, spread: 0.002, offset: 0.0, expression: 0.85, sign: 1.6 },
         { name: "hold", voices: 2, spread: 0.003, offset: 0.0, expression: 0.8, sign: -2.5 },
         { name: "weird octave", voices: 2, spread: 5.85, offset: 5.85, expression: 0.75, sign: 1.0 },
@@ -811,8 +817,6 @@ var beepbox = (function (exports) {
         { name: "deep shift", voices: 2, spread: 12.03, offset: -17.01, expression: 0.85, sign: 1.2 },
         { name: "buried", voices: 2, spread: 0.036, offset: -36.0, expression: 1.4, sign: 1.0 },
         { name: "corrupt", voices: 2, spread: 18.0, offset: 48.0, expression: 0.7, sign: 0.7 },
-        { name: "double octave", voices: 3, spread: 12, offset: 12, expression: 0.7, sign: 1.0 },
-        { name: "double fifth", voices: 3, spread: 7, offset: 7, expression: 0.7, sign: 1.0 },
     ]);
     Config.customUnisonIndex = 63;
     Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "flanger",];
@@ -1263,7 +1267,6 @@ var beepbox = (function (exports) {
         { name: "grainRange", computeIndex: 54, displayName: "grain range", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: 55, displayName: "echo delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
         { name: "flangerMix", computeIndex: 56, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15, compatibleInstruments: null },
-        { name: "reverbDelay", computeIndex: 57, displayName: "reverb delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: _a.sineWave },
@@ -1406,8 +1409,6 @@ var beepbox = (function (exports) {
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
         { name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: _a.flangerMixRange - 1, newNoteVol: Math.ceil((_a.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: 0,
             promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"] },
-        { name: "reverb delay", pianoName: "Reverb Delay", maxRawVol: _a.reverbDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 0, maxIndex: 0,
-            promptName: "Reverb Delay", promptDesc: ["This setting controls the delay of your reverb on your instrument", "At $LO, your instrument will have no reverb. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -2890,6 +2891,8 @@ var beepbox = (function (exports) {
             this.chorus = 0;
             this.reverb = 0;
             this.reverbDelay = 0;
+            this.reverbShelfHz = 32;
+            this.reverbShelfGain = 6;
             this.echoSustain = 0;
             this.echoDelay = 0;
             this.flangerDelay = 0;
@@ -2897,6 +2900,7 @@ var beepbox = (function (exports) {
             this.flangerRate = 0;
             this.flangerFeedback = 0;
             this.flangerMix = 0;
+            this.slideTicks = 0;
             this.algorithm = 0;
             this.feedbackType = 0;
             this.algorithm6Op = 1;
@@ -2960,6 +2964,8 @@ var beepbox = (function (exports) {
             this.chorus = Config.chorusRange - 1;
             this.reverb = 0;
             this.reverbDelay = 0;
+            this.reverbShelfHz = 32;
+            this.reverbShelfGain = 6;
             this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
             this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
             this.eqFilter.reset();
@@ -2991,6 +2997,8 @@ var beepbox = (function (exports) {
             this.flangerRate = 3;
             this.flangerFeedback = 13;
             this.flangerMix = 26;
+            this.slideTicks = 3;
+            this.strumParts = 10;
             this.pan = Config.panCenter;
             this.panDelay = 0;
             this.pitchShift = Config.pitchShiftCenter;
@@ -3246,6 +3254,8 @@ var beepbox = (function (exports) {
             if (effectsIncludeTransition(this.effects)) {
                 instrumentObject["transition"] = Config.transitions[this.transition].name;
                 instrumentObject["clicklessTransition"] = this.clicklessTransition;
+                if (Config.transitions[this.transition].slides == true)
+                    instrumentObject["slideTicks"] = this.slideTicks;
             }
             if (effectsIncludeChord(this.effects)) {
                 instrumentObject["chord"] = this.getChord().name;
@@ -3326,6 +3336,8 @@ var beepbox = (function (exports) {
             if (effectsIncludeReverb(this.effects)) {
                 instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
                 instrumentObject["reverbDelay"] = this.reverbDelay;
+                instrumentObject["reverbShelfHz"] = this.reverbShelfHz;
+                instrumentObject["reverbShelfGain"] = this.reverbShelfGain;
             }
             if (this.type != 4) {
                 instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
@@ -3473,6 +3485,7 @@ var beepbox = (function (exports) {
             return instrumentObject;
         }
         fromJsonObject(instrumentObject, isNoiseChannel, isModChannel, useSlowerRhythm, useFastTwoNoteArp, legacyGlobalReverb = 0, jsonFormat = Config.jsonFormat) {
+            var _a, _b;
             if (instrumentObject == undefined)
                 instrumentObject = {};
             const format = jsonFormat.toLowerCase();
@@ -3540,6 +3553,9 @@ var beepbox = (function (exports) {
                 if (this.transition != Config.transitions.dictionary["normal"].index) {
                     this.effects = (this.effects | (1 << 10));
                 }
+            }
+            if (instrumentObject["slideTicks"] != undefined) {
+                this.slideTicks = instrumentObject["slideTicks"];
             }
             if (instrumentObject["fadeInSeconds"] != undefined) {
                 this.fadeIn = secondsToFadeInSetting(+instrumentObject["fadeInSeconds"]);
@@ -3746,11 +3762,15 @@ var beepbox = (function (exports) {
             }
             if (instrumentObject["reverb"] != undefined) {
                 this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
-                this.reverbDelay = clamp(0, Config.reverbDelayRange, instrumentObject["reverbDelay"] | 0);
+                this.reverbDelay = clamp(0, Config.reverbDelayRange - 1, Math.round((Config.reverbDelayRange - 1) * (instrumentObject["reverbDelay"] | 0) / 100));
+                this.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, (_a = instrumentObject["reverbShelfHz"]) !== null && _a !== void 0 ? _a : 32);
+                this.reverbShelfGain = clamp(0, Config.reverbShelfGainRange, (_b = instrumentObject["reverbShelfGain"]) !== null && _b !== void 0 ? _b : 6);
             }
             else {
                 this.reverb = legacyGlobalReverb;
                 this.reverbDelay = 0;
+                this.reverbShelfHz = 32;
+                this.reverbShelfGain = 6;
             }
             if (instrumentObject["pulseWidth"] != undefined) {
                 this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
@@ -4631,7 +4651,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 58;
+            const length = 57;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -4725,7 +4745,8 @@ var beepbox = (function (exports) {
                     const noteEndTick = tone.noteEndPart * Config.ticksPerPart;
                     const noteLengthTicks = noteEndTick - noteStartTick;
                     const maximumSlideTicks = noteLengthTicks * 0.5;
-                    const slideTicks = Math.min(maximumSlideTicks, transition.slideTicks) * 10;
+                    let slideTicks = instrument.slideTicks * 10;
+                    slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
                     if (tone.prevNote != null && !tone.forceContinueAtStart) {
                         if (tickTimeStartReal - noteStartTick < slideTicks) {
                             prevSlideStart = true;
@@ -5096,8 +5117,6 @@ var beepbox = (function (exports) {
                         return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1.0 - envelopeSpeed * time / 2, 0)) + perEnvelopeLowerBound);
                     }
                 }
-                case 16:
-                    return perEnvelopeUpperBound - boundAdjust / (2.0 + time * envelopeSpeed);
                 default: throw new Error("Unrecognized operator envelope type.");
             }
         }
@@ -5706,7 +5725,7 @@ var beepbox = (function (exports) {
                 const granularDelayLineSizeInMilliseconds = 2500;
                 const granularDelayLineSizeInSeconds = granularDelayLineSizeInMilliseconds / 1000;
                 this.granularMaximumDelayTimeInSeconds = granularDelayLineSizeInSeconds;
-                const granularDelayLineSizeInSamples = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * synth.samplesPerSecond));
+                const granularDelayLineSizeInSamples = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * (synth.samplesPerSecond)));
                 if (this.granularDelayLine == null || this.granularDelayLine.length != granularDelayLineSizeInSamples) {
                     this.granularDelayLine = new Float32Array(granularDelayLineSizeInSamples);
                     this.granularDelayLineIndex = 0;
@@ -6243,8 +6262,14 @@ var beepbox = (function (exports) {
                 this.reverbMult = reverbStart;
                 this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;
                 maxReverbMult = Math.max(reverbStart, reverbEnd);
-                const shelfRadians = 2.0 * Math.PI * Config.reverbShelfHz / synth.samplesPerSecond;
-                Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, Config.reverbShelfGain);
+                const shelfRadians = 2.0 * Math.PI * (instrument.reverbShelfHz * Config.reverbShelfHzStepTicks) / synth.samplesPerSecond;
+                const shelfGainDb = (instrument.reverbShelfGain - 24) * Config.reverbShelfGainStepDb;
+                const shelfLinearGain = Math.pow(10, shelfGainDb / 20);
+                Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, shelfLinearGain);
+                this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
+                this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
+                this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
+                this.reverbDelay = instrument.reverbDelay;
                 this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
                 this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
                 this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
@@ -6281,7 +6306,7 @@ var beepbox = (function (exports) {
                     const attenuationPerSecond = Math.pow(averageMult, 1.0 / averageReverbDelaySeconds);
                     const halfLife = -1.0 / Math.log2(attenuationPerSecond);
                     const reverbDuration = halfLife * halfLifeMult;
-                    delayDuration += reverbDuration;
+                    delayDuration += reverbDuration + Math.max(0, this.reverbDelay * Config.reverbDelayStepTicks - (this.reverbDelay > 1 ? 80 : 0)) * samplesPerTick / samplesPerSecond;
                 }
                 if (usesGranular) {
                     this.computeGrains = false;
@@ -7245,8 +7270,7 @@ var beepbox = (function (exports) {
                     if (!Config.modulators[currentIndex].forSong && instrument.modInstruments[modCount] < this.channels[instrument.modChannels[modCount]].instruments.length) {
                         let chorusIndex = Config.modulators.dictionary["chorus"].index;
                         let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
-                        let reverbIndex = Config.modulators.dictionary["reverb"].index;
-                        let reverbDelayIndex = Config.modulators.dictionary["reverbDelay"].index;
+                        let reverbMixIndex = Config.modulators.dictionary["reverb"].index;
                         let panningIndex = Config.modulators.dictionary["pan"].index;
                         let panDelayIndex = Config.modulators.dictionary["pan delay"].index;
                         let distortionIndex = Config.modulators.dictionary["distortion"].index;
@@ -7275,11 +7299,8 @@ var beepbox = (function (exports) {
                             case chorusIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].chorus - Config.modulators[chorusIndex].convertRealFactor;
                                 break;
-                            case reverbIndex:
-                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbIndex].convertRealFactor;
-                                break;
-                            case reverbDelayIndex:
-                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverbDelay - Config.modulators[reverbDelayIndex].convertRealFactor;
+                            case reverbMixIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbMixIndex].convertRealFactor;
                                 break;
                             case panningIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pan - Config.modulators[panningIndex].convertRealFactor;
@@ -7660,6 +7681,8 @@ var beepbox = (function (exports) {
                     }
                     if (effectsIncludeTransition(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.transition]);
+                        if (Config.transitions[instrument.transition].slides == true)
+                            buffer.push(base64IntToCharCode[instrument.slideTicks]);
                     }
                     if (effectsIncludeChord(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.chord]);
@@ -7669,6 +7692,9 @@ var beepbox = (function (exports) {
                         }
                         if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
                             buffer.push(base64IntToCharCode[instrument.monoChordTone]);
+                        }
+                        if (Config.chords[instrument.chord].strumParts > 0) {
+                            buffer.push(base64IntToCharCode[instrument.strumParts]);
                         }
                     }
                     if (effectsIncludePitchShift(instrument.effects)) {
@@ -7713,6 +7739,8 @@ var beepbox = (function (exports) {
                     if (effectsIncludeReverb(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.reverb]);
                         buffer.push(base64IntToCharCode[instrument.reverbDelay]);
+                        buffer.push(base64IntToCharCode[instrument.reverbShelfHz]);
+                        buffer.push(base64IntToCharCode[instrument.reverbShelfGain]);
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.granular]);
@@ -8153,7 +8181,7 @@ var beepbox = (function (exports) {
             return Config.envelopes[clamp(0, Config.envelopes.length, legacyIndex)];
         }
         fromBase64String(compressed, jsonFormat = "auto") {
-            var _a;
+            var _a, _b, _c;
             if (compressed == null || compressed == "") {
                 Song._clearSamples();
                 this.initToDefault(true);
@@ -8350,9 +8378,19 @@ var beepbox = (function (exports) {
                     case 115:
                         {
                             this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                            if (this.scale == Config.scales["dictionary"]["Custom"].index) {
-                                for (var i = 1; i < Config.pitchesPerOctave; i++) {
-                                    this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+                            if (from41Box) {
+                                if (this.scale == Config.scales["dictionary"]["Custom"].index) {
+                                    for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                                        this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+                                    }
+                                }
+                            }
+                            else {
+                                if (this.scale == Config.scales["dictionary"]["Test Scale (TB)"].index) {
+                                    this.scale = Config.scales["dictionary"]["Custom"].index;
+                                    for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                                        this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+                                    }
                                 }
                             }
                             if (fromBeepBox)
@@ -8518,7 +8556,7 @@ var beepbox = (function (exports) {
                         {
                             if (!fromUltraBox && !fromSlarmoosBox && !from41Box) {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
+                                this.rhythm = clamp(0, Config.rhythms.length - 1, newRhythm);
                                 if (fromJummBox && beforeThree || fromBeepBox) {
                                     const rhythmObj = (_a = Config.rhythms[this.rhythm]) !== null && _a !== void 0 ? _a : Config.rhythms[1];
                                     if (rhythmObj.stepsPerBeat == 3 || rhythmObj.stepsPerBeat == 6) {
@@ -8529,12 +8567,20 @@ var beepbox = (function (exports) {
                                     }
                                 }
                             }
-                            else if (((fromSlarmoosBox && beforeFour) || !from41Box) || (fromUltraBox && beforeFive)) {
-                                const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
-                                this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
+                            else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeFive)) {
+                                const rhythmMap = [3, 3, 2, 3, 5, 7, 11, 23];
+                                this.rhythm = clamp(0, Config.rhythms.length - 1, (_b = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]) !== null && _b !== void 0 ? _b : 3);
                             }
                             else {
-                                this.rhythm = clamp(0, Config.rhythms.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                const oldRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                if ((!from41Box) || beforeTwo) {
+                                    const rhythmMap = (!fromUltraBox && !fromSlarmoosBox && !from41Box) ? [2, 3, 5, 7, 23] : [2, 3, 5, 7, 11, 23];
+                                    this.rhythm = (_c = rhythmMap[oldRhythm]) !== null && _c !== void 0 ? _c : 3;
+                                }
+                                else {
+                                    this.rhythm = oldRhythm;
+                                }
+                                this.rhythm = clamp(0, Config.rhythms.length - 1, this.rhythm);
                             }
                         }
                         break;
@@ -9181,7 +9227,11 @@ var beepbox = (function (exports) {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                const unisonLength = from41Box ? (beforeThree ? 27 : beforeFour ? 49 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
+                                const unisonLength = from41Box
+                                    ? (beforeTwo ? 27 : beforeFour ? 49 : Config.unisons.length)
+                                    : fromSlarmoosBox
+                                        ? (beforeFive ? 27 : 33)
+                                        : 27;
                                 if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                                     instrument.unison = Config.unisons.length;
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -9314,6 +9364,10 @@ var beepbox = (function (exports) {
                                 }
                                 if (effectsIncludeTransition(instrument.effects)) {
                                     instrument.transition = clamp(0, Config.transitions.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    if ((fromUltraBox && !beforeSix) || (from41Box && !beforeFour)) {
+                                        if (Config.transitions[instrument.transition].slides == true)
+                                            instrument.slideTicks = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    }
                                 }
                                 if (effectsIncludeChord(instrument.effects)) {
                                     instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -9323,6 +9377,9 @@ var beepbox = (function (exports) {
                                     }
                                     if (instrument.chord == Config.chords.dictionary["monophonic"].index && ((fromSlarmoosBox && !beforeFive) || from41Box)) {
                                         instrument.monoChordTone = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    }
+                                    if (Config.chords[instrument.chord].strumParts > 0 && (from41Box && !beforeFour)) {
+                                        instrument.strumParts = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     }
                                 }
                                 if (effectsIncludePitchShift(instrument.effects)) {
@@ -9394,11 +9451,17 @@ var beepbox = (function (exports) {
                                     if (fromBeepBox) {
                                         instrument.reverb = clamp(0, Config.reverbRange, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * Config.reverbRange / 3.0));
                                         instrument.reverbDelay = 0;
+                                        instrument.reverbShelfHz = 32;
+                                        instrument.reverbShelfGain = 6;
                                     }
                                     else {
                                         instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                        if (!beforeFour)
+                                        if (!beforeFour && from41Box)
                                             instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        if (!beforeFour && from41Box)
+                                            instrument.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        if (!beforeFour && from41Box)
+                                            instrument.reverbShelfGain = clamp(0, Config.reverbShelfGainRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     }
                                 }
                                 if (effectsIncludeGranular(instrument.effects)) {
@@ -9960,6 +10023,7 @@ var beepbox = (function (exports) {
                             let largerChords = !((beforeFour && fromJummBox) || fromBeepBox);
                             let recentPitchBitLength = (largerChords ? 4 : 3);
                             let recentPitchLength = (largerChords ? 16 : 8);
+                            let useFortyOneScale = !from41Box ? 10 : 1;
                             if (beforeThree && fromBeepBox) {
                                 channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 charIndex++;
@@ -9970,6 +10034,7 @@ var beepbox = (function (exports) {
                             else {
                                 channelIndex = 0;
                                 let bitStringLengthLength = validateRange(1, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                console.log("[41Box debug] Patterns tag begins at:", charIndex - 1);
                                 while (bitStringLengthLength > 0) {
                                     bitStringLength = bitStringLength << 6;
                                     bitStringLength += base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -10113,7 +10178,7 @@ var beepbox = (function (exports) {
                                         if (!useOldShape && !newNote) {
                                             if (isModChannel) {
                                                 const isBackwards = bits.read(1) == 1;
-                                                const restLength = bits.readPartDuration();
+                                                const restLength = bits.readPartDuration() * useFortyOneScale;
                                                 if (isBackwards) {
                                                     curPart -= restLength;
                                                 }
@@ -10124,7 +10189,7 @@ var beepbox = (function (exports) {
                                             else {
                                                 const restLength = (beforeSeven && fromBeepBox)
                                                     ? bits.readLegacyPartDuration() * Config.partsPerBeat / Config.rhythms[this.rhythm].stepsPerBeat
-                                                    : bits.readPartDuration();
+                                                    : bits.readPartDuration() * useFortyOneScale;
                                                 curPart += restLength;
                                             }
                                         }
@@ -10169,7 +10234,7 @@ var beepbox = (function (exports) {
                                                         shape.bendCount++;
                                                     shape.length += (beforeSeven && fromBeepBox)
                                                         ? bits.readLegacyPartDuration() * Config.partsPerBeat / Config.rhythms[this.rhythm].stepsPerBeat
-                                                        : bits.readPartDuration();
+                                                        : bits.readPartDuration() * (from41Box ? 1 : 10);
                                                     pinObj.time = shape.length;
                                                     if (fromBeepBox) {
                                                         pinObj.size = bits.read(2) * 2;
@@ -15222,9 +15287,9 @@ var beepbox = (function (exports) {
                 }
                 if (usesGranular) {
                     effectsSource += `
-                let granularWet = instrumentState.granularMix;
+                let granularWet = instrumentState.granularMix / 2; // Gralunar is *2 as fast on 41Box for some reason???
                 const granularMixDelta = instrumentState.granularMixDelta;
-                let granularDry = 1.0 - granularWet; 
+                let granularDry = 1.0 - (granularWet * 2); 
                 const granularDelayLine = instrumentState.granularDelayLine;
                 const granularGrains = instrumentState.granularGrains;
                 let granularGrainCount = instrumentState.granularGrainsLength;
@@ -15437,8 +15502,10 @@ var beepbox = (function (exports) {
                 const reverbDelta = +instrumentState.reverbMultDelta;
 
                 const reverbDelay = +instrumentState.reverbDelay;
+
+                //const reverbFeedback = 0.45;
                 
-                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 0 ? synth.getSamplesPerTick() * 45 : 0);
+                const reverbPreDelaySamples = reverbDelay * Config.reverbDelayStepTicks * synth.getSamplesPerTick() - (reverbDelay > 1 ? synth.getSamplesPerTick() * 80 : 0);
                 const reverbShelfA1 = +instrumentState.reverbShelfA1;
                 const reverbShelfB0 = +instrumentState.reverbShelfB0;
                 const reverbShelfB1 = +instrumentState.reverbShelfB1;
@@ -15795,8 +15862,8 @@ var beepbox = (function (exports) {
 					reverbDelayLine[reverbDelayPos3] = reverbShelfSample2 * delayInputMult;
 					reverbDelayLine[reverbDelayPos ] = reverbShelfSample3 * delayInputMult;
 					reverbDelayPos = (reverbDelayPos + 1) & reverbMask;
-					sampleL += reverbSample1 + reverbSample2 + reverbSample3;
-					sampleR += reverbSample0 + reverbSample2 - reverbSample3;
+					sampleL += (reverbSample1 + reverbSample2 + reverbSample3) * 1;
+					sampleR += (reverbSample0 + reverbSample2 - reverbSample3) * 1;
 					reverb += reverbDelta;`;
                 }
                 effectsSource += `

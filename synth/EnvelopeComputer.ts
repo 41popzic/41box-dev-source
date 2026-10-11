@@ -152,7 +152,11 @@ export class EnvelopeComputer {
                 const noteEndTick: number = tone.noteEndPart * Config.ticksPerPart;
                 const noteLengthTicks: number = noteEndTick - noteStartTick;
                 const maximumSlideTicks: number = noteLengthTicks * 0.5;
-                const slideTicks: number = Math.min(maximumSlideTicks, transition.slideTicks) * 10;
+                let slideTicks: number = instrument.slideTicks * 10;
+                //if (synth.isModActive(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex)) { //modulation
+                //    slideTicks = Config.maxSlideTicks + 1 - synth.getModValue(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex, false);
+                //}
+                slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
                 if (tone.prevNote != null && !tone.forceContinueAtStart) {
                     if (tickTimeStartReal - noteStartTick < slideTicks) {
                         prevSlideStart = true;
@@ -513,12 +517,6 @@ export class EnvelopeComputer {
                     return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1.0 - envelopeSpeed * time / 2, 0)) + perEnvelopeLowerBound);
                 }
             }
-            case EnvelopeType.sidechain:
-                /*if (inverse) {
-                    return boundAdjust / (1.0 + time * envelopeSpeed) + perEnvelopeLowerBound; //swell is twang's inverse... I wonder if it would be worth it to just merge the two :/
-                } else {*/
-                    return perEnvelopeUpperBound - boundAdjust / (2.0 + time * envelopeSpeed);
-                //}
             default: throw new Error("Unrecognized operator envelope type.");
         }
 

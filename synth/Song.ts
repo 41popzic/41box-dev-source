@@ -459,8 +459,7 @@ export class Song {
             if (!Config.modulators[currentIndex].forSong && instrument.modInstruments[modCount] < this.channels[instrument.modChannels[modCount]].instruments.length) {
                 let chorusIndex: number = Config.modulators.dictionary["chorus"].index;
                 let flangerMixIndex = Config.modulators.dictionary["flanger mix"].index;
-                let reverbIndex: number = Config.modulators.dictionary["reverb"].index;
-                let reverbDelayIndex: number = Config.modulators.dictionary["reverbDelay"].index;
+                let reverbMixIndex: number = Config.modulators.dictionary["reverb"].index;
                 let panningIndex: number = Config.modulators.dictionary["pan"].index;
                 let panDelayIndex: number = Config.modulators.dictionary["pan delay"].index;
                 let distortionIndex: number = Config.modulators.dictionary["distortion"].index;
@@ -490,11 +489,8 @@ export class Song {
                     case chorusIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].chorus - Config.modulators[chorusIndex].convertRealFactor;
                         break;
-                    case reverbIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbIndex].convertRealFactor;
-                        break;
-                    case reverbDelayIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverbDelay - Config.modulators[reverbDelayIndex].convertRealFactor;
+                    case reverbMixIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbMixIndex].convertRealFactor;
                         break;
                     case panningIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pan - Config.modulators[panningIndex].convertRealFactor;
@@ -933,6 +929,7 @@ export class Song {
                 }
                 if (effectsIncludeTransition(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.transition]);
+                    if (Config.transitions[instrument.transition].slides == true) buffer.push(base64IntToCharCode[instrument.slideTicks]);
                 }
                 if (effectsIncludeChord(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.chord]);
@@ -943,6 +940,9 @@ export class Song {
                     }
                     if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
                         buffer.push(base64IntToCharCode[instrument.monoChordTone]); //which note is selected
+                    }
+                    if (Config.chords[instrument.chord].strumParts > 0) {
+                        buffer.push(base64IntToCharCode[instrument.strumParts]);
                     }
                 }
                 if (effectsIncludePitchShift(instrument.effects)) {
@@ -989,6 +989,8 @@ export class Song {
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
                     buffer.push(base64IntToCharCode[instrument.reverbDelay]);
+                    buffer.push(base64IntToCharCode[instrument.reverbShelfHz]);
+                    buffer.push(base64IntToCharCode[instrument.reverbShelfGain]);
                 }
                 // if (effectsIncludeNoteRange(instrument.effects)) {
                 //     buffer.push(base64IntToCharCode[instrument.noteRange]);
@@ -1519,6 +1521,7 @@ export class Song {
         let fromUltraBox: boolean = false;
         let fromSlarmoosBox: boolean = false;
         let from41Box: boolean = false;
+        //let fromJukeBox: boolean = false;
         // let fromMidbox: boolean;
         // let fromDogebox2: boolean;
         // let fromAbyssBox: boolean;
@@ -1547,6 +1550,9 @@ export class Song {
         } else if (variantTest == 0x70) { //"p"
             from41Box = true
             charIndex++;    
+        //} else if (variantTest == 0x4A) { //"J"
+        //    fromJukeBox = true
+        //    charIndex++;    
         } else {
             fromBeepBox = true;
         }
@@ -1679,6 +1685,7 @@ export class Song {
         let useSlowerArpSpeed: boolean = false;
         let useFastTwoNoteArp: boolean = false;
         while (charIndex < compressed.length) switch (command = compressed.charCodeAt(charIndex++)) {
+
             case SongTagCode.songTitle: {
                 // Length of song name string
                 var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -1713,12 +1720,21 @@ export class Song {
             } break;
             case SongTagCode.scale: {
                 this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                // All the scales were jumbled around by Jummbox. Just convert to free.
-                if (this.scale == Config.scales["dictionary"]["Custom"].index) {
-                    for (var i = 1; i < Config.pitchesPerOctave; i++) {
-                        this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1; // ineffiecent? yes, all we're going to do for now? hell yes
+                if (from41Box) {
+                    if (this.scale == Config.scales["dictionary"]["Custom"].index) {
+                        for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                            this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1; // ineffiecent? yes, all we're going to do for now? hell yes
+                        }
+                    }
+                } else { // Assume every mod has the same scales as Jummbox and on, and Test Scale on other mods has the same index as Custom
+                    if (this.scale == Config.scales["dictionary"]["Test Scale (TB)"].index) {
+                        this.scale = Config.scales["dictionary"]["Custom"].index;
+                        for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                            this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1; // ineffiecent? yes, all we're going to do for now? hell yes
+                        }
                     }
                 }
+                // All the scales were jummbled around by Jummbox. Just convert to free.
                 if (fromBeepBox) this.scale = 0;
             } break;
             case SongTagCode.key: {
@@ -1859,22 +1875,30 @@ export class Song {
             case SongTagCode.rhythm: {
                 if (!fromUltraBox && !fromSlarmoosBox && !from41Box) {
                     let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
+                    this.rhythm = clamp(0, Config.rhythms.length - 1, newRhythm);
                     if (fromJummBox && beforeThree || fromBeepBox) {
-                    const rhythmObj = Config.rhythms[this.rhythm] ?? Config.rhythms[1]; // fallback ÷4
+                        const rhythmObj = Config.rhythms[this.rhythm] ?? Config.rhythms[1]; // fallback ÷4
 
-                    if (rhythmObj.stepsPerBeat == 3 || rhythmObj.stepsPerBeat == 6) {
-                        useSlowerArpSpeed = true;
-                    }
-                    if (rhythmObj.stepsPerBeat >= 6) {
-                        useFastTwoNoteArp = true;
-                    }
-                    }
-                } else if (((fromSlarmoosBox && beforeFour) || !from41Box) || (fromUltraBox && beforeFive)) {
-                    const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];  
-                    this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
+                        if (rhythmObj.stepsPerBeat == 3 || rhythmObj.stepsPerBeat == 6) {
+                            useSlowerArpSpeed = true;
+                        }
+                        if (rhythmObj.stepsPerBeat >= 6) {
+                            useFastTwoNoteArp = true;
+                        }
+                    }   
+                } else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeFive)) {
+                    const rhythmMap = [3, 3, 2, 3, 5, 7, 11, 23];
+                    this.rhythm = clamp(0, Config.rhythms.length - 1, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]] ?? 3);
                 } else {
-                    this.rhythm = clamp(0, Config.rhythms.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    const oldRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+
+                    if ((!from41Box) || beforeTwo) {
+                        const rhythmMap = (!fromUltraBox && !fromSlarmoosBox && !from41Box) ? [2, 3, 5, 7, 23] : [2, 3, 5, 7, 11, 23];
+                        this.rhythm = rhythmMap[oldRhythm] ?? 3;
+                    } else {
+                        this.rhythm = oldRhythm;
+                    }
+                    this.rhythm = clamp(0, Config.rhythms.length - 1, this.rhythm);
                 }
             } break;
             case SongTagCode.rhythmEnabled: {
@@ -2543,7 +2567,13 @@ export class Song {
                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     // Be warned the line below is unreadable -41popzic
-                    const unisonLength = from41Box ? (beforeThree ? 27 : beforeFour ? 49 : Config.unisons.length) : fromSlarmoosBox ? (beforeFive ? 27 : Config.unisons.length) : Config.unisons.length;
+                    // It looks weird but it's the only way I can read it I'm sorry
+                    const unisonLength = 
+                        from41Box
+                        ? (beforeTwo ? 27 : beforeFour ? 49 : Config.unisons.length)
+                            : fromSlarmoosBox
+                            ? (beforeFive ? 27 : 33)
+                                : 27;
                     if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || from41Box) && (instrument.unison == unisonLength)) {
                         // if (instrument.unison == Config.unisons.length) {
                         instrument.unison = Config.unisons.length;
@@ -2692,6 +2722,9 @@ export class Song {
                     }
                     if (effectsIncludeTransition(instrument.effects)) {
                         instrument.transition = clamp(0, Config.transitions.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if ((fromUltraBox && !beforeSix)||(from41Box && !beforeFour)) {
+                            if (Config.transitions[instrument.transition].slides == true) instrument.slideTicks = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        }
                     }
                     if (effectsIncludeChord(instrument.effects)) {
                         instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2702,6 +2735,9 @@ export class Song {
                         }
                         if (instrument.chord == Config.chords.dictionary["monophonic"].index && ((fromSlarmoosBox && !beforeFive) || from41Box)) {
                             instrument.monoChordTone = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        }
+                        if (Config.chords[instrument.chord].strumParts > 0 && (from41Box && !beforeFour)) {
+                            instrument.strumParts = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         }
                     }
                     if (effectsIncludePitchShift(instrument.effects)) {
@@ -2779,9 +2815,13 @@ export class Song {
                         if (fromBeepBox) {
                             instrument.reverb = clamp(0, Config.reverbRange, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * Config.reverbRange / 3.0));
                             instrument.reverbDelay = 0;
+                            instrument.reverbShelfHz = 32;
+                            instrument.reverbShelfGain = 6;
                         } else {
                             instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                            if (!beforeFour) instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
+                            if (!beforeFour && from41Box) instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
+                            if (!beforeFour && from41Box) instrument.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
+                            if (!beforeFour && from41Box) instrument.reverbShelfGain = clamp(0, Config.reverbShelfGainRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                         }
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
@@ -3320,6 +3360,7 @@ export class Song {
                 let largerChords: boolean = !((beforeFour && fromJummBox) || fromBeepBox);
                 let recentPitchBitLength: number = (largerChords ? 4 : 3);
                 let recentPitchLength: number = (largerChords ? 16 : 8);
+                let useFortyOneScale: number = !from41Box ? 10 : 1;
                 if (beforeThree && fromBeepBox) {
                     channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 
@@ -3332,6 +3373,7 @@ export class Song {
                 } else {
                     channelIndex = 0;
                     let bitStringLengthLength: number = validateRange(1, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    console.log("[41Box debug] Patterns tag begins at:", charIndex - 1);
                     while (bitStringLengthLength > 0) {
                         bitStringLength = bitStringLength << 6;
                         bitStringLength += base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -3522,7 +3564,7 @@ export class Song {
                                 // For mod channels, check if you need to move backward too (notes can appear in any order and offset from each other).
                                 if (isModChannel) {
                                     const isBackwards: boolean = bits.read(1) == 1;
-                                    const restLength: number = bits.readPartDuration();
+                                    const restLength: number = bits.readPartDuration() * useFortyOneScale;
                                     if (isBackwards) {
                                         curPart -= restLength;
                                     }
@@ -3532,7 +3574,7 @@ export class Song {
                                 } else {
                                     const restLength: number = (beforeSeven && fromBeepBox)
                                         ? bits.readLegacyPartDuration() * Config.partsPerBeat / Config.rhythms[this.rhythm].stepsPerBeat
-                                        : bits.readPartDuration();
+                                        : bits.readPartDuration() * useFortyOneScale;
                                     curPart += restLength;
 
                                 }
@@ -3579,7 +3621,7 @@ export class Song {
                                         if (pinObj.pitchBend) shape.bendCount++;
                                         shape.length += (beforeSeven && fromBeepBox)
                                             ? bits.readLegacyPartDuration() * Config.partsPerBeat / Config.rhythms[this.rhythm].stepsPerBeat
-                                            : bits.readPartDuration();
+                                            : bits.readPartDuration() * (from41Box ? 1 : 10);
                                         pinObj.time = shape.length;
                                         if (fromBeepBox) {
                                             pinObj.size = bits.read(2) * 2;
@@ -3761,7 +3803,8 @@ export class Song {
             default: {
                 throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
             } break;
-        }
+    }
+
 
         if (Config.willReloadForCustomSamples) {
             window.location.hash = this.toBase64String();

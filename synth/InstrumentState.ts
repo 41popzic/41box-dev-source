@@ -597,7 +597,7 @@ export class InstrumentState {
             const granularDelayLineSizeInMilliseconds: number = 2500;
             const granularDelayLineSizeInSeconds: number = granularDelayLineSizeInMilliseconds / 1000; // Maximum possible delay time
             this.granularMaximumDelayTimeInSeconds = granularDelayLineSizeInSeconds;
-            const granularDelayLineSizeInSamples: number = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * synth.samplesPerSecond));
+            const granularDelayLineSizeInSamples: number = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * (synth.samplesPerSecond)));
             if (this.granularDelayLine == null || this.granularDelayLine.length != granularDelayLineSizeInSamples) {
                 this.granularDelayLine = new Float32Array(granularDelayLineSizeInSamples);
                 this.granularDelayLineIndex = 0;
@@ -1355,8 +1355,17 @@ export class InstrumentState {
             this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;
             maxReverbMult = Math.max(reverbStart, reverbEnd);
 
-            const shelfRadians: number = 2.0 * Math.PI * Config.reverbShelfHz / synth.samplesPerSecond;
-            Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, Config.reverbShelfGain);
+            const shelfRadians: number = 2.0 * Math.PI * (instrument.reverbShelfHz * Config.reverbShelfHzStepTicks) / synth.samplesPerSecond;
+
+            const shelfGainDb = (instrument.reverbShelfGain - 24) * Config.reverbShelfGainStepDb;
+            const shelfLinearGain = Math.pow(10, shelfGainDb / 20);
+
+            Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, shelfLinearGain);
+
+            this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
+            this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
+            this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
+            this.reverbDelay = instrument.reverbDelay;
             this.reverbShelfA1 = Synth.tempFilterStartCoefficients.a[1];
             this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
             this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
@@ -1400,7 +1409,7 @@ export class InstrumentState {
                 const attenuationPerSecond: number = Math.pow(averageMult, 1.0 / averageReverbDelaySeconds);
                 const halfLife: number = -1.0 / Math.log2(attenuationPerSecond);
                 const reverbDuration: number = halfLife * halfLifeMult;
-                delayDuration += reverbDuration;
+                delayDuration += reverbDuration + Math.max(0, this.reverbDelay * Config.reverbDelayStepTicks - (this.reverbDelay > 1 ? 80 : 0)) * samplesPerTick / samplesPerSecond;
             }
 
             if (usesGranular) {
