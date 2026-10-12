@@ -791,6 +791,10 @@ export class SongEditor {
     private readonly _volumeBarBoxR: HTMLDivElement = div({ class: "playback-volume-bar", style: "height: 12px; margin-top: -5px; align-self: center;" },
         this._volumeBarContainerR,
     );
+    private readonly _volumeBarBox: HTMLDivElement = div({},
+        this._volumeBarBoxL,
+        this._volumeBarBoxR,
+    )
     private readonly _fileMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "options"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
         //option({ value: "new" }, "+ New Blank Song (⇧`)"),
@@ -1507,19 +1511,17 @@ export class SongEditor {
             this._sampleLoadingStatusContainer,
         ),
     );
-
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
-        this._modulatorGroup
-    );
-
-    public readonly _otherSettingsArea: HTMLDivElement = div({ class: "other-settings-area"},
-        div({ class: "version-area", },
+        this._modulatorGroup);
+    public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
+        div({ class: "version-area" },
             div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText};` },
                 this._songTitleInputBox.input,
             ),
         ),
         div({ class: "play-pause-area" },
+            this._volumeBarBox,
             div({ class: "playback-bar-controls" },
                 this._playButton,
                 this._pauseButton,
@@ -1533,14 +1535,8 @@ export class SongEditor {
                 this._volumeSlider.container,
             ),
             this._globalOscscopeContainer,
-            this._volumeBarBoxL,
-            this._volumeBarBoxR,
         ),
         this._menuArea,
-    )
-
-    public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
-        this._otherSettingsArea,
         this._songSettingsArea,
         this._instrumentSettingsArea,
     );

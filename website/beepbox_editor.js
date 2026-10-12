@@ -16628,12 +16628,10 @@ html {
 .beepboxEditor {
 	display: grid;
     grid-template-columns: minmax(0, 1fr) max-content;
-    grid-template-rows: max-content 1fr;
+    grid-template-rows: max-content 1fr; /* max-content minmax(0, 1fr); Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
     grid-template-areas: "pattern-area settings-area" "track-area settings-area";
 	grid-column-gap: 6px;
 	grid-row-gap: 6px;
-	//padding: 5px;
-    box-sizing: border-box;
 	position: relative;
 	touch-action: manipulation;
 	cursor: default;
@@ -16742,24 +16740,15 @@ html {
 
 .beepboxEditor .pattern-area {
 	grid-area: pattern-area;
-	//margin-top: 10px;
 	height: 481px;
 	display: flex;
 	flex-direction: row;
 	position: relative;
-
-	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
 }
 
 .beepboxEditor .track-area {
 	grid-area: track-area;
 	background-image: url(${getLocalStorageItem("customThemeImage", "")});
-	//margin-top: 10px;
-
-	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
-	margin-right: -2px;
 }
 
 .beepboxEditor .loopEditor {
@@ -18165,23 +18154,19 @@ html {
 .beepboxEditor .instrument-settings-area {
 	display: flex;
 	flex-direction: column;
-	
-	//background: color-mix(in srgb, ${ColorConfig.uiWidgetBackground} 33%, transparent);
-	//border: 1px solid ${ColorConfig.uiWidgetFocus} !important;
-
-	//margin-left: 2px !important;
-	//margin-right: 2px !important;
 
 	overflow-x: clip;
 
 	box-sizing: border-box;
 
 	min-width: 0;
-
-    //width: calc(100% - 6px);
-
-	//border-radius: 2px;
 }
+
+@media (max-width: 710px) {
+	.beepboxEditor .layoutAreaButton, .layoutArea {
+		display: none;
+	}
+}	
 
 .beepboxEditor .editor-right-side-top > *, .beepboxEditor .editor-right-side-bottom > * {
 	flex-shrink: 0;
@@ -60244,6 +60229,11 @@ You should be redirected to the song at:<br /><br />
         { class: "playback-volume-bar", style: "height: 12px; margin-top: -5px; align-self: center;" },
         this._volumeBarContainerR
       );
+      this._volumeBarBox = div27(
+        {},
+        this._volumeBarBoxL,
+        this._volumeBarBoxR
+      );
       this._fileMenu = select14(
         { style: "width: 100%;" },
         option14({ selected: true, disabled: true, hidden: false }, "options"),
@@ -60973,8 +60963,8 @@ You should be redirected to the song at:<br /><br />
         this._instrumentSettingsGroup,
         this._modulatorGroup
       );
-      this._otherSettingsArea = div27(
-        { class: "other-settings-area" },
+      this._settingsArea = div27(
+        { class: "settings-area noSelection" },
         div27(
           { class: "version-area" },
           div27(
@@ -60984,6 +60974,7 @@ You should be redirected to the song at:<br /><br />
         ),
         div27(
           { class: "play-pause-area" },
+          this._volumeBarBox,
           div27(
             { class: "playback-bar-controls" },
             this._playButton,
@@ -60998,15 +60989,9 @@ You should be redirected to the song at:<br /><br />
             span8({ class: "volume-speaker" }),
             this._volumeSlider.container
           ),
-          this._globalOscscopeContainer,
-          this._volumeBarBoxL,
-          this._volumeBarBoxR
+          this._globalOscscopeContainer
         ),
-        this._menuArea
-      );
-      this._settingsArea = div27(
-        { class: "settings-area noSelection" },
-        this._otherSettingsArea,
+        this._menuArea,
         this._songSettingsArea,
         this._instrumentSettingsArea
       );
