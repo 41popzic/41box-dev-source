@@ -1875,7 +1875,7 @@ export class Song {
             case SongTagCode.rhythm: {
                 if (!fromUltraBox && !fromSlarmoosBox && !from41Box) {
                     let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    this.rhythm = clamp(0, Config.rhythms.length - 1, newRhythm);
+                    this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
                     if (fromJummBox && beforeThree || fromBeepBox) {
                     const rhythmObj = Config.rhythms[this.rhythm] ?? Config.rhythms[3]; // fallback ÷4
 
@@ -2635,8 +2635,6 @@ export class Song {
                     } else if (effectsIncludeReverb(instrument.effects)) {
                         instrument.reverb = legacyGlobalReverb;
                     }
-                    // @jummbus - Enabling pan effect on song import no matter what to make it a default.
-                    // I decided to disable panning on default
                     if (instrument.pan != Config.panCenter) {
                     instrument.effects |= 1 << EffectType.panning;
                     }
