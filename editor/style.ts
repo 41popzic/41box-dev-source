@@ -4,7 +4,6 @@ import { getLocalStorageItem } from "../synth/SynthConfig";
 import { ColorConfig } from "./ColorConfig";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 
-
 // Determine if the user's browser/OS adds scrollbars that occupy space.
 // See: https://www.filamentgroup.com/lab/scrollbars/
 const scrollBarTest: HTMLDivElement = document.body.appendChild(HTML.div({ style: "width:30px; height:30px; overflow: auto;" },
@@ -14,7 +13,6 @@ if ((<any>scrollBarTest).firstChild.clientWidth < 30) {
     document.documentElement.classList.add("obtrusive-scrollbars");
 }
 document.body.removeChild(scrollBarTest);
-
 
 document.head.appendChild(HTML.style({ type: "text/css" }, `
 
@@ -1608,6 +1606,52 @@ html {
 	font-weight: 1000;
 }
 
+.beepboxEditor .knobContainer {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 56px;
+}
+
+.beepboxEditor .knob {
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.beepboxEditor .knobTrack {
+	fill: ${ColorConfig.uiWidgetBackground};
+}
+
+.beepboxEditor .knobIndicator {
+	stroke: currentColor;
+    stroke-width: 2;
+	stroke-linecap: round;
+    pointer-events: none;
+}
+
+.beepboxEditor .knobIndicatorModulation {
+	stroke: ${ColorConfig.modPrimaryNoteHue};
+    stroke-width: 2;
+	stroke-linecap: butt;
+    pointer-events: none;
+}
+
+.beepboxEditor .knobMarker {
+    stroke: ${ColorConfig.uiWidgetFocus};
+    stroke-width: 1.5;
+    pointer-events: none;
+}
+
+.beepboxEditor .knobValueArc {
+    stroke: currentColor;
+	stroke-width: 1.5;
+	stroke-linecap: butt;
+    pointer-events: none;
+}
+
 .beepboxEditor .selectRow > :last-child {
 	width: 62.5%;
 	flex-shrink: 0;
@@ -1691,7 +1735,7 @@ html {
 	.beepboxEditor .layoutAreaButton, .layoutArea {
 		display: none;
 	}
-}	
+}
 
 .beepboxEditor .editor-right-side-top > *, .beepboxEditor .editor-right-side-bottom > * {
 	flex-shrink: 0;

@@ -22,6 +22,7 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
 import { InputBox, Slider } from "./HTMLWrapper";
+import { Knob } from "./Knob";
 import { ImportPrompt } from "./ImportPrompt";
 import { ChannelRow } from "./ChannelRow";
 import { LayoutPrompt } from "./LayoutPrompt";
@@ -1076,6 +1077,9 @@ export class SongEditor {
     private readonly _pitchShiftRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose"), this._pitchShiftMarkerContainer);
     private readonly _pitchShiftContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "pitch shift"), this._pitchShiftRow)
     
+    private readonly _testKnob: Knob = new Knob(-25, 25, 1, 0, true, this.doc, (oldValue: number, newValue: number) => new ChangeVolume(this.doc, oldValue, newValue), [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25])
+    private readonly _testKnobRow: HTMLDivElement = div({ style: "display: flex; flex-direction: column"}, this._testKnob.container, div({ style: "padding-bottom: 4px" }, "test knob"));
+
     private readonly _detuneSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue: number, newValue: number) => new ChangeDetune(this.doc, oldValue, newValue), true);
     private readonly _detuneSliderInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
     private readonly _detuneSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
@@ -1304,6 +1308,7 @@ export class SongEditor {
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "effects")),
             div({ class: "effects-menu" }, this._effectsSelect),
         ),
+        this._testKnobRow,
         //this._panSliderRow,
         //this._panDropdownGroup,
         this._panContainer,
@@ -1917,28 +1922,6 @@ export class SongEditor {
         this._zoomOutButton.addEventListener("click", this._zoomOut);
         this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
         this._trackArea.addEventListener("mousedown", this.refocusStage);
-
-        /*window.addEventListener("contextmenu", (event) => {
-            event.preventDefault();
-
-            const target = event.target as HTMLElement;
-            const tabElement = target.closest(".song-tab") as HTMLElement | null;
-
-            if (tabElement == null) return;
-
-            const tabId = tabElement.dataset.tabId;
-            if (tabId == null) return;
-
-            this._contextMenu.show(
-                event.clientX,
-                event.clientY,
-                tabId
-            );
-        });
-
-        window.addEventListener("click", (event) => {
-            this._contextMenu.hide();
-        })*/
 
         // The song volume slider is styled slightly different than the class' default.
         this._volumeSlider.container.style.setProperty("flex-grow", "1");
