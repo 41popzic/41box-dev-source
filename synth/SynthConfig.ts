@@ -123,6 +123,7 @@ export const enum EffectType {
 
     //41Box
     flanger,
+    phaser,
 
     length,
 }
@@ -162,16 +163,16 @@ export const enum EnvelopeComputeIndex {
     grainRange,
     echoDelay,
 
-    //phaserFreq,
-    //phaserMix,
-    //phaserFeedback,
-    //phaserStages,
-
     //flangerFeedback,
     //flangerDelay,
     //flangerDepth,
     //flangerRate,
     flangerMix,
+
+    phaserFreq,
+    phaserMix,
+    phaserFeedback,
+    phaserStages,
 
     //Add more here
 
@@ -985,6 +986,11 @@ export class Config {
     public static readonly reverbDelayBufferMask: number = Config.reverbDelayBufferSize - 1; // TODO: Compute a buffer size based on sample rate.
     public static readonly reverbDelayRange: number = 24; // The delay between dry and wet
     public static readonly reverbDelayStepTicks: number = Config.echoDelayStepTicks; // hehe I stole echo
+    public static readonly flangerDelayRange: number = 24;
+    public static readonly flangerDepthRange: number = 32;
+    public static readonly flangerRateRange: number = 57;
+    public static readonly flangerFeedbackRange: number = 32;
+    public static readonly flangerMixRange: number = 51;
     public static readonly phaserMixRange: number = 32; 
     public static readonly phaserFeedbackRange: number = 32; 
     public static readonly phaserFreqRange: number = 32; 
@@ -992,11 +998,6 @@ export class Config {
     public static readonly phaserMaxFreq: number = 20000.0; 
     public static readonly phaserMinStages: number = 0; 
     public static readonly phaserMaxStages: number = 32; 
-    public static readonly flangerDelayRange: number = 24;
-    public static readonly flangerDepthRange: number = 32;
-    public static readonly flangerRateRange: number = 57;
-    public static readonly flangerFeedbackRange: number = 32;
-    public static readonly flangerMixRange: number = 51;
     public static readonly maxSlideTicks: number = 48;
     public static readonly maxStrumSpeed: number = 48;
     public static readonly beatsPerBarMin: number = 1;
@@ -1305,8 +1306,8 @@ export class Config {
     
     public static readonly customUnisonIndex: number = 63; // not used
 
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "flanger",/* "phaser"*/];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.flanger,/* EffectType.phaser*/];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "flanger", "phaser"];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.flanger, EffectType.phaser];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -1859,13 +1860,12 @@ export class Config {
         { name: "grainSize", computeIndex: EnvelopeComputeIndex.grainSize, displayName: "grain size", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainRange", computeIndex: EnvelopeComputeIndex.grainRange, displayName: "grain range", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: EnvelopeComputeIndex.echoDelay, displayName: "echo delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null },
-        /*{ name: "phaserFreq", computeIndex: EnvelopeComputeIndex.phaserFreq, displayName: "phaser freq", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
+        { name: "flangerMix", computeIndex: EnvelopeComputeIndex.flangerMix, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.flanger, compatibleInstruments: null },
+        { name: "phaserFreq", computeIndex: EnvelopeComputeIndex.phaserFreq, displayName: "phaser freq", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserMix", computeIndex: EnvelopeComputeIndex.phaserMix, displayName: "phaser", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserFeedback", computeIndex: EnvelopeComputeIndex.phaserFeedback, displayName: "phaser feedback",  perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
-        */
-        { name: "flangerMix", computeIndex: EnvelopeComputeIndex.flangerMix, displayName: "flanger mix", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.flanger, compatibleInstruments: null },
-
+        
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
         /*
@@ -2022,7 +2022,15 @@ export class Config {
             promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         {name: "flanger mix", pianoName: "Flanger Mix", maxRawVol: Config.flangerMixRange - 1, newNoteVol: Math.ceil((Config.flangerMixRange - 1) / 2), forSong: false, convertRealFactor: 0, associatedEffect: EffectType.flanger, maxIndex: 0, 
             promptName: "Flanger Mix", promptDesc: ["This setting controls the flanger mix of your instrument, just like the flanger mix slider.", "At $LO, the flanger will be completely dry. At $HI, the flanger will be at maximum mix.", "[OVERWRITING] [$LO - $HI]"]},
-        ]);
+        { name: "phaser", pianoName: "Phaser",  maxRawVol: Config.phaserMixRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser, 
+            promptName: "Instrument Phaser", promptDesc: [ "This setting controls the Phaser Mix of your insturment, just like the Phaser slider.", "At $LO, your instrument will have no phaser. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0,},
+        { name: "phaser frequency", pianoName: "Phaser Frequency", maxRawVol: Config.phaserFreqRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser, 
+            promptName: "Phaser Frequency", promptDesc: [ "This setting controls the phaser frequency of your insturment, just like the phaser freq slider.", "At $LO, your instrument will have no phaser freq. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0, }, 
+        { name: "phaser feedback", pianoName: "Phaser Feedback", maxRawVol: Config.phaserFeedbackRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser,
+            promptName: "Phaser Feedback", promptDesc: [ "This setting controls the phaser feedback of your insturment, just like the phaser feedback slider.", "At $LO, your instrument will have no phaser feedback. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0, },     
+        { name: "phaser stages", pianoName: "Phaser Stages", maxRawVol: Config.phaserMaxStages, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser,
+            promptName: "Phaser Stages", promptDesc: [ "This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0, },                       
+    ]);
 }
 
 function centerWave(wave: Array<number>): Float32Array {
@@ -2411,9 +2419,9 @@ export function effectsIncludeGranular(effects: number): boolean {
 export function effectsIncludeNoteRange(effects: number): boolean {
     return (effects & (1 << EffectType.noteRange)) != 0;
 }
-//export function effectsIncludePhaser(effects: number): boolean {
-//	return (effects & (1 << EffectType.phaser)) != 0;
-//}
+export function effectsIncludePhaser(effects: number): boolean {
+    return (effects & (1 << EffectType.phaser)) != 0;
+}
 export function effectsIncludeFlanger(effects: number): boolean {
     return (effects & (1 << EffectType.flanger)) != 0;
 }

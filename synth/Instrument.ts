@@ -3,7 +3,7 @@
 import { InstrumentType } from "./synth";
 import { EnvelopeSettings } from "./Envelope";
 import { FilterSettings } from "./Filter";
-import { Dictionary, DictionaryArray, toNameMap, SustainType, EnvelopeType, EffectType, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, LFOEnvelopeTypes, } from "./SynthConfig";
+import { Dictionary, DictionaryArray, toNameMap, SustainType, EnvelopeType, EffectType, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, LFOEnvelopeTypes, effectsIncludePhaser, } from "./SynthConfig";
 import { clamp, fadeInSettingToSeconds, secondsToFadeInSetting, fadeOutSettingToTicks, ticksToFadeOutSetting, detuneToCents, centsToDetune, fittingPowerOfTwo } from "./utils";
 
 // Settings that were available to old versions of BeepBox but are no longer available in the
@@ -288,10 +288,10 @@ export class Instrument {
     public echoSustain: number = 0;
     public echoDelay: number = 0;
 
-    //public phaserFreq: number = 0;
-    //public phaserMix: number = Config.phaserMixRange - 1;
-    //public phaserFeedback: number = 0;
-    //public phaserStages: number = 2;
+    public phaserFreq: number = 0;
+    public phaserMix: number = Config.phaserMixRange - 1;
+    public phaserFeedback: number = 0;
+    public phaserStages: number = 2;
 
     public flangerDelay: number = 0;
     public flangerDepth: number = 0;
@@ -427,10 +427,10 @@ export class Instrument {
         this.grainAmounts = Config.grainAmountsMax;
         this.grainRange = 40;
 
-        //this.phaserFreq	= 0;
-        //this.phaserFeedback = 0;
-        //this.phaserStages = 2;
-        //this.phaserMix = Config.phaserMixRange - 1;
+        this.phaserFreq	= 0;
+        this.phaserFeedback = 0;
+        this.phaserStages = 2;
+        this.phaserMix = Config.phaserMixRange - 1;
 
         this.flangerDelay = 8;
         this.flangerDepth = 12;
@@ -775,12 +775,12 @@ export class Instrument {
             instrumentObject["ringModPulseWidth"] = Math.round(100 * this.ringModPulseWidth / (Config.pulseWidthRange - 1));
             //instrumentObject["ringModHzOffset"] = Math.round(100 * this.ringModHzOffset / (Config.rmHzOffsetMax));
         }
-        /*if (effectsIncludePhaser(this.effects)) {
+        if (effectsIncludePhaser(this.effects)) {
             instrumentObject["phaserMix"] =  Math.round(100 *this.phaserMix/(Config.phaserMixRange - 1));
             instrumentObject["phaserFreq"] =  Math.round(100 *this.phaserFreq/(Config.phaserFreqRange - 1));
             instrumentObject["phaserFeedback"] =  Math.round(100 *this.phaserFeedback/(Config.phaserFeedbackRange - 1));
             instrumentObject["phaserStages"] =  Math.round(100 *this.phaserStages/(Config.phaserMaxStages - 1));
-        }*/
+        }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
             instrumentObject["aliases"] = this.aliases;
@@ -1223,18 +1223,18 @@ export class Instrument {
             this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
         }
 
-        //if (instrumentObject["phaserMix"] != undefined) {
-        //    this.phaserMix = clamp(0, Config.phaserMixRange, Math.round((Config.phaserMixRange - 1) * (instrumentObject["phaserMix"] | 0) / 100));
-       // }
-        //if (instrumentObject["phaserFreq"] != undefined) {
-        //    this.phaserFreq = clamp(0, Config.phaserFreqRange, Math.round((Config.phaserFreqRange - 1) * (instrumentObject["phaserFreq"] | 0) / 100));
-        //}
-        //if (instrumentObject["phaserFeedback"] != undefined) {
-        //    this.phaserFeedback = clamp(0, Config.phaserFeedbackRange, Math.round((Config.phaserFeedbackRange - 1) * (instrumentObject["phaserFeedback"] | 0) / 100));
-        //}
-        //if (instrumentObject["phaserStages"] != undefined) {
-        //    this.phaserStages = clamp(0, Config.phaserMaxStages, Math.round((Config.phaserMaxStages - 1) * (instrumentObject["phaserStages"] | 0) / 100));
-        //}
+        if (instrumentObject["phaserMix"] != undefined) {
+            this.phaserMix = clamp(0, Config.phaserMixRange, Math.round((Config.phaserMixRange - 1) * (instrumentObject["phaserMix"] | 0) / 100));
+        }
+        if (instrumentObject["phaserFreq"] != undefined) {
+            this.phaserFreq = clamp(0, Config.phaserFreqRange, Math.round((Config.phaserFreqRange - 1) * (instrumentObject["phaserFreq"] | 0) / 100));
+        }
+        if (instrumentObject["phaserFeedback"] != undefined) {
+            this.phaserFeedback = clamp(0, Config.phaserFeedbackRange, Math.round((Config.phaserFeedbackRange - 1) * (instrumentObject["phaserFeedback"] | 0) / 100));
+        }
+        if (instrumentObject["phaserStages"] != undefined) {
+            this.phaserStages = clamp(0, Config.phaserMaxStages, Math.round((Config.phaserMaxStages - 1) * (instrumentObject["phaserStages"] | 0) / 100));
+        }
 
         if (instrumentObject["distortion"] != undefined) {
             this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));

@@ -56,6 +56,9 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	--internal-add-symbol: var(--add-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 -1 L -1 -1 L -1 -8  L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z"/></svg>'));
 	--internal-zoom-in-symbol: var(--zoom-in-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -1 -4 L -1 2 M -4 -1 L 2 -1" fill="none"></path></svg>'));
 	--internal-zoom-out-symbol: var(--zoom-out-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -4 -1 L 2 -1" fill="none"></path></svg>'));
+	--loop-within-bar-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -0.5 12 12"><path d="M 5 2 C 3 2 2 3 2 5 L 2 6 C 2 8 3 9 5 9 L 11 9 C 13 9 14 8 14 6 L 14 5 C 14 3 13 2 11 2 L 8 2 L 8 4 L 11 4 C 11 4 12 4 12 5 L 12 6 C 12 7 11 7 11 7 L 5 7 C 5 7 4 7 4 6 L 4 5 C 4 4 5 4 5 4 L 8 4 L 8 2"/></svg>');
+	--loop-full-song-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -2 15 15"><path d="M 3 3 C 2 3 2 3 2 3 L 4 6 L 6 3 L 5 3 C 5 3 5 1 7 1 L 12 1 C 14 1 14 3 14 3 L 13 8 L 15 5 L 17 8 L 16 8 C 16 12 12 12 12 12 L 7 12 C 3 12 3 8 3 8 C 3 7 5 7 5 8 C 5 8 5 10 7 10 L 12 10 C 14 10 14 8 14 8 L 13 8 L 14 3 C 14 4 16 4 16 3 C 16 -1 12 -1 12 -1 L 7 -1 C 3 -1 3 3 3 3 Z Z"/></svg>');
+	--dont-loop-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -2 15 15"><path d="M 3 3 C 2 3 2 3 2 3 L 4 6 L 6 3 L 5 3 C 5 3 5 1 7 1 L 12 1 C 14 1 14 3 14 3 L 13 8 L 15 5 L 17 8 L 16 8 C 16 12 12 12 12 12 L 7 12 C 3 12 3 8 3 8 C 3 7 5 7 5 8 C 5 8 5 10 7 10 L 12 10 C 14 10 14 8 14 8 L 8 8 L 8 7 L 9 7 L 9 4.5 L 8 4.5 L 8 3.5 L 9 3 L 10 3 L 10 7 L 11 7 L 11 8 L 13 8 L 14 3 C 14 4 16 4 16 3 C 16 -1 12 -1 12 -1 L 7 -1 C 3 -1 3 3 3 3 Z Z"/></svg>');
 	--internal-checkmark-symbol: var(--checkmark-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -9 -2 L -8 -3 L -3 2 L 9 -8 L 10 -7 L -3 8 z"/></svg>'));
 	--internal-drum-symbol: var(--drum-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"> \
 			<defs> \
@@ -146,6 +149,28 @@ html {
 .obtrusive-scrollbars::-webkit-scrollbar-thumb, .obtrusive-scrollbars *::-webkit-scrollbar-thumb {
 	background-color: ${ColorConfig.uiWidgetBackground};
 	border: 3px solid ${ColorConfig.editorBackground};
+}
+	
+.songLoopButton::before {
+content: "";
+  position: absolute;
+  width: var(--button-size);
+  height: var(--button-size);
+  left: 3px;
+  top: 0;
+  mask-image: var(--loop-within-bar-symbol);
+  -webkit-mask-image: var(--loop-within-bar-symbol);
+  pointer-events: none;
+  background: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: -o-crisp-edges !important;
+  image-rendering: pixelated !important;
+  image-rendering: optimizeSpeed !important;
 }
 
 .beepboxEditor {

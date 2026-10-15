@@ -4,7 +4,7 @@ import { SpectrumWave, HarmonicsWave, Instrument } from "./Instrument";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
 import { Tone, Synth } from "./synth";
-import { SustainType, InstrumentType, calculateRingModHertz, EnvelopeComputeIndex, FilterType, Unison, Chord, Config, getDrumWave, drawNoiseSpectrum, performIntegralOld, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, GranularEnvelopeType } from "./SynthConfig";
+import { SustainType, InstrumentType, calculateRingModHertz, EnvelopeComputeIndex, FilterType, Unison, Chord, Config, getDrumWave, drawNoiseSpectrum, performIntegralOld, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, GranularEnvelopeType, effectsIncludePhaser } from "./SynthConfig";
 import {  } from "./utils";
 import { DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { EnvelopeComputer } from "./EnvelopeComputer";
@@ -502,16 +502,16 @@ export class InstrumentState {
     public reverbPreDelayLineR: Float32Array | null = null;
     public reverbPreDelayPos: number = 0;
 
-    //public phaserSamples: Float32Array | null = null;
-    //public phaserPrevInputs: Float32Array | null = null;
-    //public phaserFeedbackMult: number = 0.0;
-    //public phaserFeedbackMultDelta: number = 0.0;
-    //public phaserMix: number = 0.0;
-    //public phaserMixDelta: number = 0.0;
-    //public phaserBreakCoef: number = 0.0;
-    //public phaserBreakCoefDelta: number = 0.0;
-    //public phaserStages: number = 0;
-    //public phaserStagesDelta: number = 0;
+    public phaserSamples: Float32Array | null = null;
+    public phaserPrevInputs: Float32Array | null = null;
+    public phaserFeedbackMult: number = 0.0;
+    public phaserFeedbackMultDelta: number = 0.0;
+    public phaserMix: number = 0.0;
+    public phaserMixDelta: number = 0.0;
+    public phaserBreakCoef: number = 0.0;
+    public phaserBreakCoefDelta: number = 0.0;
+    public phaserStages: number = 0;
+    public phaserStagesDelta: number = 0;
 
     public flangerDelayLineL: Float32Array | null = null;
     public flangerDelayLineR: Float32Array | null = null;
@@ -587,12 +587,12 @@ export class InstrumentState {
                 this.reverbPreDelayLineR = new Float32Array(Config.reverbPreDelayBufferSize);
             }
         }
-        /*if (effectsIncludePhaser(instrument.effects)) {
+        if (effectsIncludePhaser(instrument.effects)) {
             if (this.phaserSamples == null) {
                 this.phaserSamples = new Float32Array(Config.phaserMaxStages);
                 this.phaserPrevInputs = new Float32Array(Config.phaserMaxStages);
             }
-        }*/
+        }
         if (effectsIncludeGranular(instrument.effects)) {
             const granularDelayLineSizeInMilliseconds: number = 2500;
             const granularDelayLineSizeInSeconds: number = granularDelayLineSizeInMilliseconds / 1000; // Maximum possible delay time
@@ -673,8 +673,8 @@ export class InstrumentState {
         this.reverbShelfPrevInput2 = 0.0;
         this.reverbShelfPrevInput3 = 0.0;
         this.reverbDelay = 0.0;        
-        //if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
-        //if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
+        if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
+        if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
         
         this.flangerDelayPos = 0;
         this.flangerPhase = 0;
@@ -792,7 +792,7 @@ export class InstrumentState {
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
-        //const usesPhaser: boolean = effectsIncludePhaser(this.effects);
+        const usesPhaser: boolean = effectsIncludePhaser(this.effects);
         const usesFlanger: boolean = effectsIncludeFlanger(this.effects);
 
         let granularChance: number = 0;
@@ -1254,8 +1254,8 @@ export class InstrumentState {
         }
 
         let maxReverbMult = 0.0;
-    
-        /*if (usesPhaser) {
+
+        if (usesPhaser) {
             const phaserMinFeedback: number = 0.0;
             const phaserMaxFeedback: number = 0.95;
             const phaserFeedbackMultSlider: number = instrument.phaserFeedback / Config.phaserFeedbackRange;
@@ -1320,8 +1320,8 @@ export class InstrumentState {
 
             this.phaserStages = phaserStagesStart;
             this.phaserStagesDelta = (phaserStagesEnd - phaserStagesStart) / roundedSamplesPerTick;
-        }*/
-
+        }
+            
         if (usesFlanger) {
             this.flangerDelay = (instrument.flangerDelay / (Config.flangerDelayRange - 1)) * 0.010;       
             this.flangerDepth = instrument.flangerDepth       

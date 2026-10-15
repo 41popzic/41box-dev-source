@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Chord, Envelope, Config, getArpeggioPitchIndex, getPulseWidthRatio, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, OperatorWave, GranularEnvelopeType, flangerRateValues, /*effectsIncludePhaser*/ } from "./SynthConfig";
+import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Chord, Envelope, Config, getArpeggioPitchIndex, getPulseWidthRatio, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, OperatorWave, GranularEnvelopeType, flangerRateValues, effectsIncludePhaser } from "./SynthConfig";
 import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter } from "./filtering";
@@ -4552,7 +4552,7 @@ if (playSong && !this.countInMetronome) {
         const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects);
         const usesGranular: boolean = effectsIncludeGranular(instrumentState.effects);
         const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects);
-        //const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects);
+        const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects);
         const usesFlanger = effectsIncludeFlanger(instrumentState.effects);
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
@@ -4563,7 +4563,7 @@ if (playSong && !this.countInMetronome) {
         signature = signature << 1; if (usesReverb) signature = signature | 1;
         signature = signature << 1; if (usesGranular) signature = signature | 1;
         signature = signature << 1; if (usesRingModulation) signature = signature | 1;
-        //signature = signature << 1; if (usesPhaser) signature = signature | 1;
+        signature = signature << 1; if (usesPhaser) signature = signature | 1;
         signature = signature << 1; if (usesFlanger) signature = signature | 1;
 
         let effectsFunction: Function = Synth.effectsFunctionCache[signature];
@@ -4682,7 +4682,7 @@ if (playSong && !this.countInMetronome) {
                 `
             }
 
-            /*if (usesPhaser) {
+            if (usesPhaser) {
                 effectsSource += `
                 
                 const phaserSamples = instrumentState.phaserSamples;
@@ -4697,7 +4697,7 @@ if (playSong && !this.countInMetronome) {
                 const phaserBreakCoefDelta = +instrumentState.phaserBreakCoefDelta;
                 let phaserBreakCoef = +instrumentState.phaserBreakCoef;
                 `
-            }*/
+            }
 
             if (usesEqFilter) {
                 effectsSource += `
@@ -5014,7 +5014,7 @@ if (playSong && !this.countInMetronome) {
                 `
             }
 
-            /*if (usesPhaser) {
+            if (usesPhaser) {
                 effectsSource += `
                         const phaserFeedback = phaserSamples[Math.max(0,phaserStagesInt - 1)] * phaserFeedbackMult;
                         for (let stage = 0; stage < phaserStagesInt; stage++) {
@@ -5031,10 +5031,9 @@ if (playSong && !this.countInMetronome) {
                         phaserBreakCoef += phaserBreakCoefDelta;
                         phaserMix += phaserMixDelta;
                         phaserStages += phaserStagesDelta;
-                        /*phaserStagesInt = Math.floor(phaserStages);
+                        /*phaserStagesInt = Math.floor(phaserStages);*/
                     `
             }
-            */
 
             if (usesEqFilter) {
                 effectsSource += `
@@ -5323,7 +5322,7 @@ if (playSong && !this.countInMetronome) {
                  `
             }
 
-            /*if (usesPhaser) {
+            if (usesPhaser) {
                 effectsSource += `
                 
                 for (let stage = 0; stage < phaserStages; stage++) {
@@ -5336,7 +5335,6 @@ if (playSong && !this.countInMetronome) {
                 instrumentState.phaserBreakCoef = phaserBreakCoef;
                 `
             }
-                */
 
             if (usesEqFilter) {
                 effectsSource += `

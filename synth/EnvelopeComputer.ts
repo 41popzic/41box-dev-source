@@ -152,7 +152,7 @@ export class EnvelopeComputer {
                 const noteEndTick: number = tone.noteEndPart * Config.ticksPerPart;
                 const noteLengthTicks: number = noteEndTick - noteStartTick;
                 const maximumSlideTicks: number = noteLengthTicks * 0.5;
-                let slideTicks: number = instrument.slideTicks * 7; // Oddly specific but the only way that I could get it to line up
+                let slideTicks: number = instrument.slideTicks * 0.5; // Weird
                 //if (synth.isModActive(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex)) { //modulation
                 //    slideTicks = Config.maxSlideTicks + 1 - synth.getModValue(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex, false);
                 //}

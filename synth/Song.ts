@@ -1,6 +1,6 @@
 // Copyright (c) John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, Envelope, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, LFOEnvelopeTypes, RandomEnvelopeTypes, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludeNoteFilter, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, Envelope, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, LFOEnvelopeTypes, RandomEnvelopeTypes, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludeNoteFilter, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludePhaser } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { Channel } from "./Channel";
 import { Instrument, LegacySettings } from "./Instrument";
@@ -205,7 +205,7 @@ const enum SongTagCode {
     harmonics = CharCode.H, // added in BeepBox URL version 7
     stringSustain = CharCode.I, // added in BeepBox URL version 9
     rhythmEnabled = CharCode.J, // added in 41Box URL version 4
-    //	                    = CharCode.K,
+    loopType = CharCode.K, // added in 41Box URL version 4
     pan = CharCode.L, // added between 8 and 9, DEPRECATED
     customChipWave = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
     songTitle = CharCode.N, // added in JummBox URL version 1(?) for songTitle
@@ -402,6 +402,7 @@ export class Song {
     public key!: number;
     public octave!: number;
     public tempo!: number;
+    public loopType: number = 1;
     public reverb!: number;
     public beatsPerBar!: number;
     public barCount!: number;
@@ -681,7 +682,8 @@ export class Song {
         this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
-        this.tempo = 111;
+        this.tempo = 110;
+        this.loopType = 1;
         this.reverb = 0;
         this.beatsPerBar = 8;
         this.barCount = 16;
@@ -795,6 +797,7 @@ export class Song {
         buffer.push(SongTagCode.patternCount, base64IntToCharCode[(this.patternsPerChannel - 1) >> 6], base64IntToCharCode[(this.patternsPerChannel - 1) & 0x3f]);
         buffer.push(SongTagCode.rhythm, base64IntToCharCode[this.rhythm]);
         buffer.push(SongTagCode.rhythmEnabled, base64IntToCharCode[this.rhythmEnabled ? 1 : 0]);
+        buffer.push(SongTagCode.loopType, base64IntToCharCode[this.loopType]);
 
         // Push limiter settings, but only if they aren't the default!
         buffer.push(SongTagCode.limiterSettings);
@@ -1034,12 +1037,12 @@ export class Song {
                     buffer.push(base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) >> 6], base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) & 0x3F]);
                 }
 
-                /*if (effectsIncludePhaser(instrument.effects)) {
+                if (effectsIncludePhaser(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.phaserFreq]);
                     buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
                     buffer.push(base64IntToCharCode[instrument.phaserStages]);
                     buffer.push(base64IntToCharCode[instrument.phaserMix]);
-                }*/
+                }
                 if (instrument.type != InstrumentType.drumset) {
                     buffer.push(SongTagCode.fadeInOut, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
                     // Transition info follows transition song tag
@@ -1822,6 +1825,9 @@ export class Song {
                     this.tempo = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
                 this.tempo = clamp(Config.tempoMin, Config.tempoMax + 1, this.tempo);
+            } break;
+            case SongTagCode.loopType: {
+                this.loopType = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
             } break;
             case SongTagCode.reverb: {
                 if (beforeNine && fromBeepBox) {
@@ -2697,7 +2703,7 @@ export class Song {
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
                     // BeepBox currently uses three base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 16) throw new Error();
+                    if (EffectType.length > 17) throw new Error();
                     if (from41Box || (fromSlarmoosBox && !beforeFive)) {
                         instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     } else {
@@ -2875,12 +2881,12 @@ export class Song {
                         instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
-                    /*if (effectsIncludePhaser(instrument.effects)) {
+                    if (effectsIncludePhaser(instrument.effects) && !beforeFour) {
                         instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]); 
                         instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    }*/
+                    }
 
                 }
                 // Clamp the range.
@@ -4192,6 +4198,7 @@ export class Song {
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,
             "keyOctave": this.octave,
+            "loopType": this.loopType,
             "introBars": this.loopStart,
             "loopBars": this.loopLength,
             "beatsPerBar": this.beatsPerBar,
@@ -4636,6 +4643,10 @@ export class Song {
 
         if (jsonObject["beatsPerMinute"] != undefined) {
             this.tempo = clamp(Config.tempoMin, Config.tempoMax + 1, jsonObject["beatsPerMinute"] | 0);
+        }
+
+        if (jsonObject["loopType"] != undefined) {
+            this.loopType = jsonObject["loopType"] | 0;
         }
 
         if (jsonObject["keyOctave"] != undefined) {

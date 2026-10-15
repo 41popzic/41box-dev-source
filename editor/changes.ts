@@ -4963,6 +4963,46 @@ export class ChangeFlangerMix extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangePhaserMix extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.phaserMix = newValue;
+        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangePhaserFreq extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.phaserFreq = newValue;
+        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangePhaserFeedback extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.phaserFeedback = newValue;
+        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangePhaserStages extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.phaserStages = newValue;
+        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeChorus extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -5608,6 +5648,19 @@ export class ChangeShowSongDetails extends Change {
         super();
 
         doc.song.showSongDetails = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeLoopType extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        if (newValue < 3) {
+            newValue++;} else {
+            newValue = 1;
+        }
+        doc.song.loopType = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
