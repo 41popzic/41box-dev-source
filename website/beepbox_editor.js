@@ -2207,7 +2207,7 @@ var beepbox = (() => {
           /*range: Config.defaultAutomationRange,  */
           maxCount: 1,
           effect: null,
-          compatibleInstruments: [0 /* chip */, 5 /* harmonics */, 7 /* pickedString */, 9 /* customChipWave */, 6 /* pwm */, 2 /* noise */, 3 /* spectrum */, 4 /* drumset */]
+          compatibleInstruments: null
         },
         {
           name: "operatorFrequency",
