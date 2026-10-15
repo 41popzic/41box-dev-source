@@ -4807,7 +4807,7 @@ var beepbox = (() => {
       this.unisonSign = 1;
       this.effects = 0;
       this.chord = 1;
-      this.strumParts = 10;
+      this.strumParts = 1;
       this.volume = 0;
       this.pan = Config.panCenter;
       this.panDelay = 0;
@@ -4957,7 +4957,7 @@ var beepbox = (() => {
       this.flangerFeedback = 13;
       this.flangerMix = 26;
       this.slideTicks = 3;
-      this.strumParts = 10;
+      this.strumParts = 1;
       this.pan = Config.panCenter;
       this.panDelay = 0;
       this.pitchShift = Config.pitchShiftCenter;
@@ -6500,7 +6500,7 @@ var beepbox = (() => {
           const noteEndTick = tone.noteEndPart * Config.ticksPerPart;
           const noteLengthTicks = noteEndTick - noteStartTick;
           const maximumSlideTicks = noteLengthTicks * 0.5;
-          let slideTicks = instrument.slideTicks * 10;
+          let slideTicks = instrument.slideTicks * 7;
           slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
           if (tone.prevNote != null && !tone.forceContinueAtStart) {
             if (tickTimeStartReal - noteStartTick < slideTicks) {
@@ -8192,6 +8192,9 @@ var beepbox = (() => {
       this.ctrlName = _EditorConfig.isOnMac ? "command" : "control";
     }
     static {
+      this.showSongDetailsAlert = true;
+    }
+    static {
       this.presetCategories = toNameMap([
         {
           // The order of this array needs to line up with the order of the InstrumentType declarations in SynthConfig.ts. (changes.ts' random instrument generation relies on this, for one.)
@@ -9352,6 +9355,9 @@ var beepbox = (() => {
         this.eqSubFilters[i] = null;
       }
       this.title = "Unnamed";
+      this.author = "";
+      this.description = "";
+      this.showSongDetails = false;
       this.titleNotifier.forEach((o) => o());
       if (andResetChannels) {
         this.pitchChannelCount = 3;
@@ -9400,6 +9406,17 @@ var beepbox = (() => {
       for (let i2 = 0; i2 < encodedSongTitle.length; i2++) {
         buffer.push(encodedSongTitle.charCodeAt(i2));
       }
+      var encodedAuthorTitle = encodeURIComponent(this.author);
+      buffer.push(base64IntToCharCode[encodedAuthorTitle.length >> 6], base64IntToCharCode[encodedAuthorTitle.length & 63]);
+      for (let i2 = 0; i2 < encodedAuthorTitle.length; i2++) {
+        buffer.push(encodedAuthorTitle.charCodeAt(i2));
+      }
+      var encodedDescriptionTitle = encodeURIComponent(this.description);
+      buffer.push(base64IntToCharCode[encodedDescriptionTitle.length >> 6], base64IntToCharCode[encodedDescriptionTitle.length & 63]);
+      for (let i2 = 0; i2 < encodedDescriptionTitle.length; i2++) {
+        buffer.push(encodedDescriptionTitle.charCodeAt(i2));
+      }
+      buffer.push(base64IntToCharCode[this.showSongDetails ? 1 : 0]);
       buffer.push(110 /* channelCount */, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
       buffer.push(115 /* scale */, base64IntToCharCode[this.scale]);
       if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -10145,6 +10162,15 @@ var beepbox = (() => {
             this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
             this.titleNotifier.forEach((o) => o());
             charIndex += songNameLength;
+            if (fromUltraBox && !beforeSix || from41Box && !beforeFour) {
+              var songAuthorLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+              this.author = decodeURIComponent(compressed.substring(charIndex, charIndex + songAuthorLength));
+              charIndex += songAuthorLength;
+              var songDescriptionLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+              this.description = decodeURIComponent(compressed.substring(charIndex, charIndex + songDescriptionLength));
+              charIndex += songDescriptionLength;
+              this.showSongDetails = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+            }
           }
           break;
         case 110 /* channelCount */:
@@ -12359,6 +12385,9 @@ var beepbox = (() => {
         "name": this.title,
         "format": _Song._format,
         "version": _Song._latest41BoxVersion,
+        "author": this.author,
+        "description": this.description,
+        "showSongDetails": this.showSongDetails,
         "scale": Config.scales[this.scale].name,
         "customScale": this.scaleCustom,
         "key": Config.keys[this.key].name,
@@ -12407,6 +12436,15 @@ var beepbox = (() => {
       const format = (jsonFormat == "auto" ? jsonObject["format"] : jsonFormat).toLowerCase();
       if (jsonObject["name"] != void 0) {
         this.title = jsonObject["name"];
+      }
+      if (jsonObject["author"] != void 0) {
+        this.author = jsonObject["author"];
+      }
+      if (jsonObject["description"] != void 0) {
+        this.description = jsonObject["description"];
+      }
+      if (jsonObject["showSongDetails"] != void 0) {
+        this.showSongDetails = jsonObject["showSongDetails"];
       }
       if (jsonObject["customSamples"] != void 0) {
         const customSamples = jsonObject["customSamples"];
@@ -14929,7 +14967,7 @@ var beepbox = (() => {
                   noteEndPart = Math.min(Config.partsPerBeat * this.song.beatsPerBar, noteEndPart + strumOffsetParts);
                 }
                 if (!transition2.continues && !forceContinueAtStart || prevNoteForThisTone == null) {
-                  if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
+                  if (useStrumSpeed) strumOffsetParts += instrument.strumParts * 10;
                 }
                 const atNoteStart = Config.ticksPerPart * noteStartPart == currentTick;
                 let tone;

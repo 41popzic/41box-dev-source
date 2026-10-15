@@ -302,6 +302,7 @@ export class PreferencesPrompt implements Prompt {
 	private readonly _showSampleLoadingStatus: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 	private readonly _showDescription: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 	private readonly _rainbowifyLoop: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
+	private readonly _promptSongDetails: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 
 	private readonly _layoutForm: HTMLFormElement = form({ style: "display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; text-align: center;" },
 		label({ class: "layout-option" },
@@ -744,7 +745,7 @@ export class PreferencesPrompt implements Prompt {
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
 				"Rainbowify Song Loop:",
 				div({ style: "width: 50%; text-align: center;" }, this._rainbowifyLoop),
-			)
+			),
 		)
 	);
 
@@ -892,6 +893,10 @@ export class PreferencesPrompt implements Prompt {
 					"Close prompts on click-off:",
 					div({ style: "width: 50%; text-align: center;" }, this._closePromptByClickoff),
 			),
+			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
+				"Prompt song details on load:",
+				div({ style: "width: 50%; text-align: center;" }, this._promptSongDetails),
+			),
 		)
 	);
 
@@ -946,6 +951,7 @@ export class PreferencesPrompt implements Prompt {
 		this._showOscilloscope.checked = this._doc.prefs.showOscilloscope;
 		this._showSampleLoadingStatus.checked = this._doc.prefs.showSampleLoadingStatus;
 		this._showDescription.checked = this._doc.prefs.showDescription;
+		this._promptSongDetails.checked = this._doc.prefs.promptSongDetails;
 		this._rainbowifyLoop.checked = this._doc.prefs.rainbowLoop;
 
 		(<any>this._layoutForm.elements)["layout"].value = this._doc.prefs.layout;
@@ -1073,6 +1079,7 @@ export class PreferencesPrompt implements Prompt {
 		this._doc.prefs.showOscilloscope = this._showOscilloscope.checked;
 		this._doc.prefs.showSampleLoadingStatus = this._showSampleLoadingStatus.checked;
 		this._doc.prefs.showDescription = this._showDescription.checked;
+		this._doc.prefs.promptSongDetails = this._promptSongDetails.checked;
 		this._doc.prefs.rainbowLoop = this._rainbowifyLoop.checked;
 
 		this._doc.prefs.layout = (<any>this._layoutForm.elements)["layout"].value;
@@ -1125,7 +1132,7 @@ export class PreferencesPrompt implements Prompt {
 		this._doc.prefs.save();
 		Layout.setLayout(this._doc.prefs.layout);
 		this._close();
-		setTimeout(() => { window.location.reload(); }, 50);
+		if (localStorage.getItem("customLayout") != this._layoutInput.value) setTimeout(() => { window.location.reload(); }, 50); // Someone explain why this is broken
 	}
 
 	private _renderAppearanceArea = (event: Event): void => {

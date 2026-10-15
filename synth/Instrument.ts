@@ -251,7 +251,7 @@ export class Instrument {
     public unisonSign: number = 1.0;
     public effects: number = 0;
     public chord: number = 1;
-    public strumParts: number = 10;
+    public strumParts: number = 1;
     public volume: number = 0;
     public pan: number = Config.panCenter;
     public panDelay: number = 0;
@@ -439,7 +439,7 @@ export class Instrument {
         this.flangerMix = 26;
 
         this.slideTicks = 3;
-        this.strumParts = 10;
+        this.strumParts = 1;
 
         this.pan = Config.panCenter;
         this.panDelay = 0;

@@ -523,6 +523,27 @@ html {
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
+
+.beepboxEditor .details-button {
+	width: var(--button-size);
+}
+.beepboxEditor .details-button::before {
+	content: "";
+	position: absolute;
+	width: var(--button-size);
+	height: var(--button-size);
+	left: 0;
+	top: 0;
+	pointer-events: none;
+	background: var(--primary-text);
+	mask-image: var(--internal-add-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	-webkit-mask-image: var(--internal-add-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+}
+	
 .beepboxEditor .add-envelope:disabled {
 	visibility: hidden;
 }
@@ -1607,18 +1628,18 @@ html {
 }
 
 .beepboxEditor .knobContainer {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: 56px;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	width: 56px;
 }
 
 .beepboxEditor .knob {
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    touch-action: none;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	touch-action: none;
 }
 
 .beepboxEditor .knobTrack {
@@ -1627,29 +1648,32 @@ html {
 
 .beepboxEditor .knobIndicator {
 	stroke: currentColor;
-    stroke-width: 2;
+	stroke-width: 2;
 	stroke-linecap: round;
-    pointer-events: none;
-}
-
-.beepboxEditor .knobIndicatorModulation {
-	stroke: ${ColorConfig.modPrimaryNoteHue};
-    stroke-width: 2;
-	stroke-linecap: butt;
-    pointer-events: none;
+	pointer-events: none;
 }
 
 .beepboxEditor .knobMarker {
-    stroke: ${ColorConfig.uiWidgetFocus};
-    stroke-width: 1.5;
-    pointer-events: none;
+	stroke: ${ColorConfig.blackPianoKey};
+	stroke-width: 2;
+	stroke-linecap: round;
+	pointer-events: none;
 }
 
 .beepboxEditor .knobValueArc {
-    stroke: currentColor;
+	stroke: currentColor;
 	stroke-width: 1.5;
 	stroke-linecap: butt;
-    pointer-events: none;
+	pointer-events: none;
+	fill: none;
+}
+
+.beepboxEditor .knobModulationArc {
+	stroke: ${ColorConfig.overwritingModSlider};
+	stroke-width: 1.5;
+	stroke-linecap: butt;
+	pointer-events: none;
+	fill: none;
 }
 
 .beepboxEditor .selectRow > :last-child {

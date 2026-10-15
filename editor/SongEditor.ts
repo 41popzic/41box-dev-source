@@ -62,6 +62,7 @@ import { PreferencesPrompt } from "./PreferencesPrompt";
 //import { AlertPrompt } from "./AlertPrompt";
 //import { SongTabs } from "./SongTab";
 //import { ContextMenu } from "./Context";
+import { SongDetailsPrompt } from "./SongDetailsPrompt";
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -981,16 +982,21 @@ export class SongEditor {
         div({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._instrumentVolumeSliderInputBox),
     ), this._instrumentVolumeSlider.container);
     private readonly _panSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.panMax, value: Config.panCenter, step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), true);
+    private readonly _panKnob: Knob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), [0, 50, 100])
     private readonly _panDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Pan) }, "▼");
     private readonly _panSliderInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
-    private readonly _panSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
-        span({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("pan") }, "pan: "),
+    /*private readonly _panSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
+        span({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("pan") }, "pan "),
         div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._panSliderInputBox),
-    ), this._panDropdown, this._panSlider.container);
+    ), this._panDropdown, this._panSlider.container);*/
+    private readonly _panKnobRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
+        span({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("pan") }, "pan "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._panSliderInputBox),
+    ), this._panDropdown, this._panKnob.container);
     private readonly _panDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["pan delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePanDelay(this.doc, oldValue, newValue), false);
     private readonly _panDelayRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("panDelay") }, "‣ delay"), this._panDelaySlider.container);
     private readonly _panDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._panDelayRow);
-    private readonly _panContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "panning"), this._panSliderRow, this._panDropdownGroup)
+    private readonly _panContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "panning"), this._panKnobRow, this._panDropdownGroup)
     
     private readonly _chipWaveSelect: HTMLSelectElement = buildOptions(select(), Config.chipWaves.map(wave => wave.name));
     private readonly _chipNoiseSelect: HTMLSelectElement = buildOptions(select(), Config.chipNoises.map(wave => wave.name));
@@ -1077,9 +1083,6 @@ export class SongEditor {
     private readonly _pitchShiftRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose"), this._pitchShiftMarkerContainer);
     private readonly _pitchShiftContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "pitch shift"), this._pitchShiftRow)
     
-    private readonly _testKnob: Knob = new Knob(-25, 25, 1, 0, true, this.doc, (oldValue: number, newValue: number) => new ChangeVolume(this.doc, oldValue, newValue), [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25])
-    private readonly _testKnobRow: HTMLDivElement = div({ style: "display: flex; flex-direction: column"}, this._testKnob.container, div({ style: "padding-bottom: 4px" }, "test knob"));
-
     private readonly _detuneSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue: number, newValue: number) => new ChangeDetune(this.doc, oldValue, newValue), true);
     private readonly _detuneSliderInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
     private readonly _detuneSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
@@ -1308,7 +1311,6 @@ export class SongEditor {
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "effects")),
             div({ class: "effects-menu" }, this._effectsSelect),
         ),
-        this._testKnobRow,
         //this._panSliderRow,
         //this._panDropdownGroup,
         this._panContainer,
@@ -1516,13 +1518,14 @@ export class SongEditor {
             this._sampleLoadingStatusContainer,
         ),
     );
+    private readonly _songDetailsButton: HTMLButtonElement = button({class:"details-button"});
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
         this._modulatorGroup);
     public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
         div({ class: "version-area" },
-            div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText};` },
-                this._songTitleInputBox.input,
+            div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText}; display:flex;` },
+                this._songTitleInputBox.input, this._songDetailsButton
             ),
         ),
         div({ class: "play-pause-area" },
@@ -1918,6 +1921,7 @@ export class SongEditor {
         this._prevBarButton.addEventListener("click", this._whenPrevBarPressed);
         this._nextBarButton.addEventListener("click", this._whenNextBarPressed);
         this._volumeSlider.input.addEventListener("input", this._setVolumeSlider);
+        this._songDetailsButton.addEventListener("click", this._openDetails);
         this._zoomInButton.addEventListener("click", this._zoomIn);
         this._zoomOutButton.addEventListener("click", this._zoomOut);
         this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
@@ -2187,6 +2191,10 @@ export class SongEditor {
                 : "add current division to favorites";
     }
 
+    private _openDetails = (): void => {
+        this._openPrompt("songDetails");
+    }
+
     private _whenSampleLoadingStatusClicked = (): void => {
         this._openPrompt("sampleLoadingStatus");
     }
@@ -2312,7 +2320,8 @@ export class SongEditor {
         }
     }
 
-    private _modSliderUpdate(): void {
+
+    private _modSliderAndKnobUpdate(): void {
 
         if (!this.doc.synth.playing) {
             this._hasActiveModSliders = false;
@@ -2323,85 +2332,92 @@ export class SongEditor {
                     if (this._showModSliders[setting][index] == true) {
                         this._showModSliders[setting][index] = false;
                         this._newShowModSliders[setting][index] = false;
+                        this._modSliderValues[setting][index] = NaN;
                         let slider: Slider | null = this.getSliderForModSetting(setting, index);
+                        let knob: Knob | null = this.getKnobForModSetting(setting, index);
                         
                         if (slider != null) {
                             slider.container.classList.remove("modSlider");
-
+                        }
+                        if (knob != null) {
+                            knob.updateModulation(null);
+                            knob.container.classList.remove("modKnob");
                         }
                     }
                 }
             }
+
         } else {
 
             let instrument: number = this.doc.getCurrentInstrument();
             const anyModActive: boolean = this.doc.synth.isAnyModActive(this.doc.channel, instrument);
 
-            // Check and update mod values on sliders
+            // Check and update mod values on sliders (and knobs)
             if (anyModActive) {
 
-                let instrument: number = this.doc.getCurrentInstrument();
-
-                function updateModSlider(editor: SongEditor, slider: Slider, setting: number, channel: number, instrument: number, index: number): boolean {
-                    if (editor.doc.synth.isModActive(setting, channel, instrument)) {
-                        if (Config.modulators[setting].maxIndex > 0) {
-                            //detect that the mod actually does need updating for the specific index
-                            const envelope = editor.doc.synth.song!.channels[channel].instruments[instrument].envelopes[index];
-                            if (!envelope) return false;
-                            switch (setting) {
-                                case Config.modulators.dictionary["individual envelope speed"].index: {
-                                    if (envelope.tempEnvelopeSpeed == null || envelope.tempEnvelopeSpeed == undefined) {
-                                        return false;
-                                    }
-                                    break;
-                                }
-                                case Config.modulators.dictionary["individual envelope lower bound"].index: {
-                                    if (envelope.tempEnvelopeLowerBound == null || envelope.tempEnvelopeLowerBound == undefined) {
-                                        return false;
-                                    }
-                                    break;
-                                }
-                                case Config.modulators.dictionary["individual envelope upper bound"].index: {
-                                    if (envelope.tempEnvelopeUpperBound == null || envelope.tempEnvelopeUpperBound == undefined) {
-                                        return false;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        let currentVal: number = (editor.doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
-
-                        if (Config.modulators[setting].invertSliderIndicator == true) {
-                            currentVal = 1 - currentVal;
-                        }
-
-                        if (currentVal != editor._modSliderValues[setting][index]) {
-                            editor._modSliderValues[setting][index] = currentVal;
-                            slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
-                        }
-                        return true;
+                function updateModControl(editor: SongEditor, setting: number, channel: number, instrument: number, index: number): boolean {
+                    if (!editor.doc.synth.isModActive(setting, channel, instrument)) {
+                        return false;
                     }
-                    return false;
-                }
 
-                // Set mod sliders to present values
-                for (let setting: number = 0; setting < Config.modulators.length; setting++) {
-                    for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
-                        // Set to last value
-                        this._newShowModSliders[setting][index] = Boolean(this._showModSliders[setting][index]);
+                    if (Config.modulators[setting].maxIndex > 0) {
+                        const envelope = editor.doc.synth.song!.channels[channel].instruments[instrument].envelopes[index];
+                        if (!envelope) return false;
 
-                        // Check for newer value
-                        let slider: Slider | null = this.getSliderForModSetting(setting, index);
+                        switch (setting) {
+                            case Config.modulators.dictionary["individual envelope speed"].index:
+                                if (envelope.tempEnvelopeSpeed == null) return false;
+                                break;
+
+                            case Config.modulators.dictionary["individual envelope lower bound"].index:
+                                if (envelope.tempEnvelopeLowerBound == null) return false;
+                                break;
+
+                            case Config.modulators.dictionary["individual envelope upper bound"].index:
+                                if (envelope.tempEnvelopeUpperBound == null) return false;
+                                break;
+                        }
+                    }
+                    let currentVal: number =
+                        (editor.doc.synth.getModValue(setting, channel, instrument, false)
+                        - Config.modulators[setting].convertRealFactor)
+                        / Config.modulators[setting].maxRawVol;
+
+                    if (Config.modulators[setting].invertSliderIndicator) {
+                        currentVal = 1 - currentVal;
+                    }
+
+                    if (currentVal != editor._modSliderValues[setting][index]) {
+                        editor._modSliderValues[setting][index] = currentVal;
+
+                        let knob: Knob | null = editor.getKnobForModSetting(setting, index);
+                        let slider: Slider | null = editor.getSliderForModSetting(setting, index);
+
+                        if (knob != null) {
+                            knob.updateModulation(currentVal);
+                        }
 
                         if (slider != null) {
-                            this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this.doc.channel, instrument, index);
+                            slider.container.style.setProperty(
+                                "--mod-position",
+                                (currentVal * 96.0 + 2.0) + "%"
+                            );
                         }
+                    }
+
+                    return true;
+                }
+                // Set mod knobs and sliders to present values
+                for (let setting: number = 0; setting < Config.modulators.length; setting++) {
+                    for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                        this._newShowModSliders[setting][index] =
+                            updateModControl(this, setting, this.doc.channel, instrument, index);
                     }
                 }
 
-            }
-            else if (this._hasActiveModSliders) {
-                // Zero out show-mod-slider settings (since none are active) to kill active mod slider flag
+            } else if (this._hasActiveModSliders) {
+
+                // Clear mod-knob active flags when no modulation is active
                 for (let setting: number = 0; setting < Config.modulators.length; setting++) {
                     for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
                         this._newShowModSliders[setting][index] = false;
@@ -2409,41 +2425,51 @@ export class SongEditor {
                 }
             }
 
-            // Class or unclass mod sliders based on present status
+            // Add or remove mod-knob styling based on current status
             if (anyModActive || this._hasActiveModSliders) {
 
-                let anySliderActive: boolean = false;
+                let anyKnobActive: boolean = false;
 
                 for (let setting: number = 0; setting < Config.modulators.length; setting++) {
                     for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+
                         if (this._newShowModSliders[setting][index] != this._showModSliders[setting][index]) {
                             this._showModSliders[setting][index] = this._newShowModSliders[setting][index];
+
+                            let knob: Knob | null = this.getKnobForModSetting(setting, index);
                             let slider: Slider | null = this.getSliderForModSetting(setting, index);
 
-                            if (slider != null) {
+                            if (this._showModSliders[setting][index]) {
+                                if (knob != null) {
+                                    knob.container.classList.add("modKnob");
+                                }
 
-                                if (this._showModSliders[setting][index] == true) {
+                                if (slider != null) {
                                     slider.container.classList.add("modSlider");
                                 }
-                                else {
-                                    slider.container.classList.remove("modSlider");
+                            } else {
+                                if (knob != null) {
+                                    knob.container.classList.remove("modKnob");
+                                    knob.updateModulation(null);
                                 }
 
+                                if (slider != null) {
+                                    slider.container.classList.remove("modSlider");
+                                }
                             }
                         }
 
-                        if (this._newShowModSliders[setting][index] == true)
-                            anySliderActive = true;
+                        if (this._newShowModSliders[setting][index] == true) {
+                            anyKnobActive = true;
+                        }
                     }
                 }
 
-                this._hasActiveModSliders = anySliderActive;
-
+                this._hasActiveModSliders = anyKnobActive;
             }
-
         }
-
     }
+
 
     public getSliderForModSetting(setting: number, index?: number): Slider | null {
         index = index == undefined ? 0 : index;
@@ -2560,6 +2586,18 @@ export class SongEditor {
 
     }
 
+    public getKnobForModSetting(setting: number, index?: number): Knob | null {
+        index = index == undefined ? 0 : index;
+
+        switch (setting) {
+            case Config.modulators.dictionary["pan"].index:
+                return this._panKnob;
+
+            default:
+                return null;
+        }
+    }
+
     private _openPrompt(promptName: string): void {
         this.doc.openPrompt(promptName);
         this._setPrompt(promptName);
@@ -2649,6 +2687,9 @@ export class SongEditor {
                     break;
                 case "generateEuclideanRhythm":
                     this.prompt = new EuclideanRhythmPrompt(this.doc);
+                    break;
+                case "songDetails":
+                    this.prompt = new SongDetailsPrompt(this.doc);
                     break;
                 case "customTheme":
                     this.prompt = new CustomThemePrompt(this.doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
@@ -2898,7 +2939,8 @@ export class SongEditor {
         if (!this.doc.song.getChannelIsMod(this.doc.channel)) {
 
             this._customInstrumentSettingsGroup.style.display = "";
-            this._panSliderRow.style.display = "";
+            //this._panSliderRow.style.display = "";
+            this._panKnobRow.style.display = "";
             this._panDropdownGroup.style.display = (this._openPanDropdown ? "" : "none");
             this._panContainer.style.display = "";
             this._detuneSliderRow.style.display = "";
@@ -3330,13 +3372,14 @@ export class SongEditor {
             }
 
             if (effectsIncludePanning(instrument.effects)) {
-                this._panSliderRow.style.display = "";
+                //this._panSliderRow.style.display = "";
                 if (this._openPanDropdown)
                     this._panDropdownGroup.style.display = "";
                 this._panSlider.updateValue(instrument.pan);
+                this._panKnob.updateValue(instrument.pan);
                 this._panContainer.style.display = "";
             } else {
-                this._panSliderRow.style.display = "none";
+                //this._panSliderRow.style.display = "none";
                 this._panDropdownGroup.style.display = "none";
                 this._panContainer.style.display = "none";
             }
@@ -3517,7 +3560,7 @@ export class SongEditor {
             this._panDelaySlider.input.title = "" + instrument.panDelay;
             this._arpeggioSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
             this._arpeggioSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
-            this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
+            this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat * 10) + " beat(s)";
             this._eqFilterSimpleCutSlider.updateValue(instrument.eqFilterSimpleCut);
             this._eqFilterSimplePeakSlider.updateValue(instrument.eqFilterSimplePeak);
             this._noteFilterSimpleCutSlider.updateValue(instrument.noteFilterSimpleCut);
@@ -3599,7 +3642,8 @@ export class SongEditor {
             //this._intervalSelectRow.style.display = "none";
             this._detuneSliderRow.style.display = "none";
             this._detuneContainer.style.display = "none";
-            this._panSliderRow.style.display = "none";
+            //this._panSliderRow.style.display = "none";
+            this._panKnobRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
             this._panContainer.style.display = "none";
             this._pulseWidthDropdownGroup.style.display = "none";
@@ -4230,7 +4274,8 @@ export class SongEditor {
             //this._instrumentSelectRow.style.display = "none";
 
             this._customInstrumentSettingsGroup.style.display = "none";
-            this._panSliderRow.style.display = "none";
+            //this._panSliderRow.style.display = "none";
+            this._panKnobRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
             this._instrumentVolumeSliderRow.style.display = "none";
             this._instrumentTypeSelectRow.style.setProperty("display", "none");
@@ -4327,6 +4372,15 @@ export class SongEditor {
             // A dummy change that pushes history state.
             this.doc.record(new ChangeHoldingModRecording(this.doc, null, null, null));
         }
+        if (this.doc.song.showSongDetails && EditorConfig.showSongDetailsAlert && this.doc.prefs.promptSongDetails) {
+            alert(
+            (this.doc.song.title != "" ? this.doc.song.title : "Untitled") +
+            (this.doc.song.author != "" ? "\n\nBy " + this.doc.song.author : "") +
+            (this.doc.song.description != "" ? "\n\n\n" + this.doc.song.description : "")
+            );
+        }
+        // always set showSongDetailsAlert to false, as if you set it to false in the if block it'll pop up when you change the "Prompt Song Details on Load" preference
+        EditorConfig.showSongDetailsAlert = false
     }
 
     private _renderInstrumentBar(channel: Channel, instrumentIndex: number, colors: ChannelColors) {
@@ -5435,7 +5489,7 @@ export class SongEditor {
 
     public _animate = (): void => {
         // Need to update mods once more to clear the slider display
-        this._modSliderUpdate();
+        this._modSliderAndKnobUpdate();
         // Same for volume display
         if (this.doc.prefs.displayVolumeBar) {
             this._volumeUpdate();

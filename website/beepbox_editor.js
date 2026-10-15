@@ -3690,6 +3690,9 @@ var beepbox = (() => {
       this.ctrlName = _EditorConfig.isOnMac ? "command" : "control";
     }
     static {
+      this.showSongDetailsAlert = true;
+    }
+    static {
       this.presetCategories = toNameMap([
         {
           // The order of this array needs to line up with the order of the InstrumentType declarations in SynthConfig.ts. (changes.ts' random instrument generation relies on this, for one.)
@@ -17000,6 +17003,27 @@ html {
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
+
+.beepboxEditor .details-button {
+	width: var(--button-size);
+}
+.beepboxEditor .details-button::before {
+	content: "";
+	position: absolute;
+	width: var(--button-size);
+	height: var(--button-size);
+	left: 0;
+	top: 0;
+	pointer-events: none;
+	background: var(--primary-text);
+	mask-image: var(--internal-add-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	-webkit-mask-image: var(--internal-add-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+}
+	
 .beepboxEditor .add-envelope:disabled {
 	visibility: hidden;
 }
@@ -18084,18 +18108,18 @@ html {
 }
 
 .beepboxEditor .knobContainer {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: 56px;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	width: 56px;
 }
 
 .beepboxEditor .knob {
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    touch-action: none;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	touch-action: none;
 }
 
 .beepboxEditor .knobTrack {
@@ -18104,29 +18128,32 @@ html {
 
 .beepboxEditor .knobIndicator {
 	stroke: currentColor;
-    stroke-width: 2;
+	stroke-width: 2;
 	stroke-linecap: round;
-    pointer-events: none;
-}
-
-.beepboxEditor .knobIndicatorModulation {
-	stroke: ${ColorConfig.modPrimaryNoteHue};
-    stroke-width: 2;
-	stroke-linecap: butt;
-    pointer-events: none;
+	pointer-events: none;
 }
 
 .beepboxEditor .knobMarker {
-    stroke: ${ColorConfig.uiWidgetFocus};
-    stroke-width: 1.5;
-    pointer-events: none;
+	stroke: ${ColorConfig.blackPianoKey};
+	stroke-width: 2;
+	stroke-linecap: round;
+	pointer-events: none;
 }
 
 .beepboxEditor .knobValueArc {
-    stroke: currentColor;
+	stroke: currentColor;
 	stroke-width: 1.5;
 	stroke-linecap: butt;
-    pointer-events: none;
+	pointer-events: none;
+	fill: none;
+}
+
+.beepboxEditor .knobModulationArc {
+	stroke: ${ColorConfig.overwritingModSlider};
+	stroke-width: 1.5;
+	stroke-linecap: butt;
+	pointer-events: none;
+	fill: none;
 }
 
 .beepboxEditor .selectRow > :last-child {
@@ -19845,7 +19872,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.unisonSign = 1;
       this.effects = 0;
       this.chord = 1;
-      this.strumParts = 10;
+      this.strumParts = 1;
       this.volume = 0;
       this.pan = Config.panCenter;
       this.panDelay = 0;
@@ -19995,7 +20022,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.flangerFeedback = 13;
       this.flangerMix = 26;
       this.slideTicks = 3;
-      this.strumParts = 10;
+      this.strumParts = 1;
       this.pan = Config.panCenter;
       this.panDelay = 0;
       this.pitchShift = Config.pitchShiftCenter;
@@ -21347,8 +21374,8 @@ li.select2-results__option[role=group] > strong:hover {
   var PRIME32_4 = 668265263;
   var PRIME32_5 = 374761393;
   var encoder;
-  function xxHash32(input20, seed = 0) {
-    const buffer = typeof input20 === "string" ? (encoder ??= new TextEncoder()).encode(input20) : input20;
+  function xxHash32(input21, seed = 0) {
+    const buffer = typeof input21 === "string" ? (encoder ??= new TextEncoder()).encode(input21) : input21;
     const b = buffer;
     let acc = seed + PRIME32_5 & 4294967295;
     let offset = 0;
@@ -21538,7 +21565,7 @@ li.select2-results__option[role=group] > strong:hover {
           const noteEndTick = tone.noteEndPart * Config.ticksPerPart;
           const noteLengthTicks = noteEndTick - noteStartTick;
           const maximumSlideTicks = noteLengthTicks * 0.5;
-          let slideTicks = instrument.slideTicks * 10;
+          let slideTicks = instrument.slideTicks * 7;
           slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
           if (tone.prevNote != null && !tone.forceContinueAtStart) {
             if (tickTimeStartReal - noteStartTick < slideTicks) {
@@ -23911,6 +23938,9 @@ li.select2-results__option[role=group] > strong:hover {
         this.eqSubFilters[i] = null;
       }
       this.title = "Unnamed";
+      this.author = "";
+      this.description = "";
+      this.showSongDetails = false;
       this.titleNotifier.forEach((o) => o());
       if (andResetChannels) {
         this.pitchChannelCount = 3;
@@ -23959,6 +23989,17 @@ li.select2-results__option[role=group] > strong:hover {
       for (let i2 = 0; i2 < encodedSongTitle.length; i2++) {
         buffer.push(encodedSongTitle.charCodeAt(i2));
       }
+      var encodedAuthorTitle = encodeURIComponent(this.author);
+      buffer.push(base64IntToCharCode[encodedAuthorTitle.length >> 6], base64IntToCharCode[encodedAuthorTitle.length & 63]);
+      for (let i2 = 0; i2 < encodedAuthorTitle.length; i2++) {
+        buffer.push(encodedAuthorTitle.charCodeAt(i2));
+      }
+      var encodedDescriptionTitle = encodeURIComponent(this.description);
+      buffer.push(base64IntToCharCode[encodedDescriptionTitle.length >> 6], base64IntToCharCode[encodedDescriptionTitle.length & 63]);
+      for (let i2 = 0; i2 < encodedDescriptionTitle.length; i2++) {
+        buffer.push(encodedDescriptionTitle.charCodeAt(i2));
+      }
+      buffer.push(base64IntToCharCode[this.showSongDetails ? 1 : 0]);
       buffer.push(110 /* channelCount */, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
       buffer.push(115 /* scale */, base64IntToCharCode[this.scale]);
       if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -24704,6 +24745,15 @@ li.select2-results__option[role=group] > strong:hover {
             this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
             this.titleNotifier.forEach((o) => o());
             charIndex += songNameLength;
+            if (fromUltraBox && !beforeSix || from41Box && !beforeFour) {
+              var songAuthorLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+              this.author = decodeURIComponent(compressed.substring(charIndex, charIndex + songAuthorLength));
+              charIndex += songAuthorLength;
+              var songDescriptionLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+              this.description = decodeURIComponent(compressed.substring(charIndex, charIndex + songDescriptionLength));
+              charIndex += songDescriptionLength;
+              this.showSongDetails = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+            }
           }
           break;
         case 110 /* channelCount */:
@@ -26918,6 +26968,9 @@ li.select2-results__option[role=group] > strong:hover {
         "name": this.title,
         "format": _Song._format,
         "version": _Song._latest41BoxVersion,
+        "author": this.author,
+        "description": this.description,
+        "showSongDetails": this.showSongDetails,
         "scale": Config.scales[this.scale].name,
         "customScale": this.scaleCustom,
         "key": Config.keys[this.key].name,
@@ -26966,6 +27019,15 @@ li.select2-results__option[role=group] > strong:hover {
       const format = (jsonFormat == "auto" ? jsonObject["format"] : jsonFormat).toLowerCase();
       if (jsonObject["name"] != void 0) {
         this.title = jsonObject["name"];
+      }
+      if (jsonObject["author"] != void 0) {
+        this.author = jsonObject["author"];
+      }
+      if (jsonObject["description"] != void 0) {
+        this.description = jsonObject["description"];
+      }
+      if (jsonObject["showSongDetails"] != void 0) {
+        this.showSongDetails = jsonObject["showSongDetails"];
       }
       if (jsonObject["customSamples"] != void 0) {
         const customSamples = jsonObject["customSamples"];
@@ -29488,7 +29550,7 @@ li.select2-results__option[role=group] > strong:hover {
                   noteEndPart = Math.min(Config.partsPerBeat * this.song.beatsPerBar, noteEndPart + strumOffsetParts);
                 }
                 if (!transition2.continues && !forceContinueAtStart || prevNoteForThisTone == null) {
-                  if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
+                  if (useStrumSpeed) strumOffsetParts += instrument.strumParts * 10;
                 }
                 const atNoteStart = Config.ticksPerPart * noteStartPart == currentTick;
                 let tone;
@@ -34461,6 +34523,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
       this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
       this.oldModNotes = window.localStorage.getItem("oldModNotes") == "true";
+      this.promptSongDetails = window.localStorage.getItem("promptSongDetails") != "false";
       this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "pianoTransposingC";
       this.bassOffset = +window.localStorage.getItem("bassOffset") || 0;
       this.layout = window.localStorage.getItem("layout") || "wide long";
@@ -34516,6 +34579,7 @@ li.select2-results__option[role=group] > strong:hover {
       window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
       window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
       window.localStorage.setItem("oldModNotes", this.oldModNotes ? "true" : "false");
+      window.localStorage.setItem("promptSongDetails", this.promptSongDetails ? "true" : "false");
       window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
       window.localStorage.setItem("bassOffset", String(this.bassOffset));
       window.localStorage.setItem("layout", this.layout);
@@ -40013,6 +40077,45 @@ li.select2-results__option[role=group] > strong:hover {
       if (oldValue != newValue) this._didSomething();
     }
   };
+  var ChangeSongAuthor = class extends Change {
+    static {
+      __name(this, "ChangeSongAuthor");
+    }
+    constructor(doc, oldValue, newValue) {
+      super();
+      if (newValue.length > 30) {
+        newValue = newValue.substring(0, 30);
+      }
+      doc.song.author = newValue;
+      doc.notifier.changed();
+      if (oldValue != newValue) this._didSomething();
+    }
+  };
+  var ChangeSongDescription = class extends Change {
+    static {
+      __name(this, "ChangeSongDescription");
+    }
+    constructor(doc, oldValue, newValue) {
+      super();
+      if (newValue.length > 1200) {
+        newValue = newValue.substring(0, 1200);
+      }
+      doc.song.description = newValue;
+      doc.notifier.changed();
+      if (oldValue != newValue) this._didSomething();
+    }
+  };
+  var ChangeShowSongDetails = class extends Change {
+    static {
+      __name(this, "ChangeShowSongDetails");
+    }
+    constructor(doc, oldValue, newValue) {
+      super();
+      doc.song.showSongDetails = newValue;
+      doc.notifier.changed();
+      if (oldValue != newValue) this._didSomething();
+    }
+  };
   var ChangeChannelName = class extends Change {
     static {
       __name(this, "ChangeChannelName");
@@ -42555,6 +42658,12 @@ li.select2-results__option[role=group] > strong:hover {
       const visibleOctaveCount = this.getVisibleOctaveCount();
       return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
     }
+    samplesToTime(samples) {
+      const rawSeconds = Math.round(samples / this.synth.samplesPerSecond);
+      const seconds = rawSeconds % 60;
+      const minutes = Math.floor(rawSeconds / 60);
+      return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    }
   };
 
   // editor/ArrayBufferWriter.ts
@@ -43040,25 +43149,25 @@ li.select2-results__option[role=group] > strong:hover {
       this._fileName.value = newValue;
     }
     static _validateFileName(event, use) {
-      let input20;
+      let input21;
       if (event != null) {
-        input20 = event.target;
+        input21 = event.target;
       } else if (use != void 0) {
-        input20 = use;
+        input21 = use;
       } else {
         return;
       }
       const deleteChars = /[\+\*\$\?\|\{\}\\\/<>#%!`&'"=:@]/gi;
-      if (deleteChars.test(input20.value)) {
-        let cursorPos = input20.selectionStart;
-        input20.value = input20.value.replace(deleteChars, "");
+      if (deleteChars.test(input21.value)) {
+        let cursorPos = input21.selectionStart;
+        input21.value = input21.value.replace(deleteChars, "");
         cursorPos--;
-        input20.setSelectionRange(cursorPos, cursorPos);
+        input21.setSelectionRange(cursorPos, cursorPos);
       }
     }
     static _validateNumber(event) {
-      const input20 = event.target;
-      input20.value = Math.floor(Math.max(Number(input20.min), Math.min(Number(input20.max), Number(input20.value)))) + "";
+      const input21 = event.target;
+      input21.value = Math.floor(Math.max(Number(input21.min), Math.min(Number(input21.max), Number(input21.value)))) + "";
     }
     _synthesize() {
       if (this.outputStarted == false) {
@@ -43912,11 +44021,11 @@ You should be redirected to the song at:<br /><br />
       return false;
     }
     static _validateNumber(event) {
-      const input20 = event.target;
-      input20.value = String(_BeatsPerBarPrompt._validate(input20));
+      const input21 = event.target;
+      input21.value = String(_BeatsPerBarPrompt._validate(input21));
     }
-    static _validate(input20) {
-      return Math.floor(Math.max(Number(input20.min), Math.min(Number(input20.max), Number(input20.value))));
+    static _validate(input21) {
+      return Math.floor(Math.max(Number(input21.min), Math.min(Number(input21.max), Number(input21.value))));
     }
     _predictFutureLength() {
       const futureDoc = new SongDocument();
@@ -44020,8 +44129,8 @@ You should be redirected to the song at:<br /><br />
         }
       }, "_whenKeyPressed");
       this._validateNumber = /* @__PURE__ */ __name((event) => {
-        const input20 = event.target;
-        input20.value = String(_ChannelSettingsPrompt._validate(input20));
+        const input21 = event.target;
+        input21.value = String(_ChannelSettingsPrompt._validate(input21));
       }, "_validateNumber");
       this._saveChanges = /* @__PURE__ */ __name(() => {
         const group = new ChangeGroup();
@@ -44070,8 +44179,8 @@ You should be redirected to the song at:<br /><br />
       }
       return false;
     }
-    static _validate(input20) {
-      return Math.floor(Math.max(Number(input20.min), Math.min(Number(input20.max), Number(input20.value))));
+    static _validate(input21) {
+      return Math.floor(Math.max(Number(input21.min), Math.min(Number(input21.max), Number(input21.value))));
     }
   };
 
@@ -45301,20 +45410,20 @@ You should be redirected to the song at:<br /><br />
       __name(this, "InstrumentExportPrompt");
     }
     static _validateFileName(event, use) {
-      let input20;
+      let input21;
       if (event != null) {
-        input20 = event.target;
+        input21 = event.target;
       } else if (use != void 0) {
-        input20 = use;
+        input21 = use;
       } else {
         return;
       }
       const deleteChars = /[\+\*\$\?\|\{\}\\\/<>#%!`&'"=:@]/gi;
-      if (deleteChars.test(input20.value)) {
-        let cursorPos = input20.selectionStart;
-        input20.value = input20.value.replace(deleteChars, "");
+      if (deleteChars.test(input21.value)) {
+        let cursorPos = input21.selectionStart;
+        input21.value = input21.value.replace(deleteChars, "");
         cursorPos--;
-        input20.setSelectionRange(cursorPos, cursorPos);
+        input21.setSelectionRange(cursorPos, cursorPos);
       }
     }
   };
@@ -47037,8 +47146,8 @@ You should be redirected to the song at:<br /><br />
   // editor/HTMLWrapper.ts
   var { span: span2 } = HTML;
   var InputBox = class {
-    constructor(input20, _doc, _getChange) {
-      this.input = input20;
+    constructor(input21, _doc, _getChange) {
+      this.input = input21;
       this._doc = _doc;
       this._getChange = _getChange;
       this._change = null;
@@ -47054,8 +47163,8 @@ You should be redirected to the song at:<br /><br />
         this._doc.record(this._change);
         this._change = null;
       }, "_whenChange");
-      input20.addEventListener("input", this._whenInput);
-      input20.addEventListener("change", this._whenChange);
+      input21.addEventListener("input", this._whenInput);
+      input21.addEventListener("change", this._whenChange);
     }
     static {
       __name(this, "InputBox");
@@ -47066,8 +47175,8 @@ You should be redirected to the song at:<br /><br />
     }
   };
   var Slider = class {
-    constructor(input20, _doc, _getChange, midTick) {
-      this.input = input20;
+    constructor(input21, _doc, _getChange, midTick) {
+      this.input = input21;
       this._doc = _doc;
       this._getChange = _getChange;
       this._change = null;
@@ -47087,9 +47196,9 @@ You should be redirected to the song at:<br /><br />
           this._change = null;
         }
       }, "_whenChange");
-      this.container = midTick ? span2({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input20) : span2({ style: "position: sticky;" }, input20);
-      input20.addEventListener("input", this._whenInput);
-      input20.addEventListener("change", this._whenChange);
+      this.container = midTick ? span2({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input21) : span2({ style: "position: sticky;" }, input21);
+      input21.addEventListener("input", this._whenInput);
+      input21.addEventListener("change", this._whenChange);
     }
     static {
       __name(this, "Slider");
@@ -47115,23 +47224,21 @@ You should be redirected to the song at:<br /><br />
       this._doc = _doc;
       this._getChange = _getChange;
       this._markings = _markings;
-      this._marker = line({ x1: "24", y1: "24", x2: "24", y2: "9", class: "knobIndicator" });
-      this._valueArc = path({ class: "knobValueArc", fill: "none", "stroke-width": "2.5", "stroke-linecap": "round" });
+      this._marker = line({ x1: "20", y1: "20", x2: "20", y2: "9", class: "knobIndicator" });
+      this._modulationArc = path({ class: "knobModulationArc" });
+      this._valueArc = path({ class: "knobValueArc" });
       this._svg = svg(
-        { class: "knob", viewBox: "0 0 48 48", role: "slider", tabindex: "0", "aria-label": "Parameter" },
-        circle({ cx: "24", cy: "24", r: "20", class: "knobTrack" }),
-        this._valueArc,
-        this._marker
+        { class: "knob", viewBox: "0 0 44 44", role: "slider", tabindex: "0", "aria-label": "Parameter" },
+        circle({ cx: "22", cy: "22", r: "17", class: "knobTrack" })
       );
-      //private readonly _valueDisplay: HTMLInputElement = input({ class: "knobValue", type: "number", style: "width: 4em;" });
       this._change = null;
       this._value = 0;
+      this._modulationValue = null;
       this._oldValue = 0;
       this._dragging = false;
       this._lastY = 0;
-      this.innerRadius = 3;
-      this.outerRadius = 18;
-      this.radiusOffset = 5;
+      this.innerRadius = 5;
+      this.outerRadius = 14.5;
       this._whenPointerDown = /* @__PURE__ */ __name((event) => {
         if (event.button !== 0) return;
         this._dragging = true;
@@ -47157,6 +47264,7 @@ You should be redirected to the song at:<br /><br />
       this._createMarkers();
       this.container.appendChild(this._svg);
       this._svg.appendChild(this._valueArc);
+      this._svg.appendChild(this._modulationArc);
       this._svg.appendChild(this._marker);
       this._updateDisplay();
       this._addEventListeners();
@@ -47186,38 +47294,36 @@ You should be redirected to the song at:<br /><br />
     }
     _updateArc() {
       const percentage = (this._value - this._min) / (this._max - this._min || 1);
-      const angle = this._bipolar ? this._value / Math.max(Math.abs(this._min), Math.abs(this._max)) * 150 : -150 + percentage * 180;
-      const startAngle = this._bipolar ? 0 : -150;
+      const angle = this._bipolar ? (percentage * 2 - 1) * 135 : -90 + percentage * 180;
+      const startAngle = this._bipolar ? 0 : -90;
       const endAngle = angle;
       if (Math.abs(endAngle - startAngle) < 1e-3) {
         this._valueArc.setAttribute("d", "");
         return;
       }
       const radius = this.outerRadius + 4;
-      const x1 = 24 + Math.sin(startAngle * Math.PI / 180) * radius;
-      const y1 = 24 - Math.cos(startAngle * Math.PI / 180) * radius;
-      const x2 = 24 + Math.sin(endAngle * Math.PI / 180) * radius;
-      const y2 = 24 - Math.cos(endAngle * Math.PI / 180) * radius;
-      const sweep = this._bipolar ? endAngle > 0 ? 1 : 0 : 1;
-      this._valueArc.setAttribute(
-        "d",
-        `M ${x1} ${y1} A ${radius} ${radius} 0 0 ${sweep} ${x2} ${y2}`
-      );
+      const x1 = 22 + Math.sin(startAngle * Math.PI / 180) * radius;
+      const y1 = 22 - Math.cos(startAngle * Math.PI / 180) * radius;
+      const x2 = 22 + Math.sin(endAngle * Math.PI / 180) * radius;
+      const y2 = 22 - Math.cos(endAngle * Math.PI / 180) * radius;
+      const sweep = this._bipolar ? endAngle > startAngle ? 1 : 0 : 1;
+      this._valueArc.setAttribute("d", `M ${x1} ${y1} A ${radius} ${radius} 0 0 ${sweep} ${x2} ${y2}`);
     }
     _updateDisplay() {
       const percentage = (this._value - this._min) / (this._max - this._min || 1);
-      const angle = this._bipolar ? this._value / Math.max(Math.abs(this._min), Math.abs(this._max)) * 150 : -150 + percentage * 180;
+      const angle = this._bipolar ? (percentage * 2 - 1) * 135 : -90 + percentage * 180;
       const radians = angle * Math.PI / 180;
       this._updateArc();
       this._svg.setAttribute("aria-valuemin", this._min.toString());
       this._svg.setAttribute("aria-valuemax", this._max.toString());
       this._svg.setAttribute("aria-valuenow", this._value.toString());
-      const innerRadius = this.innerRadius + this.radiusOffset;
+      const innerRadius = this.innerRadius;
       const outerRadius = this.outerRadius;
-      this._svg.querySelector(".knobIndicator")?.setAttribute("x1", (24 + Math.sin(radians) * innerRadius).toString());
-      this._svg.querySelector(".knobIndicator")?.setAttribute("y1", (24 - Math.cos(radians) * innerRadius).toString());
-      this._svg.querySelector(".knobIndicator")?.setAttribute("x2", (24 + Math.sin(radians) * outerRadius).toString());
-      this._svg.querySelector(".knobIndicator")?.setAttribute("y2", (24 - Math.cos(radians) * outerRadius).toString());
+      this._svg.querySelector(".knobIndicator")?.setAttribute("x1", (22 + Math.sin(radians) * innerRadius).toString());
+      this._svg.querySelector(".knobIndicator")?.setAttribute("y1", (22 - Math.cos(radians) * innerRadius).toString());
+      this._svg.querySelector(".knobIndicator")?.setAttribute("x2", (22 + Math.sin(radians) * outerRadius).toString());
+      this._svg.querySelector(".knobIndicator")?.setAttribute("y2", (22 - Math.cos(radians) * outerRadius).toString());
+      this._updateModulationArc();
     }
     setTitle(title) {
       this._svg.setAttribute("title", title);
@@ -47226,29 +47332,14 @@ You should be redirected to the song at:<br /><br />
       for (const value of this._markings) {
         if (value < this._min || value > this._max) continue;
         const percentage = (value - this._min) / (this._max - this._min || 1);
-        const angle = this._bipolar ? value / Math.max(Math.abs(this._min), Math.abs(this._max)) * 150 : -150 + percentage * 180;
+        const angle = this._bipolar ? (percentage * 2 - 1) * 135 : -90 + percentage * 180;
         const radians = angle * Math.PI / 180;
-        const innerRadius = this.outerRadius + 3;
-        const outerRadius = this.outerRadius + 5;
-        const tick = line({ x1: (24 + Math.sin(radians) * innerRadius).toString(), y1: (24 - Math.cos(radians) * innerRadius).toString(), x2: (24 + Math.sin(radians) * outerRadius).toString(), y2: (24 - Math.cos(radians) * outerRadius).toString(), class: "knobMarker" });
+        const innerRadius = this.outerRadius + 2;
+        const outerRadius = this.outerRadius + 6;
+        const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: "knobMarker" });
         this._svg.appendChild(tick);
       }
     }
-    /*private _whenValueChanged = (): void => {
-            const value = Number(this._valueDisplay.value);
-    
-            if (!Number.isFinite(value)) {
-                this._updateDisplay();
-                return;
-            }
-    
-            this._setValue(value);
-    
-            if (this._getChange != null && this._change != null) {
-                this._doc.record(this._change);
-                this._change = null;
-            }
-        };*/
     _addEventListeners() {
       this._svg.addEventListener("pointerdown", this._whenPointerDown);
       this._svg.addEventListener("pointermove", this._whenPointerMove);
@@ -47259,6 +47350,35 @@ You should be redirected to the song at:<br /><br />
       this._svg.querySelector(".knobIndicator")?.setAttribute("stroke", color);
     }
     // Might be strange to put this here
+    updateModulation(value) {
+      this._modulationValue = value;
+      this._updateModulationArc();
+    }
+    _updateModulationArc() {
+      if (this._modulationValue == null) {
+        this._modulationArc.setAttribute("d", "");
+        return;
+      }
+      const modValue = this._min + this._modulationValue * (this._max - this._min);
+      const basePercentage = (this._value - this._min) / (this._max - this._min || 1);
+      const modPercentage = (modValue - this._min) / (this._max - this._min || 1);
+      const baseAngle = this._bipolar ? (basePercentage * 2 - 1) * 135 : -90 + basePercentage * 180;
+      const modAngle = this._bipolar ? (modPercentage * 2 - 1) * 135 : -90 + modPercentage * 180;
+      if (Math.abs(modAngle - baseAngle) < 1e-3) {
+        this._modulationArc.setAttribute("d", "");
+        return;
+      }
+      const radius = this.outerRadius + 6;
+      const minAngle = this._bipolar ? 0 : -90;
+      const x1 = 22 + Math.sin(minAngle * Math.PI / 180) * radius;
+      const y1 = 22 - Math.cos(minAngle * Math.PI / 180) * radius;
+      const x2 = 22 + Math.sin(modAngle * Math.PI / 180) * radius;
+      const y2 = 22 - Math.cos(modAngle * Math.PI / 180) * radius;
+      const delta = modAngle - minAngle;
+      const sweep = delta >= 0 ? 1 : 0;
+      const largeArc = Math.abs(delta) > 180 ? 1 : 0;
+      this._modulationArc.setAttribute("d", `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} ${sweep} ${x2} ${y2}`);
+    }
   };
 
   // editor/ArrayBufferReader.ts
@@ -50139,11 +50259,11 @@ You should be redirected to the song at:<br /><br />
       __name(this, "MoveNotesSidewaysPrompt");
     }
     static _validateNumber(event) {
-      const input20 = event.target;
-      let value = +input20.value;
+      const input21 = event.target;
+      let value = +input21.value;
       value = Math.round(value * Config.partsPerBeat) / Config.partsPerBeat;
       value = Math.round(value * 100) / 100;
-      input20.value = Math.max(+input20.min, Math.min(+input20.max, value)) + "";
+      input21.value = Math.max(+input21.min, Math.min(+input21.max, value)) + "";
     }
   };
 
@@ -51420,10 +51540,10 @@ You should be redirected to the song at:<br /><br />
         return Math.round(Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat);
       }
     }
-    _snapToMinDivision(input20) {
+    _snapToMinDivision(input21) {
       const stepsPerBeat = Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
       const step = Math.round(
-        input20 * stepsPerBeat / Config.partsPerBeat
+        input21 * stepsPerBeat / Config.partsPerBeat
       );
       return Math.round(
         step * Config.partsPerBeat / stepsPerBeat
@@ -53682,11 +53802,11 @@ You should be redirected to the song at:<br /><br />
       return false;
     }
     static _validateNumber(event) {
-      const input20 = event.target;
-      input20.value = String(_SongDurationPrompt._validate(input20));
+      const input21 = event.target;
+      input21.value = String(_SongDurationPrompt._validate(input21));
     }
-    static _validate(input20) {
-      return Math.floor(Math.max(Number(input20.min), Math.min(Number(input20.max), Number(input20.value))));
+    static _validate(input21) {
+      return Math.floor(Math.max(Number(input21.min), Math.min(Number(input21.max), Number(input21.value))));
     }
     _predictFutureLength() {
       const futureDoc = new SongDocument();
@@ -58800,6 +58920,7 @@ You should be redirected to the song at:<br /><br />
       this._showSampleLoadingStatus = input18({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
       this._showDescription = input18({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
       this._rainbowifyLoop = input18({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
+      this._promptSongDetails = input18({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
       this._layoutForm = form2(
         { style: "display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; text-align: center;" },
         label5(
@@ -59431,6 +59552,11 @@ You should be redirected to the song at:<br /><br />
             { style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
             "Close prompts on click-off:",
             div26({ style: "width: 50%; text-align: center;" }, this._closePromptByClickoff)
+          ),
+          label5(
+            { style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
+            "Prompt song details on load:",
+            div26({ style: "width: 50%; text-align: center;" }, this._promptSongDetails)
           )
         )
       );
@@ -59519,6 +59645,7 @@ You should be redirected to the song at:<br /><br />
         this._doc.prefs.showOscilloscope = this._showOscilloscope.checked;
         this._doc.prefs.showSampleLoadingStatus = this._showSampleLoadingStatus.checked;
         this._doc.prefs.showDescription = this._showDescription.checked;
+        this._doc.prefs.promptSongDetails = this._promptSongDetails.checked;
         this._doc.prefs.rainbowLoop = this._rainbowifyLoop.checked;
         this._doc.prefs.layout = this._layoutForm.elements["layout"].value;
         this._doc.prefs.colorTheme = this._themeSelect.value;
@@ -59560,7 +59687,7 @@ You should be redirected to the song at:<br /><br />
         this._doc.prefs.save();
         Layout.setLayout(this._doc.prefs.layout);
         this._close();
-        setTimeout(() => {
+        if (localStorage.getItem("customLayout") != this._layoutInput.value) setTimeout(() => {
           window.location.reload();
         }, 50);
       }, "_confirm");
@@ -59785,6 +59912,7 @@ You should be redirected to the song at:<br /><br />
       this._showOscilloscope.checked = this._doc.prefs.showOscilloscope;
       this._showSampleLoadingStatus.checked = this._doc.prefs.showSampleLoadingStatus;
       this._showDescription.checked = this._doc.prefs.showDescription;
+      this._promptSongDetails.checked = this._doc.prefs.promptSongDetails;
       this._rainbowifyLoop.checked = this._doc.prefs.rainbowLoop;
       this._layoutForm.elements["layout"].value = this._doc.prefs.layout;
       if (this._lastTheme != null) {
@@ -59839,8 +59967,107 @@ You should be redirected to the song at:<br /><br />
     }
   };
 
+  // editor/SongDetailsPrompt.ts
+  var { button: button27, div: div27, h2: h227, input: input19, br: br6, textarea: textarea2 } = HTML;
+  var SongDetailsPrompt = class {
+    constructor(_doc) {
+      this._doc = _doc;
+      this._cancelButton = button27({ class: "cancelButton" });
+      this._okayButton = button27({ class: "okayButton", style: "width:45%;" }, "Okay");
+      this._songTitle = input19({ placeholder: "Enter Title Here", type: "text", style: "width: 100%;", maxlength: 30, "autofocus": "autofocus" });
+      this._songAuthor = input19({ placeholder: "Enter Name Here", type: "text", style: "width: 100%;", maxlength: 30 });
+      this._songDescription = textarea2({ placeholder: "Enter Description Here", style: "width: 100%; resize: none; background: var(--editor-background); color: white; height: 64px; border: 0.5px solid var(--input-box-outline); font-size: 14px;", maxlength: 1200 });
+      // private readonly _songWebLink: HTMLInputElement = input({ type: "text", style: "width: 13em;", value: "https://example.com", maxlength: 30 });
+      this._showSongDetailsBox = input19({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+      this._computedSamplesLabel = div27({ style: "width: 10em;" }, new Text("0:00"));
+      this._cantShortenLabel = div27({}, "You cannot shorten this url!");
+      this.container = div27(
+        { class: "prompt noSelection", style: "width: 250px;" },
+        h227("Song Details"),
+        // justify-content: start;
+        div27(
+          { style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" },
+          "Title: ",
+          this._songTitle
+        ),
+        div27(
+          { style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" },
+          "Author: ",
+          this._songAuthor
+        ),
+        div27(
+          { style: "display: flex; flex-direction: column; align-items: baseline;" },
+          "Description: ",
+          this._songDescription
+        ),
+        div27(
+          { style: "vertical-align: middle; align-items: center; justify-content: space-between;" },
+          "Show info on load: ",
+          this._showSongDetailsBox
+        ),
+        //div({ style: "display: flex; flex-direction: column; align-items: baseline;" },
+        //	"Song Theme: ",
+        //	this._doc.song.setSongTheme,
+        //	),	
+        div27(
+          { style: "text-align: left;" },
+          div27({ style: "display:flex; gap: 3px; margin-bottom: 1em;" }, "Song Length: ", this._computedSamplesLabel),
+          br6(),
+          //div({style:"margin-bottom: 0.5em;"},"Pitch Channels: " + this._doc.song.pitchChannelCount),
+          //div({style:"margin-bottom: 0.5em;"},"Noise Channels: " + this._doc.song.noiseChannelCount),
+          //div({},"Mod Channels: " + this._doc.song.modChannelCount),
+          //br(),
+          "URL Length: " + location.href.length,
+          this._cantShortenLabel,
+          br6()
+        ),
+        // div({ style: "display: flex; flex-direction: row; align-items: center;" },
+        //     "Song Length:",
+        //     this._computedSamplesLabel,
+        // ),
+        div27(
+          { style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+          this._okayButton
+        ),
+        this._cancelButton
+      );
+      this._close = /* @__PURE__ */ __name(() => {
+        this._doc.undo();
+      }, "_close");
+      this.cleanUp = /* @__PURE__ */ __name(() => {
+        this._okayButton.removeEventListener("click", this._saveChanges);
+        this._cancelButton.removeEventListener("click", this._close);
+      }, "cleanUp");
+      // private _whenKeyPressed = (event: KeyboardEvent): void => {
+      // 		if ((<Element> event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
+      // 		this._saveChanges();
+      // 	}
+      // }
+      this._saveChanges = /* @__PURE__ */ __name(() => {
+        const group = new ChangeGroup();
+        group.append(new ChangeSongTitle(this._doc, this._doc.song.title, this._songTitle.value));
+        group.append(new ChangeSongAuthor(this._doc, this._doc.song.author, this._songAuthor.value));
+        group.append(new ChangeSongDescription(this._doc, this._doc.song.description, this._songDescription.value));
+        group.append(new ChangeShowSongDetails(this._doc, this._doc.song.showSongDetails, this._showSongDetailsBox.checked));
+        this._doc.prompt = null;
+        this._doc.record(group, true);
+      }, "_saveChanges");
+      this._showSongDetailsBox.checked = this._doc.song.showSongDetails;
+      this._songTitle.value = this._doc.song.title;
+      this._songAuthor.value = this._doc.song.author;
+      this._songDescription.value = this._doc.song.description;
+      this._cantShortenLabel.style.display = location.href.length > (window.localStorage.getItem("shortenerStrategySelect") == "isgd" ? 5010 : 12233) ? "" : "none";
+      this._computedSamplesLabel.firstChild.textContent = this._doc.samplesToTime(this._doc.synth.getTotalSamples(true, true, 0));
+      this._okayButton.addEventListener("click", this._saveChanges);
+      this._cancelButton.addEventListener("click", this._close);
+    }
+    static {
+      __name(this, "SongDetailsPrompt");
+    }
+  };
+
   // editor/SongEditor.ts
-  var { button: button27, div: div27, input: input19, select: select14, span: span9, optgroup, option: option14, canvas: canvas2 } = HTML;
+  var { button: button28, div: div28, input: input20, select: select14, span: span9, optgroup, option: option14, canvas: canvas2 } = HTML;
   function buildOptions2(menu, items) {
     for (let index = 0; index < items.length; index++) {
       menu.appendChild(option14({ value: index }, items[index]));
@@ -60393,13 +60620,13 @@ You should be redirected to the song at:<br /><br />
       this._loopEditor = new LoopEditor(this.doc, this._trackEditor);
       this._piano = new Piano(this.doc);
       this._octaveScrollBar = new OctaveScrollBar(this.doc, this._piano);
-      this._playButton = button27({ class: "playButton", type: "button", title: "play (space)" }, span9("play"));
-      this._pauseButton = button27({ class: "pauseButton", style: "display: none;", type: "button", title: "pause (space)" }, "pause");
-      this._recordButton = button27({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span9("record"));
-      this._stopButton = button27({ class: "stopButton", style: "display: none;", type: "button", title: "Stop Recording (Space)" }, "Stop Recording");
-      this._prevBarButton = button27({ class: "prevBarButton", type: "button", title: "Previous Bar (left bracket)" });
-      this._nextBarButton = button27({ class: "nextBarButton", type: "button", title: "Next Bar (right bracket)" });
-      this._volumeSlider = new Slider(input19({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "75", value: "50", step: "1" }), this.doc, null, false);
+      this._playButton = button28({ class: "playButton", type: "button", title: "play (space)" }, span9("play"));
+      this._pauseButton = button28({ class: "pauseButton", style: "display: none;", type: "button", title: "pause (space)" }, "pause");
+      this._recordButton = button28({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span9("record"));
+      this._stopButton = button28({ class: "stopButton", style: "display: none;", type: "button", title: "Stop Recording (Space)" }, "Stop Recording");
+      this._prevBarButton = button28({ class: "prevBarButton", type: "button", title: "Previous Bar (left bracket)" });
+      this._nextBarButton = button28({ class: "nextBarButton", type: "button", title: "Next Bar (right bracket)" });
+      this._volumeSlider = new Slider(input20({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "75", value: "50", step: "1" }), this.doc, null, false);
       this._outVolumeBarBgL = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
       this._outVolumeBarBgR = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
       this._outVolumeBarL = SVG.rect({ "pointer-events": "none", height: "50%", width: "0%", x: "5%", y: "25%", fill: "url('#volumeGrad2')" });
@@ -60425,15 +60652,15 @@ You should be redirected to the song at:<br /><br />
         this._outVolumeBarR,
         this._outVolumeCapR
       );
-      this._volumeBarBoxL = div27(
+      this._volumeBarBoxL = div28(
         { class: "playback-volume-bar", style: "height: 12px; align-self: center;" },
         this._volumeBarContainerL
       );
-      this._volumeBarBoxR = div27(
+      this._volumeBarBoxR = div28(
         { class: "playback-volume-bar", style: "height: 12px; margin-top: -5px; align-self: center;" },
         this._volumeBarContainerR
       );
-      this._volumeBarBox = div27(
+      this._volumeBarBox = div28(
         {},
         this._volumeBarBoxL,
         this._volumeBarBoxR
@@ -60482,105 +60709,105 @@ You should be redirected to the song at:<br /><br />
         option14({ value: "addExternal" }, "Add Custom Samples... (\u21E7Q)")
       );
       //private readonly _optionsMenu: HTMLButtonElement = button({ style: "width: 100%;", class: "preferences", type: "button", onclick: () => this._openPrompt("preferences")}, "options" );
-      this._newSong = button27({ style: "width: 49%; font-size: smaller; padding-left: 24px", class: "new", type: "button", onclick: /* @__PURE__ */ __name(() => this._newBlankSong(), "onclick") }, "new song");
-      this._import = button27({ style: "width: 49%; font-size: smaller; padding-left: 20px;", class: "import", type: "button", onclick: /* @__PURE__ */ __name(() => this._setPrompt("import"), "onclick") }, "load/save");
-      this._buttonsRow = div27(
+      this._newSong = button28({ style: "width: 49%; font-size: smaller; padding-left: 24px", class: "new", type: "button", onclick: /* @__PURE__ */ __name(() => this._newBlankSong(), "onclick") }, "new song");
+      this._import = button28({ style: "width: 49%; font-size: smaller; padding-left: 20px;", class: "import", type: "button", onclick: /* @__PURE__ */ __name(() => this._setPrompt("import"), "onclick") }, "load/save");
+      this._buttonsRow = div28(
         { style: "display: flex; width: 100%; gap: 2%;" },
         this._newSong,
         this._import
       );
       this._scaleSelect = select14();
       this._keySelect = buildOptions2(select14(), Config.keys.map((key) => key.name).reverse());
-      this._octaveStepper = input19({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
-      this._tempoSlider = new Slider(input19({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
-      this._tempoStepper = input19({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+      this._octaveStepper = input20({ style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
+      this._tempoSlider = new Slider(input20({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
+      this._tempoStepper = input20({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
       this._songEqFilterEditor = new FilterEditor(this.doc, false, false, true);
-      this._songEqFilterZoom = button27({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customSongEQFilterSettings"), "onclick") }, "+");
-      this._chorusSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeChorus(this.doc, oldValue, newValue), false);
-      this._chorusRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chorusMix"), "onclick") }, "mix"), this._chorusSlider.container);
-      this._chorusContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "chorus"), this._chorusRow);
-      this.reverbDelayNum = div27({ style: "font-size: 80%; ", id: "reverbDelayNum" });
-      this.reverbShelfHzNum = div27({ style: "font-size: 80%; ", id: "reverbShelfHzNum" });
-      this.reverbShelfGainNum = div27({ style: "font-size: 80%; ", id: "reverbShelfGainnum" });
-      this._reverbMixSlider = new Slider(input19({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange + 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverb(this.doc, oldValue, newValue), false);
-      this._reverbMixRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("reverbMix"), "onclick") }, "mix"), this._reverbMixSlider.container);
-      this._reverbDelaySlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbDelayRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbDelay(this.doc, oldValue, newValue), true);
-      this._reverbDelayRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._songEqFilterZoom = button28({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customSongEQFilterSettings"), "onclick") }, "+");
+      this._chorusSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeChorus(this.doc, oldValue, newValue), false);
+      this._chorusRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chorusMix"), "onclick") }, "mix"), this._chorusSlider.container);
+      this._chorusContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "chorus"), this._chorusRow);
+      this.reverbDelayNum = div28({ style: "font-size: 80%; ", id: "reverbDelayNum" });
+      this.reverbShelfHzNum = div28({ style: "font-size: 80%; ", id: "reverbShelfHzNum" });
+      this.reverbShelfGainNum = div28({ style: "font-size: 80%; ", id: "reverbShelfGainnum" });
+      this._reverbMixSlider = new Slider(input20({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange + 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverb(this.doc, oldValue, newValue), false);
+      this._reverbMixRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("reverbMix"), "onclick") }, "mix"), this._reverbMixSlider.container);
+      this._reverbDelaySlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbDelayRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbDelay(this.doc, oldValue, newValue), true);
+      this._reverbDelayRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex;  text-align: left; flex-direction:column; align-items:center; text-align: left" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("reverbDelay"), "onclick") }, "delay "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbDelayNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbDelayNum)
       ), this._reverbDelaySlider.container);
-      this._reverbShelfHzSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbShelfHzRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbShelfHz(this.doc, oldValue, newValue), false);
-      this._reverbShelfHzRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._reverbShelfHzSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbShelfHzRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbShelfHz(this.doc, oldValue, newValue), false);
+      this._reverbShelfHzRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex;  text-align: left; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("reverbShelf"), "onclick") }, "shelf hz. "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbShelfHzNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbShelfHzNum)
       ), this._reverbShelfHzSlider.container);
-      this._reverbShelfGainSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbShelfGainRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbShelfGain(this.doc, oldValue, newValue), false);
-      this._reverbShelfGainRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._reverbShelfGainSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.reverbShelfGainRange - 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverbShelfGain(this.doc, oldValue, newValue), false);
+      this._reverbShelfGainRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex;  text-align: left; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("reverbShelf"), "onclick") }, "shelf gain "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbShelfGainNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbShelfGainNum)
       ), this._reverbShelfGainSlider.container);
-      this._reverbContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "reverb"), this._reverbMixRow, this._reverbDelayRow, this._reverbShelfHzRow, this._reverbShelfGainRow);
+      this._reverbContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "reverb"), this._reverbMixRow, this._reverbDelayRow, this._reverbShelfHzRow, this._reverbShelfGainRow);
       this._ringModWaveSelect = buildOptions2(select14({}), Config.operatorWaves.map((wave) => wave.name));
-      this._ringModPulsewidthSlider = new Slider(input19({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "pulse width" }), this.doc, (oldValue, newValue) => new ChangeRingModPulseWidth(this.doc, oldValue, newValue), true);
-      this._ringModSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeRingMod(this.doc, oldValue, newValue), false);
-      this._ringModRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("ringMod"), "onclick") }, "mix"), this._ringModSlider.container);
-      this._ringModHzSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModHzRange - 1, value: Config.ringModHzRange - Config.ringModHzRange / 2, step: "1" }), this.doc, (oldValue, newValue) => new ChangeRingModHz(this.doc, oldValue, newValue), true);
-      this.ringModHzNum = div27({ style: "font-size: 80%; ", id: "ringModHzNum" });
-      this._ringModHzSliderRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._ringModPulsewidthSlider = new Slider(input20({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "pulse width" }), this.doc, (oldValue, newValue) => new ChangeRingModPulseWidth(this.doc, oldValue, newValue), true);
+      this._ringModSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeRingMod(this.doc, oldValue, newValue), false);
+      this._ringModRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("ringMod"), "onclick") }, "mix"), this._ringModSlider.container);
+      this._ringModHzSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModHzRange - 1, value: Config.ringModHzRange - Config.ringModHzRange / 2, step: "1" }), this.doc, (oldValue, newValue) => new ChangeRingModHz(this.doc, oldValue, newValue), true);
+      this.ringModHzNum = div28({ style: "font-size: 80%; ", id: "ringModHzNum" });
+      this._ringModHzSliderRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("RingModHz"), "onclick") }, "hertz "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.ringModHzNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.ringModHzNum)
       ), this._ringModHzSlider.container);
       this._ringModWaveText = span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("ringModChipWave"), "onclick") }, "wave ");
-      this._ringModWaveSelectRow = div27({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, this._ringModPulsewidthSlider.container, div27({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
-      this._ringModContainerRow = div27(
+      this._ringModWaveSelectRow = div28({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, this._ringModPulsewidthSlider.container, div28({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
+      this._ringModContainerRow = div28(
         { class: "", style: "display:flex; flex-direction:column;" },
         this._ringModRow,
         this._ringModHzSliderRow,
         // this._rmOffsetHzSliderRow,
         this._ringModWaveSelectRow
       );
-      this._ringModContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "ring modulation"), this._ringModContainerRow);
-      this._granularSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeGranular(this.doc, oldValue, newValue), false);
-      this._granularRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("granularMix"), "onclick") }, "mix "), this._granularSlider.container);
-      this._grainSizeSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: Config.grainSizeMin / Config.grainSizeStep, max: Config.grainSizeMax / Config.grainSizeStep, value: Config.grainSizeMin / Config.grainSizeStep, step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainSize(this.doc, oldValue, newValue), false);
-      this.grainSizeNum = div27({ style: "font-size: 80%; ", id: "grainSizeNum" });
-      this._grainSizeSliderRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._ringModContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "ring modulation"), this._ringModContainerRow);
+      this._granularSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeGranular(this.doc, oldValue, newValue), false);
+      this._granularRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("granularMix"), "onclick") }, "mix "), this._granularSlider.container);
+      this._grainSizeSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: Config.grainSizeMin / Config.grainSizeStep, max: Config.grainSizeMax / Config.grainSizeStep, value: Config.grainSizeMin / Config.grainSizeStep, step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainSize(this.doc, oldValue, newValue), false);
+      this.grainSizeNum = div28({ style: "font-size: 80%; ", id: "grainSizeNum" });
+      this._grainSizeSliderRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("grainSize"), "onclick") }, "grain "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainSizeNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainSizeNum)
       ), this._grainSizeSlider.container);
-      this._grainAmountsSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.grainAmountsMax, value: 8, step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainAmounts(this.doc, oldValue, newValue), false);
-      this._grainAmountsRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("grainAmount"), "onclick") }, "grain freq"), this._grainAmountsSlider.container);
-      this._grainRangeSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainRange(this.doc, oldValue, newValue), false);
-      this.grainRangeNum = div27({ style: "font-size: 80%; ", id: "grainRangeNum" });
-      this._grainRangeSliderRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._grainAmountsSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.grainAmountsMax, value: 8, step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainAmounts(this.doc, oldValue, newValue), false);
+      this._grainAmountsRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("grainAmount"), "onclick") }, "grain freq"), this._grainAmountsSlider.container);
+      this._grainRangeSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeGrainRange(this.doc, oldValue, newValue), false);
+      this.grainRangeNum = div28({ style: "font-size: 80%; ", id: "grainRangeNum" });
+      this._grainRangeSliderRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("grainRange"), "onclick") }, "range "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainRangeNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainRangeNum)
       ), this._grainRangeSlider.container);
-      this._granularContainerRow = div27(
+      this._granularContainerRow = div28(
         { class: "", style: "display:flex; flex-direction:column;" },
         this._granularRow,
         this._grainAmountsRow,
         this._grainSizeSliderRow,
         this._grainRangeSliderRow
       );
-      this._granularContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "granular"), this._granularContainerRow);
-      this.echoDelayNum = div27({ style: "font-size: 80%; ", id: "echoDelayNum" });
-      this._echoSustainSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
-      this._echoSustainRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("echoSustain"), "onclick") }, "mix"), this._echoSustainSlider.container);
-      this._echoDelaySlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoDelay(this.doc, oldValue, newValue), true);
-      this._echoDelayRow = div27({ class: "selectRow", style: "width:100%;" }, div27(
+      this._granularContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "granular"), this._granularContainerRow);
+      this.echoDelayNum = div28({ style: "font-size: 80%; ", id: "echoDelayNum" });
+      this._echoSustainSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
+      this._echoSustainRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("echoSustain"), "onclick") }, "mix"), this._echoSustainSlider.container);
+      this._echoDelaySlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoDelay(this.doc, oldValue, newValue), true);
+      this._echoDelayRow = div28({ class: "selectRow", style: "width:100%;" }, div28(
         { style: "display:flex; flex-direction:column; align-items:center;" },
         span9({ class: "tip", style: "font-size: small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("echoDelay"), "onclick") }, "delay "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; ` }, this.echoDelayNum)
+        div28({ style: `color: ${ColorConfig.secondaryText}; ` }, this.echoDelayNum)
       ), this._echoDelaySlider.container);
-      this._echoContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "echo"), this._echoSustainRow, this._echoDelayRow);
-      this._rhythmInput = input19({ type: "number", min: "1", max: "32", style: "width: 5em;" });
+      this._echoContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "echo"), this._echoSustainRow, this._echoDelayRow);
+      this._rhythmInput = input20({ type: "number", min: "1", max: "32", style: "width: 5em;" });
       this._rhythmActionSelect = select14({ type: "button", style: "width: 1.7em; height: 1.7em; margin-left: 5px;" }, "");
       this._rhythmActionOption = option14({ value: "toggleRhythm" }, "disable subgrid");
       this._favoriteRhythmOption = option14({ value: "toggleFavoriteRhythm" }, "add current division to favorites");
@@ -60595,251 +60822,254 @@ You should be redirected to the song at:<br /><br />
       //private readonly _phaserFeedbackRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFeedback") }, span(" Feedback:")), this._phaserFeedbackSlider.container);
       //private readonly _phaserStagesSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.phaserMinStages, max: Config.phaserMaxStages, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserStages(this.doc, oldValue, newValue), false);
       //private readonly _phaserStagesRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserStages") }, span(" Stages:")), this._phaserStagesSlider.container);
-      this.flangerRateNum = div27({ style: "font-size: 80%;", id: "flangerRateNum" });
-      this.flangerDelayNum = div27({ style: "font-size: 80%;", id: "flangerDelayNum" });
-      this.flangerDepthNum = div27({ style: "font-size: 80%;", id: "flangerDepthNum" });
-      this._flangerMixSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerMixRange - 1, value: 0, step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerMix(this.doc, oldValue, newValue), true);
-      this._flangerMixRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerMix"), "onclick") }, span9("mix")), this._flangerMixSlider.container);
-      this._flangerDelaySlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerDelay(this.doc, oldValue, newValue), false);
-      this._flangerDelayRow = div27({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerDelay"), "onclick") }, span9("delay "), this.flangerDelayNum), this._flangerDelaySlider.container);
-      this._flangerDepthSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDepthRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerDepth(this.doc, oldValue, newValue), false);
-      this._flangerDepthRow = div27({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerDepth"), "onclick") }, span9("depth"), this.flangerDepthNum), this._flangerDepthSlider.container);
-      this._flangerRateSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerRateRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerRate(this.doc, oldValue, newValue), false);
-      this._flangerRateRow = div27({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerRate"), "onclick") }, span9("rate "), div27({ style: `color: ${ColorConfig.secondaryText};` }, this.flangerRateNum)), this._flangerRateSlider.container);
-      this._flangerFeedbackSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerFeedbackRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerFeedback(this.doc, oldValue, newValue), false);
-      this._flangerFeedbackRow = div27({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerFeedback"), "onclick") }, span9("feedback")), this._flangerFeedbackSlider.container);
-      this._flangerContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "flanger"), this._flangerMixRow, this._flangerDelayRow, this._flangerDepthRow, this._flangerRateRow, this._flangerFeedbackRow);
+      this.flangerRateNum = div28({ style: "font-size: 80%;", id: "flangerRateNum" });
+      this.flangerDelayNum = div28({ style: "font-size: 80%;", id: "flangerDelayNum" });
+      this.flangerDepthNum = div28({ style: "font-size: 80%;", id: "flangerDepthNum" });
+      this._flangerMixSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerMixRange - 1, value: 0, step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerMix(this.doc, oldValue, newValue), true);
+      this._flangerMixRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerMix"), "onclick") }, span9("mix")), this._flangerMixSlider.container);
+      this._flangerDelaySlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerDelay(this.doc, oldValue, newValue), false);
+      this._flangerDelayRow = div28({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerDelay"), "onclick") }, span9("delay "), this.flangerDelayNum), this._flangerDelaySlider.container);
+      this._flangerDepthSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerDepthRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerDepth(this.doc, oldValue, newValue), false);
+      this._flangerDepthRow = div28({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerDepth"), "onclick") }, span9("depth"), this.flangerDepthNum), this._flangerDepthSlider.container);
+      this._flangerRateSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerRateRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerRate(this.doc, oldValue, newValue), false);
+      this._flangerRateRow = div28({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerRate"), "onclick") }, span9("rate "), div28({ style: `color: ${ColorConfig.secondaryText};` }, this.flangerRateNum)), this._flangerRateSlider.container);
+      this._flangerFeedbackSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerFeedbackRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerFeedback(this.doc, oldValue, newValue), false);
+      this._flangerFeedbackRow = div28({ class: "selectRow" }, span9({ style: "text-align: left", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("flangerFeedback"), "onclick") }, span9("feedback")), this._flangerFeedbackSlider.container);
+      this._flangerContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "flanger"), this._flangerMixRow, this._flangerDelayRow, this._flangerDepthRow, this._flangerRateRow, this._flangerFeedbackRow);
       this._pitchedPresetSelect = buildPresetOptions(false, "pitchPresetSelect");
       this._drumPresetSelect = buildPresetOptions(true, "drumPresetSelect");
       this._algorithmSelect = buildOptions2(select14(), Config.algorithms.map((algorithm) => algorithm.name));
-      this._algorithmSelectRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("algorithm"), "onclick") }, "algorithm "), div27({ class: "selectContainer" }, this._algorithmSelect));
+      this._algorithmSelectRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("algorithm"), "onclick") }, "algorithm "), div28({ class: "selectContainer" }, this._algorithmSelect));
       this._instrumentButtons = [];
-      this._instrumentAddButton = button27({ type: "button", class: "add-instrument last-button" });
-      this._instrumentRemoveButton = button27({ type: "button", class: "remove-instrument" });
-      this._instrumentsButtonBar = div27({ class: "instrument-bar" }, this._instrumentRemoveButton, this._instrumentAddButton);
-      this._instrumentsButtonRow = div27({ class: "selectRow", style: "display: none;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("instrumentIndex"), "onclick") }, "instrument"), this._instrumentsButtonBar);
-      this._instrumentVolumeSlider = new Slider(input19({ style: "margin: 0; position: sticky;", type: "range", min: Math.floor(-Config.volumeRange / 2), max: Math.floor(Config.volumeRange / 2), value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVolume(this.doc, oldValue, newValue), true);
-      this._instrumentVolumeSliderInputBox = input19({ style: "width: 4em; font-size: 80%", id: "volumeSliderInputBox", type: "number", step: "1", min: Math.floor(-Config.volumeRange / 2), max: Math.floor(Config.volumeRange / 2), value: "0" });
-      this._instrumentVolumeSliderTip = div27({ class: "selectRow", style: "height: 1em" }, span9({ class: "tip", style: "font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("instrumentVolume"), "onclick") }, "volume: "));
-      this._instrumentVolumeSliderRow = div27({ class: "selectRow" }, div27(
+      this._instrumentAddButton = button28({ type: "button", class: "add-instrument last-button" });
+      this._instrumentRemoveButton = button28({ type: "button", class: "remove-instrument" });
+      this._instrumentsButtonBar = div28({ class: "instrument-bar" }, this._instrumentRemoveButton, this._instrumentAddButton);
+      this._instrumentsButtonRow = div28({ class: "selectRow", style: "display: none;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("instrumentIndex"), "onclick") }, "instrument"), this._instrumentsButtonBar);
+      this._instrumentVolumeSlider = new Slider(input20({ style: "margin: 0; position: sticky;", type: "range", min: Math.floor(-Config.volumeRange / 2), max: Math.floor(Config.volumeRange / 2), value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVolume(this.doc, oldValue, newValue), true);
+      this._instrumentVolumeSliderInputBox = input20({ style: "width: 4em; font-size: 80%", id: "volumeSliderInputBox", type: "number", step: "1", min: Math.floor(-Config.volumeRange / 2), max: Math.floor(Config.volumeRange / 2), value: "0" });
+      this._instrumentVolumeSliderTip = div28({ class: "selectRow", style: "height: 1em" }, span9({ class: "tip", style: "font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("instrumentVolume"), "onclick") }, "volume: "));
+      this._instrumentVolumeSliderRow = div28({ class: "selectRow" }, div28(
         {},
-        div27({ style: `color: ${ColorConfig.secondaryText};` }, span9({ class: "tip" }, this._instrumentVolumeSliderTip)),
-        div27({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._instrumentVolumeSliderInputBox)
+        div28({ style: `color: ${ColorConfig.secondaryText};` }, span9({ class: "tip" }, this._instrumentVolumeSliderTip)),
+        div28({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._instrumentVolumeSliderInputBox)
       ), this._instrumentVolumeSlider.container);
-      this._panSlider = new Slider(input19({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.panMax, value: Config.panCenter, step: "1" }), this.doc, (oldValue, newValue) => new ChangePan(this.doc, oldValue, newValue), true);
-      this._panDropdown = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(1 /* Pan */), "onclick") }, "\u25BC");
-      this._panSliderInputBox = input19({ style: "width: 4em; font-size: 80%; ", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
-      this._panSliderRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, div27(
+      this._panSlider = new Slider(input20({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.panMax, value: Config.panCenter, step: "1" }), this.doc, (oldValue, newValue) => new ChangePan(this.doc, oldValue, newValue), true);
+      this._panKnob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue, newValue) => new ChangePan(this.doc, oldValue, newValue), [0, 50, 100]);
+      this._panDropdown = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(1 /* Pan */), "onclick") }, "\u25BC");
+      this._panSliderInputBox = input20({ style: "width: 4em; font-size: 80%; ", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
+      /*private readonly _panSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
+          span({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("pan") }, "pan "),
+          div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._panSliderInputBox),
+      ), this._panDropdown, this._panSlider.container);*/
+      this._panKnobRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, div28(
         {},
-        span9({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("pan"), "onclick") }, "pan: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._panSliderInputBox)
-      ), this._panDropdown, this._panSlider.container);
-      this._panDelaySlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["pan delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePanDelay(this.doc, oldValue, newValue), false);
-      this._panDelayRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("panDelay"), "onclick") }, "\u2023 delay"), this._panDelaySlider.container);
-      this._panDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none;" }, this._panDelayRow);
-      this._panContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "panning"), this._panSliderRow, this._panDropdownGroup);
+        span9({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("pan"), "onclick") }, "pan "),
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._panSliderInputBox)
+      ), this._panDropdown, this._panKnob.container);
+      this._panDelaySlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["pan delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePanDelay(this.doc, oldValue, newValue), false);
+      this._panDelayRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("panDelay"), "onclick") }, "\u2023 delay"), this._panDelaySlider.container);
+      this._panDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none;" }, this._panDelayRow);
+      this._panContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "panning"), this._panKnobRow, this._panDropdownGroup);
       this._chipWaveSelect = buildOptions2(select14(), Config.chipWaves.map((wave) => wave.name));
       this._chipNoiseSelect = buildOptions2(select14(), Config.chipNoises.map((wave) => wave.name));
       // advloop addition
       // @TODO: Add a dropdown for these. Or maybe this checkbox is fine?
-      this._useChipWaveAdvancedLoopControlsBox = input19({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
+      this._useChipWaveAdvancedLoopControlsBox = input20({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
       this._chipWaveLoopModeSelect = buildOptions2(select14(), ["loop", "ping-pong", "play once", "play loop once"]);
-      this._chipWaveLoopStartStepper = input19({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
-      this._chipWaveLoopEndStepper = input19({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
-      this._setChipWaveLoopEndToEndButton = button27({ type: "button", style: "width: 1.5em; height: 1.5em; padding: 0; margin-left: 0.5em;" }, SVG.svg({ width: "16", height: "16", viewBox: "-13 -14 26 26", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.rect({ x: "4", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
-      this._chipWaveStartOffsetStepper = input19({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
-      this._chipWavePlayBackwardsBox = input19({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
+      this._chipWaveLoopStartStepper = input20({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
+      this._chipWaveLoopEndStepper = input20({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
+      this._setChipWaveLoopEndToEndButton = button28({ type: "button", style: "width: 1.5em; height: 1.5em; padding: 0; margin-left: 0.5em;" }, SVG.svg({ width: "16", height: "16", viewBox: "-13 -14 26 26", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.rect({ x: "4", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
+      this._chipWaveStartOffsetStepper = input20({ type: "number", min: "0", step: "1", value: "0", style: "width: 100%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;" });
+      this._chipWavePlayBackwardsBox = input20({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
       // advloop addition
-      this._chipWaveSelectRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chipWave"), "onclick") }, "wave "), div27({ class: "selectContainer" }, this._chipWaveSelect));
-      this._chipNoiseSelectRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chipNoise"), "onclick") }, "noise: "), div27({ class: "selectContainer" }, this._chipNoiseSelect));
-      this._visualLoopControlsButton = button27({ style: "margin-left: 0em; padding-left: 0.2em; height: 1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("visualLoopControls"), "onclick") }, "+");
-      this._useChipWaveAdvancedLoopControlsRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "flex-shrink: 0;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopControls"), "onclick") }, "loop controls "), this._useChipWaveAdvancedLoopControlsBox);
-      this._chipWaveLoopModeSelectRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopMode"), "onclick") }, "loop mode: "), div27({ class: "selectContainer" }, this._chipWaveLoopModeSelect));
-      this._chipWaveLoopStartRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopStart"), "onclick") }, "loop start: "), this._visualLoopControlsButton, span9({ style: "display: flex;" }, this._chipWaveLoopStartStepper));
-      this._chipWaveLoopEndRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopEnd"), "onclick") }, "loop end: "), span9({ style: "display: flex;" }, this._chipWaveLoopEndStepper, this._setChipWaveLoopEndToEndButton));
-      this._chipWaveStartOffsetRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("offset"), "onclick") }, "offset "), span9({ style: "display: flex;" }, this._chipWaveStartOffsetStepper));
-      this._chipWavePlayBackwardsRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("backwards"), "onclick") }, "backwards "), this._chipWavePlayBackwardsBox);
+      this._chipWaveSelectRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chipWave"), "onclick") }, "wave "), div28({ class: "selectContainer" }, this._chipWaveSelect));
+      this._chipNoiseSelectRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chipNoise"), "onclick") }, "noise: "), div28({ class: "selectContainer" }, this._chipNoiseSelect));
+      this._visualLoopControlsButton = button28({ style: "margin-left: 0em; padding-left: 0.2em; height: 1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("visualLoopControls"), "onclick") }, "+");
+      this._useChipWaveAdvancedLoopControlsRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "flex-shrink: 0;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopControls"), "onclick") }, "loop controls "), this._useChipWaveAdvancedLoopControlsBox);
+      this._chipWaveLoopModeSelectRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopMode"), "onclick") }, "loop mode: "), div28({ class: "selectContainer" }, this._chipWaveLoopModeSelect));
+      this._chipWaveLoopStartRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopStart"), "onclick") }, "loop start: "), this._visualLoopControlsButton, span9({ style: "display: flex;" }, this._chipWaveLoopStartStepper));
+      this._chipWaveLoopEndRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "font-size: x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("loopEnd"), "onclick") }, "loop end: "), span9({ style: "display: flex;" }, this._chipWaveLoopEndStepper, this._setChipWaveLoopEndToEndButton));
+      this._chipWaveStartOffsetRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("offset"), "onclick") }, "offset "), span9({ style: "display: flex;" }, this._chipWaveStartOffsetStepper));
+      this._chipWavePlayBackwardsRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("backwards"), "onclick") }, "backwards "), this._chipWavePlayBackwardsBox);
       this._fadeInOutEditor = new FadeInOutEditor(this.doc);
-      this._fadeInOutRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("fadeInOut"), "onclick") }, "fade"), this._fadeInOutEditor.container);
+      this._fadeInOutRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("fadeInOut"), "onclick") }, "fade"), this._fadeInOutEditor.container);
       this._transitionSelect = buildOptions2(select14(), Config.transitions.map((transition) => transition.name));
-      this._transitionDropdown = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(3 /* Transition */), "onclick") }, "\u25BC");
-      this._transitionRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("transition"), "onclick") }, "transition"), this._transitionDropdown, div27({ class: "selectContainer", style: "width: 52.5%;" }, this._transitionSelect));
-      this._clicklessTransitionBox = input19({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-      this._clicklessTransitionRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("clicklessTransition"), "onclick") }, "\u2023 clickless"), this._clicklessTransitionBox);
+      this._transitionDropdown = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(3 /* Transition */), "onclick") }, "\u25BC");
+      this._transitionRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("transition"), "onclick") }, "transition"), this._transitionDropdown, div28({ class: "selectContainer", style: "width: 52.5%;" }, this._transitionSelect));
+      this._clicklessTransitionBox = input20({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+      this._clicklessTransitionRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("clicklessTransition"), "onclick") }, "\u2023 clickless"), this._clicklessTransitionBox);
       this._slideSpeedDisplay = span9({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-      this._slideSpeedSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "1", max: Config.maxSlideTicks, value: "3", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSlideSpeed(this.doc, oldValue, newValue), false);
-      this._slideSpeedRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("slideSpeedSlider"), "onclick") }, "\u2023 spd"), this._slideSpeedDisplay, this._slideSpeedSlider.container);
-      this._transitionDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none;" }, this._slideSpeedRow, this._clicklessTransitionRow);
-      this._transitionContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "transition"), this._transitionRow, this._transitionDropdownGroup);
+      this._slideSpeedSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "1", max: Config.maxSlideTicks, value: "3", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSlideSpeed(this.doc, oldValue, newValue), false);
+      this._slideSpeedRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("slideSpeedSlider"), "onclick") }, "\u2023 spd"), this._slideSpeedDisplay, this._slideSpeedSlider.container);
+      this._transitionDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none;" }, this._slideSpeedRow, this._clicklessTransitionRow);
+      this._transitionContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "transition"), this._transitionRow, this._transitionDropdownGroup);
       this._effectsSelect = select14(option14({ selected: true, disabled: true, hidden: false }));
       // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
-      this._eqFilterSimpleButton = button27({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: /* @__PURE__ */ __name(() => this._switchEQFilterType(true), "onclick") }, "noob");
-      this._eqFilterAdvancedButton = button27({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: /* @__PURE__ */ __name(() => this._switchEQFilterType(false), "onclick") }, "pro");
-      this._eqFilterTypeRow = div27({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span9({ style: "", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterType"), "onclick") }, "EQ type"), div27({ class: "instrument-bar" }, this._eqFilterSimpleButton, this._eqFilterAdvancedButton));
+      this._eqFilterSimpleButton = button28({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: /* @__PURE__ */ __name(() => this._switchEQFilterType(true), "onclick") }, "noob");
+      this._eqFilterAdvancedButton = button28({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: /* @__PURE__ */ __name(() => this._switchEQFilterType(false), "onclick") }, "pro");
+      this._eqFilterTypeRow = div28({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span9({ style: "", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterType"), "onclick") }, "EQ type"), div28({ class: "instrument-bar" }, this._eqFilterSimpleButton, this._eqFilterAdvancedButton));
       this._eqFilterEditor = new FilterEditor(this.doc);
-      this._eqFilterZoom = button27({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customEQFilterSettings"), "onclick") }, "+");
-      this._eqFilterRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("eqFilter"), "onclick") }, "EQ filt"), this._eqFilterZoom, this._eqFilterEditor.container);
-      this._eqFilterSimpleCutSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEQFilterSimpleCut(this.doc, oldValue, newValue), false);
-      this._eqFilterSimpleCutRow = div27({ class: "selectRow", title: "low-pass filter cutoff frequency" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterCutoff"), "onclick") }, "filt. cut"), this._eqFilterSimpleCutSlider.container);
-      this._eqFilterSimplePeakSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEQFilterSimplePeak(this.doc, oldValue, newValue), false);
-      this._eqFilterSimplePeakRow = div27({ class: "selectRow", title: "low-pass filter eak resonance" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterResonance"), "onclick") }, "filt. peak"), this._eqFilterSimplePeakSlider.container);
-      this._noteFilterSimpleButton = button27({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: /* @__PURE__ */ __name(() => this._switchNoteFilterType(true), "onclick") }, "noob");
-      this._noteFilterAdvancedButton = button27({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: /* @__PURE__ */ __name(() => this._switchNoteFilterType(false), "onclick") }, "pro");
-      this._noteFilterTypeRow = div27({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span9({ style: "", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterType"), "onclick") }, "filter type"), div27({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
+      this._eqFilterZoom = button28({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customEQFilterSettings"), "onclick") }, "+");
+      this._eqFilterRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("eqFilter"), "onclick") }, "EQ filt"), this._eqFilterZoom, this._eqFilterEditor.container);
+      this._eqFilterSimpleCutSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEQFilterSimpleCut(this.doc, oldValue, newValue), false);
+      this._eqFilterSimpleCutRow = div28({ class: "selectRow", title: "low-pass filter cutoff frequency" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterCutoff"), "onclick") }, "filt. cut"), this._eqFilterSimpleCutSlider.container);
+      this._eqFilterSimplePeakSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEQFilterSimplePeak(this.doc, oldValue, newValue), false);
+      this._eqFilterSimplePeakRow = div28({ class: "selectRow", title: "low-pass filter eak resonance" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterResonance"), "onclick") }, "filt. peak"), this._eqFilterSimplePeakSlider.container);
+      this._noteFilterSimpleButton = button28({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: /* @__PURE__ */ __name(() => this._switchNoteFilterType(true), "onclick") }, "noob");
+      this._noteFilterAdvancedButton = button28({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: /* @__PURE__ */ __name(() => this._switchNoteFilterType(false), "onclick") }, "pro");
+      this._noteFilterTypeRow = div28({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span9({ style: "", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterType"), "onclick") }, "filter type"), div28({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
       this._noteFilterEditor = new FilterEditor(this.doc, true);
-      this._noteFilterZoom = button27({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customNoteFilterSettings"), "onclick") }, "+");
-      this._noteFilterRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("noteFilter"), "onclick") }, "filter"), this._noteFilterZoom, this._noteFilterEditor.container);
-      this._noteFilterSimpleCutSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeNoteFilterSimpleCut(this.doc, oldValue, newValue), false);
-      this._noteFilterSimpleCutRow = div27({ class: "selectRow", title: "low-pass filter cutoff frequency" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterCutoff"), "onclick") }, "filter cut"), this._noteFilterSimpleCutSlider.container);
-      this._noteFilterSimplePeakSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeNoteFilterSimplePeak(this.doc, oldValue, newValue), false);
-      this._noteFilterSimplePeakRow = div27({ class: "selectRow", title: "low-pass filter peak resonance" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterResonance"), "onclick") }, "filter peak"), this._noteFilterSimplePeakSlider.container);
-      this._noteFilterContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em;" }, span9({ class: "effectTitle" }, "note filter"), this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow);
-      this._supersawDynamismSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawDynamismMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawDynamism(this.doc, oldValue, newValue), false);
-      this._supersawDynamismRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawDynamism"), "onclick") }, "dynamism"), this._supersawDynamismSlider.container);
-      this._supersawSpreadSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawSpreadMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawSpread(this.doc, oldValue, newValue), false);
-      this._supersawSpreadRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawSpread"), "onclick") }, "spread"), this._supersawSpreadSlider.container);
-      this._supersawShapeSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawShapeMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawShape(this.doc, oldValue, newValue), false);
-      this._supersawShapeRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawShape"), "onclick"), style: "overflow: clip;" }, "saw-pulse"), this._supersawShapeSlider.container);
-      this._pulseWidthSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "1", max: Config.pulseWidthRange, value: "1", step: "1" }), this.doc, (oldValue, newValue) => new ChangePulseWidth(this.doc, oldValue, newValue), false);
-      this._pulseWidthDropdown = button27({ style: "margin-left:53px; position: absolute; margin-top: 15px; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(5 /* PulseWidth */), "onclick") }, "\u25BC");
-      this._pwmSliderInputBox = input19({ style: "width: 4em; font-size: 70%;", id: "pwmSliderInputBox", type: "number", step: "1", min: "1", max: Config.pulseWidthRange, value: "1" });
-      this._pulseWidthRow = div27({ class: "selectRow" }, div27(
+      this._noteFilterZoom = button28({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customNoteFilterSettings"), "onclick") }, "+");
+      this._noteFilterRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("noteFilter"), "onclick") }, "filter"), this._noteFilterZoom, this._noteFilterEditor.container);
+      this._noteFilterSimpleCutSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeNoteFilterSimpleCut(this.doc, oldValue, newValue), false);
+      this._noteFilterSimpleCutRow = div28({ class: "selectRow", title: "low-pass filter cutoff frequency" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterCutoff"), "onclick") }, "filter cut"), this._noteFilterSimpleCutSlider.container);
+      this._noteFilterSimplePeakSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeNoteFilterSimplePeak(this.doc, oldValue, newValue), false);
+      this._noteFilterSimplePeakRow = div28({ class: "selectRow", title: "low-pass filter peak resonance" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("filterResonance"), "onclick") }, "filter peak"), this._noteFilterSimplePeakSlider.container);
+      this._noteFilterContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em;" }, span9({ class: "effectTitle" }, "note filter"), this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow);
+      this._supersawDynamismSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawDynamismMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawDynamism(this.doc, oldValue, newValue), false);
+      this._supersawDynamismRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawDynamism"), "onclick") }, "dynamism"), this._supersawDynamismSlider.container);
+      this._supersawSpreadSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawSpreadMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawSpread(this.doc, oldValue, newValue), false);
+      this._supersawSpreadRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawSpread"), "onclick") }, "spread"), this._supersawSpreadSlider.container);
+      this._supersawShapeSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawShapeMax, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeSupersawShape(this.doc, oldValue, newValue), false);
+      this._supersawShapeRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("supersawShape"), "onclick"), style: "overflow: clip;" }, "saw-pulse"), this._supersawShapeSlider.container);
+      this._pulseWidthSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "1", max: Config.pulseWidthRange, value: "1", step: "1" }), this.doc, (oldValue, newValue) => new ChangePulseWidth(this.doc, oldValue, newValue), false);
+      this._pulseWidthDropdown = button28({ style: "margin-left:53px; position: absolute; margin-top: 15px; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(5 /* PulseWidth */), "onclick") }, "\u25BC");
+      this._pwmSliderInputBox = input20({ style: "width: 4em; font-size: 70%;", id: "pwmSliderInputBox", type: "number", step: "1", min: "1", max: Config.pulseWidthRange, value: "1" });
+      this._pulseWidthRow = div28({ class: "selectRow" }, div28(
         {},
         span9({ class: "tip", tabindex: "0", style: "height:1em; font-size: smaller; white-space: nowrap;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("pulseWidth"), "onclick") }, "pulse width"),
-        div27({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._pwmSliderInputBox)
+        div28({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._pwmSliderInputBox)
       ), this._pulseWidthDropdown, this._pulseWidthSlider.container);
       //private readonly _pulseWidthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pulseWidth") }, "Pulse Width:"), this._pulseWidthDropdown, this._pulseWidthSlider.container);
-      this._decimalOffsetSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: "99", value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDecimalOffset(this.doc, oldValue, 99 - newValue), false);
-      this._decimalOffsetRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("decimalOffset"), "onclick") }, "\u2023 offset"), this._decimalOffsetSlider.container);
-      this._pulseWidthDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none;" }, this._decimalOffsetRow);
-      this._pitchShiftSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePitchShift(this.doc, oldValue, newValue), true);
-      this._pitchShiftTonicMarkers = [div27({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div27({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div27({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
-      this._pitchShiftFifthMarkers = [div27({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: 100 * 7 / 24 + "%" } }), div27({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: 100 * 19 / 24 + "%" } })];
-      this._pitchShiftMarkerContainer = div27({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div27({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
-      this._pitchShiftRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("pitchShift"), "onclick") }, "transpose"), this._pitchShiftMarkerContainer);
-      this._pitchShiftContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "pitch shift"), this._pitchShiftRow);
-      this._testKnob = new Knob(-25, 25, 1, 0, true, this.doc, (oldValue, newValue) => new ChangeVolume(this.doc, oldValue, newValue), [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]);
-      this._testKnobRow = div27({ style: "display: flex; flex-direction: column" }, this._testKnob.container, div27({ style: "padding-bottom: 4px" }, "test knob"));
-      this._detuneSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue, newValue) => new ChangeDetune(this.doc, oldValue, newValue), true);
-      this._detuneSliderInputBox = input19({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
-      this._detuneSliderRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, div27(
+      this._decimalOffsetSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: "99", value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDecimalOffset(this.doc, oldValue, 99 - newValue), false);
+      this._decimalOffsetRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("decimalOffset"), "onclick") }, "\u2023 offset"), this._decimalOffsetSlider.container);
+      this._pulseWidthDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none;" }, this._decimalOffsetRow);
+      this._pitchShiftSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePitchShift(this.doc, oldValue, newValue), true);
+      this._pitchShiftTonicMarkers = [div28({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div28({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div28({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
+      this._pitchShiftFifthMarkers = [div28({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: 100 * 7 / 24 + "%" } }), div28({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: 100 * 19 / 24 + "%" } })];
+      this._pitchShiftMarkerContainer = div28({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div28({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
+      this._pitchShiftRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("pitchShift"), "onclick") }, "transpose"), this._pitchShiftMarkerContainer);
+      this._pitchShiftContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "pitch shift"), this._pitchShiftRow);
+      this._detuneSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue, newValue) => new ChangeDetune(this.doc, oldValue, newValue), true);
+      this._detuneSliderInputBox = input20({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
+      this._detuneSliderRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("detune"), "onclick") }, "cents "),
-        div27({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._detuneSliderInputBox)
+        div28({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._detuneSliderInputBox)
       ), this._detuneSlider.container);
-      this._detuneContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "detune"), this._detuneSliderRow);
-      this._distortionSlider = new Slider(input19({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDistortion(this.doc, oldValue, newValue), false);
-      this._distortionRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("distortionMix"), "onclick") }, "mix"), this._distortionSlider.container);
-      this._aliasingBox = input19({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-      this._aliasingRow = div27({ class: "selectRow" }, span9({ class: "tip", style: "margin-left:10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("aliases"), "onclick") }, "aliasing"), this._aliasingBox);
-      this._distortionContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "distortion"), this._distortionRow, this._aliasingRow);
-      this._bitcrusherQuantizationSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherQuantization(this.doc, oldValue, newValue), false);
-      this._bitcrusherQuantizationRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("bitcrusherQuantization"), "onclick") }, "bitcrush"), this._bitcrusherQuantizationSlider.container);
-      this._bitcrusherFreqSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherFreqRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherFreq(this.doc, oldValue, newValue), false);
-      this._bitcrusherFreqRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("bitcrusherFreq"), "onclick") }, "freq-crush"), this._bitcrusherFreqSlider.container);
-      this._bitcrusherContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "bitcrush"), this._bitcrusherQuantizationRow, this._bitcrusherFreqRow);
-      this._stringSustainSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeStringSustain(this.doc, oldValue, newValue), false);
+      this._detuneContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "detune"), this._detuneSliderRow);
+      this._distortionSlider = new Slider(input20({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDistortion(this.doc, oldValue, newValue), false);
+      this._distortionRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("distortionMix"), "onclick") }, "mix"), this._distortionSlider.container);
+      this._aliasingBox = input20({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+      this._aliasingRow = div28({ class: "selectRow" }, span9({ class: "tip", style: "margin-left:10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("aliases"), "onclick") }, "aliasing"), this._aliasingBox);
+      this._distortionContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "distortion"), this._distortionRow, this._aliasingRow);
+      this._bitcrusherQuantizationSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherQuantization(this.doc, oldValue, newValue), false);
+      this._bitcrusherQuantizationRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("bitcrusherQuantization"), "onclick") }, "bitcrush"), this._bitcrusherQuantizationSlider.container);
+      this._bitcrusherFreqSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherFreqRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherFreq(this.doc, oldValue, newValue), false);
+      this._bitcrusherFreqRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("bitcrusherFreq"), "onclick") }, "freq-crush"), this._bitcrusherFreqSlider.container);
+      this._bitcrusherContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "bitcrush"), this._bitcrusherQuantizationRow, this._bitcrusherFreqRow);
+      this._stringSustainSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeStringSustain(this.doc, oldValue, newValue), false);
       this._stringSustainLabel = span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("stringSustain"), "onclick") }, "sustain");
-      this._stringSustainRow = div27({ class: "selectRow" }, this._stringSustainLabel, this._stringSustainSlider.container);
-      this._unisonDropdown = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(6 /* Unison */), "onclick") }, "\u25BC");
+      this._stringSustainRow = div28({ class: "selectRow" }, this._stringSustainLabel, this._stringSustainSlider.container);
+      this._unisonDropdown = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(6 /* Unison */), "onclick") }, "\u25BC");
       this._unisonSelect = select14();
-      this._unisonSelectRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unison"), "onclick") }, "unison"), this._unisonDropdown, div27({ class: "selectContainer", style: "width: 61.5%;" }, this._unisonSelect));
-      this._unisonVoicesInputBox = input19({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonVoicesInputBox", type: "number", step: "1", min: Config.unisonVoicesMin, max: Config.unisonVoicesMax, value: 1 });
-      this._unisonVoicesRow = div27({ class: "selectRow dropFader" }, div27(
+      this._unisonSelectRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unison"), "onclick") }, "unison"), this._unisonDropdown, div28({ class: "selectContainer", style: "width: 61.5%;" }, this._unisonSelect));
+      this._unisonVoicesInputBox = input20({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonVoicesInputBox", type: "number", step: "1", min: Config.unisonVoicesMin, max: Config.unisonVoicesMax, value: 1 });
+      this._unisonVoicesRow = div28({ class: "selectRow dropFader" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unisonVoices"), "onclick") }, "\u2023 voices: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonVoicesInputBox)
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonVoicesInputBox)
       ));
-      this._unisonSpreadInputBox = input19({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonSpreadInputBox", type: "number", step: "0.001", min: Config.unisonSpreadMin, max: Config.unisonSpreadMax, value: 0 });
-      this._unisonSpreadRow = div27({ class: "selectRow dropFader" }, div27(
+      this._unisonSpreadInputBox = input20({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonSpreadInputBox", type: "number", step: "0.001", min: Config.unisonSpreadMin, max: Config.unisonSpreadMax, value: 0 });
+      this._unisonSpreadRow = div28({ class: "selectRow dropFader" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unisonSpread"), "onclick") }, "\u2023 spread: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSpreadInputBox)
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSpreadInputBox)
       ));
-      this._unisonOffsetInputBox = input19({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonOffsetInputBox", type: "number", step: "0.001", min: Config.unisonOffsetMin, max: Config.unisonOffsetMax, value: 0 });
-      this._unisonOffsetRow = div27({ class: "selectRow dropFader" }, div27(
+      this._unisonOffsetInputBox = input20({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonOffsetInputBox", type: "number", step: "0.001", min: Config.unisonOffsetMin, max: Config.unisonOffsetMax, value: 0 });
+      this._unisonOffsetRow = div28({ class: "selectRow dropFader" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unisonOffset"), "onclick") }, "\u2023 offset: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonOffsetInputBox)
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonOffsetInputBox)
       ));
-      this._unisonExpressionInputBox = input19({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonExpressionInputBox", type: "number", step: "0.001", min: Config.unisonExpressionMin, max: Config.unisonExpressionMax, value: 1.4 });
-      this._unisonExpressionRow = div27({ class: "selectRow dropFader" }, div27(
+      this._unisonExpressionInputBox = input20({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonExpressionInputBox", type: "number", step: "0.001", min: Config.unisonExpressionMin, max: Config.unisonExpressionMax, value: 1.4 });
+      this._unisonExpressionRow = div28({ class: "selectRow dropFader" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unisonExpression"), "onclick") }, "\u2023 volume: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonExpressionInputBox)
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonExpressionInputBox)
       ));
-      this._unisonSignInputBox = input19({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "0.001", min: Config.unisonSignMin, max: Config.unisonSignMax, value: 1 });
-      this._unisonSignRow = div27({ class: "selectRow dropFader" }, div27(
+      this._unisonSignInputBox = input20({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "0.001", min: Config.unisonSignMin, max: Config.unisonSignMax, value: 1 });
+      this._unisonSignRow = div28({ class: "selectRow dropFader" }, div28(
         {},
         span9({ class: "tip", style: "height:1em; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("unisonSign"), "onclick") }, "\u2023 sign: "),
-        div27({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSignInputBox)
+        div28({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSignInputBox)
       ));
-      this._unisonDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
+      this._unisonDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
       this._chordSelect = buildOptions2(select14({ style: "flex-shrink: 100" }), Config.chords.map((chord) => chord.name));
-      this._chordDropdown = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(2 /* Chord */), "onclick") }, "\u25BC");
-      this._monophonicNoteInputBox = input19({ style: "width: 2.35em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1 });
-      this._chordSelectContainer = div27({ class: "selectContainer", style: "width=100%" }, this._chordSelect);
-      this._chordSelectRow = div27({ style: "margin-top: 0.667em; display: flex; flex-direction: row;", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chords"), "onclick") }, "type "), this._monophonicNoteInputBox, this._chordDropdown, this._chordSelectContainer);
+      this._chordDropdown = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(2 /* Chord */), "onclick") }, "\u25BC");
+      this._monophonicNoteInputBox = input20({ style: "width: 2.35em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1 });
+      this._chordSelectContainer = div28({ class: "selectContainer", style: "width=100%" }, this._chordSelect);
+      this._chordSelectRow = div28({ style: "margin-top: 0.667em; display: flex; flex-direction: row;", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("chords"), "onclick") }, "type "), this._monophonicNoteInputBox, this._chordDropdown, this._chordSelectContainer);
       this._arpeggioSpeedDisplay = span9({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-      this._arpeggioSpeedSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeArpeggioSpeed(this.doc, oldValue, newValue), false);
-      this._arpeggioSpeedRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("arpeggioSpeed"), "onclick") }, "\u2023 spd"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
-      this._twoNoteArpBox = input19({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-      this._twoNoteArpRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("twoNoteArpeggio"), "onclick") }, "\u2023 fast two-note"), this._twoNoteArpBox);
+      this._arpeggioSpeedSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeArpeggioSpeed(this.doc, oldValue, newValue), false);
+      this._arpeggioSpeedRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("arpeggioSpeed"), "onclick") }, "\u2023 spd"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
+      this._twoNoteArpBox = input20({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+      this._twoNoteArpRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("twoNoteArpeggio"), "onclick") }, "\u2023 fast two-note"), this._twoNoteArpBox);
       this._strumSpeedDisplay = span9({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "0.04 beat(s)");
-      this._strumSpeedSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "1", max: Config.maxStrumSpeed, value: "1", step: "1" }), this.doc, (oldValue, newValue) => new ChangeStrumSpeed(this.doc, oldValue, newValue), false);
-      this._strumSpeedRow = div27({ class: "selectRow dropFader" }, div27({ style: "display: flex; flex-direction: column" }, span9({ class: "tip", style: "margin-left:4px; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("strumSpeedSlider"), "onclick") }, "\u2023 spd"), this._strumSpeedDisplay), this._strumSpeedSlider.container);
-      this._chordDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none;" }, this._strumSpeedRow, this._arpeggioSpeedRow, this._twoNoteArpRow);
-      this._chordContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "chord type"), this._chordSelectRow, this._chordDropdownGroup);
+      this._strumSpeedSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "1", max: Config.maxStrumSpeed, value: "1", step: "1" }), this.doc, (oldValue, newValue) => new ChangeStrumSpeed(this.doc, oldValue, newValue), false);
+      this._strumSpeedRow = div28({ class: "selectRow dropFader" }, div28({ style: "display: flex; flex-direction: column" }, span9({ class: "tip", style: "margin-left:4px; font-size: smaller;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("strumSpeedSlider"), "onclick") }, "\u2023 spd"), this._strumSpeedDisplay), this._strumSpeedSlider.container);
+      this._chordDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none;" }, this._strumSpeedRow, this._arpeggioSpeedRow, this._twoNoteArpRow);
+      this._chordContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "chord type"), this._chordSelectRow, this._chordDropdownGroup);
       this._vibratoSelect = buildOptions2(select14(), Config.vibratos.map((vibrato) => vibrato.name));
-      this._vibratoDropdown = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(0 /* Vibrato */), "onclick") }, "\u25BC");
-      this._vibratoSelectRow = div27({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibrato"), "onclick") }, "vibrato "), this._vibratoDropdown, div27({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
-      this._vibratoDepthSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato depth"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoDepth(this.doc, oldValue, newValue), false);
-      this._vibratoDepthRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoDepth"), "onclick") }, "\u2023 depth"), this._vibratoDepthSlider.container);
+      this._vibratoDropdown = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(0 /* Vibrato */), "onclick") }, "\u25BC");
+      this._vibratoSelectRow = div28({ style: "margin-top: 0.667em", class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibrato"), "onclick") }, "vibrato "), this._vibratoDropdown, div28({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
+      this._vibratoDepthSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato depth"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoDepth(this.doc, oldValue, newValue), false);
+      this._vibratoDepthRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoDepth"), "onclick") }, "\u2023 depth"), this._vibratoDepthSlider.container);
       this._vibratoSpeedDisplay = span9({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-      this._vibratoSpeedSlider = new Slider(input19({ style: "margin: 0; text-overflow: clip;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoSpeed(this.doc, oldValue, newValue), false);
-      this._vibratoSpeedRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoSpeed"), "onclick") }, "\u2023 spd"), this._vibratoSpeedDisplay, this._vibratoSpeedSlider.container);
-      this._vibratoDelaySlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoDelay(this.doc, oldValue, newValue), false);
-      this._vibratoDelayRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoDelay"), "onclick") }, "\u2023 delay"), this._vibratoDelaySlider.container);
+      this._vibratoSpeedSlider = new Slider(input20({ style: "margin: 0; text-overflow: clip;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoSpeed(this.doc, oldValue, newValue), false);
+      this._vibratoSpeedRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoSpeed"), "onclick") }, "\u2023 spd"), this._vibratoSpeedDisplay, this._vibratoSpeedSlider.container);
+      this._vibratoDelaySlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeVibratoDelay(this.doc, oldValue, newValue), false);
+      this._vibratoDelayRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoDelay"), "onclick") }, "\u2023 delay"), this._vibratoDelaySlider.container);
       this._vibratoTypeSelect = buildOptions2(select14(), Config.vibratoTypes.map((vibrato) => vibrato.name));
-      this._vibratoTypeSelectRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoType"), "onclick") }, "\u2023 type"), div27({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
-      this._vibratoDropdownGroup = div27({ class: "editor-controls-alt", style: `display: none;` }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
-      this._vibratoContainer = div27({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "vibrato"), this._vibratoSelectRow, this._vibratoDropdownGroup);
-      this._phaseModGroup = div27({ class: "editor-controls-alt" });
+      this._vibratoTypeSelectRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibratoType"), "onclick") }, "\u2023 type"), div28({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
+      this._vibratoDropdownGroup = div28({ class: "editor-controls-alt", style: `display: none;` }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
+      this._vibratoContainer = div28({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span9({ class: "effectTitle" }, "vibrato"), this._vibratoSelectRow, this._vibratoDropdownGroup);
+      this._phaseModGroup = div28({ class: "editor-controls-alt" });
       this._feedbackTypeSelect = buildOptions2(select14(), Config.feedbacks.map((feedback) => feedback.name));
       this.envelopeEditor = new EnvelopeEditor(this.doc, (id2, submenu, subtype) => this._toggleDropdownMenu(id2, submenu), (name) => this._openPrompt(name));
-      this._feedbackRow1 = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackType"), "onclick") }, "feedback"), div27({ class: "selectContainer" }, this._feedbackTypeSelect));
+      this._feedbackRow1 = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackType"), "onclick") }, "feedback"), div28({ class: "selectContainer" }, this._feedbackTypeSelect));
       this._spectrumEditor = new SpectrumEditor(this.doc, null);
-      this._spectrumZoom = button27({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("spectrumSettings"), "onclick") }, "+");
-      this._spectrumRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("spectrum"), "onclick"), style: "font-size: smaller" }, "spectrum"), this._spectrumZoom, this._spectrumEditor.container);
+      this._spectrumZoom = button28({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("spectrumSettings"), "onclick") }, "+");
+      this._spectrumRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("spectrum"), "onclick"), style: "font-size: smaller" }, "spectrum"), this._spectrumZoom, this._spectrumEditor.container);
       this._harmonicsEditor = new HarmonicsEditor(this.doc);
-      this._harmonicsZoom = button27({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("harmonicsSettings"), "onclick") }, "+");
-      this._harmonicsRow = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("harmonics"), "onclick"), style: "font-size: smaller" }, "harmonics"), this._harmonicsZoom, this._harmonicsEditor.container);
+      this._harmonicsZoom = button28({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("harmonicsSettings"), "onclick") }, "+");
+      this._harmonicsRow = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("harmonics"), "onclick"), style: "font-size: smaller" }, "harmonics"), this._harmonicsZoom, this._harmonicsEditor.container);
       this._envelopeSpeedDisplay = span9({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-      this._envelopeSpeedSlider = new Slider(input19({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["envelope speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEnvelopeSpeed(this.doc, oldValue, newValue), false);
-      this._envelopeSpeedRow = div27({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("envelopeSpeed"), "onclick") }, "\u2023 spd."), this._envelopeSpeedDisplay, this._envelopeSpeedSlider.container);
-      this._envelopeDropdownGroup = div27({ class: "editor-controls-alt", style: "display: none;" }, this._envelopeSpeedRow);
-      this._envelopeDropdown = button27({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(7 /* Envelope */), "onclick") }, "\u25BC");
-      this._drumsetGroup = div27({ class: "editor-controls-alt" });
-      this._drumsetZoom = button27({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("drumsetSettings"), "onclick") }, "+");
-      this._modulatorGroup = div27({ class: "editor-controls-alt" });
+      this._envelopeSpeedSlider = new Slider(input20({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["envelope speed"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEnvelopeSpeed(this.doc, oldValue, newValue), false);
+      this._envelopeSpeedRow = div28({ class: "selectRow dropFader" }, span9({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("envelopeSpeed"), "onclick") }, "\u2023 spd."), this._envelopeSpeedDisplay, this._envelopeSpeedSlider.container);
+      this._envelopeDropdownGroup = div28({ class: "editor-controls-alt", style: "display: none;" }, this._envelopeSpeedRow);
+      this._envelopeDropdown = button28({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(7 /* Envelope */), "onclick") }, "\u25BC");
+      this._drumsetGroup = div28({ class: "editor-controls-alt" });
+      this._drumsetZoom = button28({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("drumsetSettings"), "onclick") }, "+");
+      this._modulatorGroup = div28({ class: "editor-controls-alt" });
       this._feedback6OpTypeSelect = buildOptions2(select14(), Config.feedbacks6Op.map((feedback) => feedback.name));
-      this._feedback6OpRow1 = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackType"), "onclick") }, "feedback"), div27({ class: "selectContainer" }, this._feedback6OpTypeSelect));
-      this._algorithmCanvasSwitch = button27({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name((e) => this._toggleAlgorithmCanvas(e), "onclick") }, "A");
+      this._feedback6OpRow1 = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackType"), "onclick") }, "feedback"), div28({ class: "selectContainer" }, this._feedback6OpTypeSelect));
+      this._algorithmCanvasSwitch = button28({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name((e) => this._toggleAlgorithmCanvas(e), "onclick") }, "A");
       this._customAlgorithmCanvas = new CustomAlgorythmCanvas(canvas2({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this.doc, (newArray, carry, mode) => new ChangeCustomAlgorythmorFeedback(this.doc, newArray, carry, mode));
       this._algorithm6OpSelect = buildOptions2(select14(), Config.algorithms6Op.map((algorithm) => algorithm.name));
-      this._algorithm6OpSelectRow = div27(
-        div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("algorithm"), "onclick") }, "algorithm "), div27({ class: "selectContainer" }, this._algorithm6OpSelect)),
-        div27({ style: "height:144px; display:flex; flex-direction: row; align-items:center; justify-content:center;" }, div27({ style: "display:block; width:10px; margin-right: 0.2em" }, this._algorithmCanvasSwitch), div27({ style: "width:144px; height:144px;" }, this._customAlgorithmCanvas.canvas))
+      this._algorithm6OpSelectRow = div28(
+        div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("algorithm"), "onclick") }, "algorithm "), div28({ class: "selectContainer" }, this._algorithm6OpSelect)),
+        div28({ style: "height:144px; display:flex; flex-direction: row; align-items:center; justify-content:center;" }, div28({ style: "display:block; width:10px; margin-right: 0.2em" }, this._algorithmCanvasSwitch), div28({ style: "width:144px; height:144px;" }, this._customAlgorithmCanvas.canvas))
       );
       //temp
-      this._instrumentCopyButton = button27({ style: "max-width:86px; width: 86px;", class: "copyButton", title: "Copy Instrument (\u21E7C)" }, [
+      this._instrumentCopyButton = button28({ style: "max-width:86px; width: 86px;", class: "copyButton", title: "Copy Instrument (\u21E7C)" }, [
         "copy",
         // Copy icon:
         SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
           SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" })
         ])
       ]);
-      this._instrumentPasteButton = button27({ style: "max-width:86px;", class: "pasteButton", title: "Paste Instrument (\u21E7V)" }, [
+      this._instrumentPasteButton = button28({ style: "max-width:86px;", class: "pasteButton", title: "Paste Instrument (\u21E7V)" }, [
         "paste",
         // Paste icon:
         SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
@@ -60847,14 +61077,14 @@ You should be redirected to the song at:<br /><br />
           SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor" })
         ])
       ]);
-      this._instrumentExportButton = button27({ style: "max-width:86px; width: 86px;", class: "exportInstrumentButton" }, [
+      this._instrumentExportButton = button28({ style: "max-width:86px; width: 86px;", class: "exportInstrumentButton" }, [
         "export",
         // Export icon:
         SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
           SVG.path({ d: "M200-120v-40h560v40H200Zm279.231-150.769L254.615-568.462h130.769V-840h188.462v271.538h130.77L479.231-270.769Zm0-65.385 142.923-191.538h-88.308V-800H425.385v272.308h-88.308l142.154 191.538ZM480-527.692Z", fill: "currentColor" })
         ])
       ]);
-      this._instrumentImportButton = button27({ style: "max-width:86px;", class: "importInstrumentButton" }, [
+      this._instrumentImportButton = button28({ style: "max-width:86px;", class: "importInstrumentButton" }, [
         "import",
         // Import icon:
         SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
@@ -60862,7 +61092,7 @@ You should be redirected to the song at:<br /><br />
         ])
       ]);
       this._globalOscscope = new oscilloscopeCanvas(canvas2({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilloscopeAll" }), 1);
-      this._globalOscscopeContainer = div27(
+      this._globalOscscopeContainer = div28(
         { style: "height: 38px; margin-left: auto; margin-right: auto;" },
         this._globalOscscope.canvas
       );
@@ -60872,14 +61102,14 @@ You should be redirected to the song at:<br /><br />
         select14({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
         Config.chipWaves.map((wave) => wave.name)
       );
-      this._customWaveZoom = button27({ style: "margin-left:0.5em; height:1.5em; max-width: 20px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customChipSettings"), "onclick") }, "+");
-      this._customWaveDraw = div27({ style: "height:80px; margin-top:10px; margin-bottom:5px" }, [
-        div27({ style: "height:54px; display:flex; justify-content:center;" }, [this._customWaveDrawCanvas.canvas]),
-        div27({ style: "margin-top:5px; display:flex; justify-content:center;" }, [this._customWavePresetDrop, this._customWaveZoom])
+      this._customWaveZoom = button28({ style: "margin-left:0.5em; height:1.5em; max-width: 20px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("customChipSettings"), "onclick") }, "+");
+      this._customWaveDraw = div28({ style: "height:80px; margin-top:10px; margin-bottom:5px" }, [
+        div28({ style: "height:54px; display:flex; justify-content:center;" }, [this._customWaveDrawCanvas.canvas]),
+        div28({ style: "margin-top:5px; display:flex; justify-content:center;" }, [this._customWavePresetDrop, this._customWaveZoom])
       ]);
-      this._songTitleInputBox = new InputBox(input19({ style: "font-weight:bold; border:none; width: 98%; background-color:${ColorConfig.editorBackground}; color:${ColorConfig.primaryText}; text-align:center", maxlength: "30", type: "text", value: EditorConfig.versionDisplayName }), this.doc, (oldValue, newValue) => new ChangeSongTitle(this.doc, oldValue, newValue));
-      this._feedbackAmplitudeSlider = new Slider(input19({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this.doc, (oldValue, newValue) => new ChangeFeedbackAmplitude(this.doc, oldValue, newValue), false);
-      this._feedbackRow2 = div27({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackVolume"), "onclick") }, "feed. vol."), this._feedbackAmplitudeSlider.container);
+      this._songTitleInputBox = new InputBox(input20({ style: "font-weight:bold; border:none; width: 98%; background-color:${ColorConfig.editorBackground}; color:${ColorConfig.primaryText}; text-align:center", maxlength: "30", type: "text", value: EditorConfig.versionDisplayName }), this.doc, (oldValue, newValue) => new ChangeSongTitle(this.doc, oldValue, newValue));
+      this._feedbackAmplitudeSlider = new Slider(input20({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this.doc, (oldValue, newValue) => new ChangeFeedbackAmplitude(this.doc, oldValue, newValue), false);
+      this._feedbackRow2 = div28({ class: "selectRow" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackVolume"), "onclick") }, "feed. vol."), this._feedbackAmplitudeSlider.container);
       /*
            * @jummbus - my very real, valid reason for cutting this button: I don't like it.
            * 
@@ -60888,8 +61118,8 @@ You should be redirected to the song at:<br /><br />
               "Customize Instrument",
           );
           */
-      this._addEnvelopeButton = button27({ type: "button", class: "add-envelope" });
-      this._customInstrumentSettingsGroup = div27(
+      this._addEnvelopeButton = button28({ type: "button", class: "add-envelope" });
+      this._customInstrumentSettingsGroup = div28(
         { class: "editor-controls-alt" },
         this._eqFilterTypeRow,
         this._eqFilterRow,
@@ -60923,12 +61153,11 @@ You should be redirected to the song at:<br /><br />
         this._chipWaveLoopEndRow,
         this._chipWaveStartOffsetRow,
         this._chipWavePlayBackwardsRow,
-        div27(
+        div28(
           { style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
           span9({ style: `flex-grow: 1; text-align: center;` }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("effects"), "onclick") }, "effects")),
-          div27({ class: "effects-menu" }, this._effectsSelect)
+          div28({ class: "effects-menu" }, this._effectsSelect)
         ),
-        this._testKnobRow,
         //this._panSliderRow,
         //this._panDropdownGroup,
         this._panContainer,
@@ -60977,7 +61206,7 @@ You should be redirected to the song at:<br /><br />
         //this._flangerRateRow,
         //this._flangerFeedbackRow,
         this._flangerContainer,
-        div27(
+        div28(
           { style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
           span9({ style: `flex-grow: 1; text-align: center;` }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("envelopes"), "onclick") }, "envelopes")),
           this._envelopeDropdown,
@@ -60986,35 +61215,35 @@ You should be redirected to the song at:<br /><br />
         this._envelopeDropdownGroup,
         this.envelopeEditor.container
       );
-      this._instrumentCopyGroup = div27(
+      this._instrumentCopyGroup = div28(
         { class: "editor-controls-alt" },
-        div27(
+        div28(
           { class: "selectRow" },
           this._instrumentCopyButton,
           this._instrumentPasteButton
         )
       );
-      this._instrumentExportGroup = div27(
+      this._instrumentExportGroup = div28(
         { class: "editor-controls-alt" },
-        div27(
+        div28(
           { class: "selectRow" },
           this._instrumentExportButton,
           this._instrumentImportButton
         )
       );
-      this._instrumentSettingsTextRow = div27(
+      this._instrumentSettingsTextRow = div28(
         { id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` },
         "instrument settings"
       );
-      this._instrumentTypeSelectRow = div27(
+      this._instrumentTypeSelectRow = div28(
         { class: "selectRow", id: "typeSelectRow" },
         span9({ style: "font-size: smaller; padding-top: 4px;", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("instrumentType"), "onclick") }, "instrument"),
-        div27(
-          div27({ class: "pitchSelect" }, this._pitchedPresetSelect),
-          div27({ class: "drumSelect" }, this._drumPresetSelect)
+        div28(
+          div28({ class: "pitchSelect" }, this._pitchedPresetSelect),
+          div28({ class: "drumSelect" }, this._drumPresetSelect)
         )
       );
-      this._instrumentSettingsGroup = div27(
+      this._instrumentSettingsGroup = div28(
         { class: "editor-controls-alt" },
         this._instrumentSettingsTextRow,
         this._instrumentsButtonRow,
@@ -61035,17 +61264,17 @@ You should be redirected to the song at:<br /><br />
         SVG.path({ d: "M32 58 c3 -23 48 -40 48 -19 0 6 -7 11 -15 11 -8 0 -15 7 -15 15 0 8 -5 15 -11 15 -6 0 -9 -10 -7 -22z" }),
         SVG.path({ d: "M150 65 c0 -8 -7 -15 -15 -15 -8 0 -15 -4 -15 -10 0 -14 23 -13 38 2 15 15 16 38 2 38 -5 0 -10 -7 -10 -15z" })
       ]);
-      this._promptContainer = div27({ class: "promptContainer", style: "display: none;" });
-      this._promptContainerBG = div27({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
-      this._zoomInButton = button27({ class: "zoomInButton", type: "button", title: "Zoom In" });
-      this._zoomOutButton = button27({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
-      this._patternEditorRow = div27(
+      this._promptContainer = div28({ class: "promptContainer", style: "display: none;" });
+      this._promptContainerBG = div28({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
+      this._zoomInButton = button28({ class: "zoomInButton", type: "button", title: "Zoom In" });
+      this._zoomOutButton = button28({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
+      this._patternEditorRow = div28(
         { style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" },
         this._patternEditorPrev.container,
         this._patternEditor.container,
         this._patternEditorNext.container
       );
-      this._patternArea = div27(
+      this._patternArea = div28(
         { class: "pattern-area" },
         this._piano.container,
         this._patternEditorRow,
@@ -61053,34 +61282,34 @@ You should be redirected to the song at:<br /><br />
         this._zoomInButton,
         this._zoomOutButton
       );
-      this._trackContainer = div27(
+      this._trackContainer = div28(
         { class: "trackContainer" },
         this._trackEditor.container,
         this._loopEditor.container
       );
-      this._trackVisibleArea = div27({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });
-      this._trackAndMuteContainer = div27(
+      this._trackVisibleArea = div28({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });
+      this._trackAndMuteContainer = div28(
         { class: "trackAndMuteContainer" },
         this._muteEditor.container,
         this._trackContainer,
         this._trackVisibleArea
       );
       this._barScrollBar = new BarScrollBar(this.doc);
-      this._trackArea = div27(
+      this._trackArea = div28(
         { class: "track-area" },
         this._trackAndMuteContainer,
         this._barScrollBar.container
       );
-      this._menuArea = div27(
+      this._menuArea = div28(
         { class: "menu-area" },
         //this._newSong,
         //this._import,
         this._buttonsRow,
-        div27(
+        div28(
           { class: "selectContainer menu file" },
           this._editMenu
         ),
-        div27(
+        div28(
           { class: "selectContainer menu pref" },
           this._fileMenu
         )
@@ -61088,32 +61317,32 @@ You should be redirected to the song at:<br /><br />
             this._optionsMenu,
         ),*/
       );
-      this._sampleLoadingBar = div27({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
-      this._sampleLoadingBarContainer = div27({ style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
-      this._sampleLoadingStatusContainer = div27(
+      this._sampleLoadingBar = div28({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
+      this._sampleLoadingBarContainer = div28({ style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
+      this._sampleLoadingStatusContainer = div28(
         { style: "cursor: pointer;" },
-        div27({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "sample loading status"),
-        div27(
+        div28({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "sample loading status"),
+        div28(
           { class: "selectRow", style: "height: 6px; margin-bottom: 0.5em;" },
           this._sampleLoadingBarContainer
         )
       );
-      this._songSettingsArea = div27(
+      this._songSettingsArea = div28(
         { class: "song-settings-area" },
-        div27(
+        div28(
           { class: "editor-controls" },
-          div27(
+          div28(
             { class: "editor-song-settings" },
-            div27(
+            div28(
               { style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" },
-              div27(
+              div28(
                 { class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: /* @__PURE__ */ __name(() => this._openPrompt("usedPattern"), "onclick") },
                 SVG.svg(
                   { style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" },
                   this._usedPatternIndicator
                 )
               ),
-              div27(
+              div28(
                 { class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: /* @__PURE__ */ __name(() => this._openPrompt("usedInstrument"), "onclick") },
                 SVG.svg(
                   { style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" },
@@ -61121,25 +61350,25 @@ You should be redirected to the song at:<br /><br />
                 )
               ),
               "song settings",
-              div27({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator)
+              div28({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator)
             )
           ),
-          div27(
+          div28(
             { class: "selectRow" },
             span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("scale"), "onclick") }, "scale "),
-            div27({ class: "selectContainer" }, this._scaleSelect)
+            div28({ class: "selectContainer" }, this._scaleSelect)
           ),
-          div27(
+          div28(
             { class: "selectRow" },
             span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("key"), "onclick") }, "key "),
             this._octaveStepper,
-            div27({ class: "selectContainer" }, this._keySelect)
+            div28({ class: "selectContainer" }, this._keySelect)
           ),
           /*div({ class: "selectRow" },
               span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "),
               this._octaveStepper,
           ),*/
-          div27(
+          div28(
             { class: "selectRow" },
             span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("tempo"), "onclick") }, "tempo "),
             span9(
@@ -61148,15 +61377,15 @@ You should be redirected to the song at:<br /><br />
               this._tempoStepper
             )
           ),
-          div27(
+          div28(
             { class: "selectRow" },
             span9({ class: "tip", style: "white-space: nowrap;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("rhythm"), "onclick") }, "subgrid "),
             //span({ style: "display: flex;" },
-            div27({ style: "position: relative; display: inline-block;" }, this._rhythmInput, this._rhythmDisabledLabel),
+            div28({ style: "position: relative; display: inline-block;" }, this._rhythmInput, this._rhythmDisabledLabel),
             this._rhythmActionSelect
             //),
           ),
-          div27(
+          div28(
             { class: "selectRow" },
             span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("songeq"), "onclick") }, span9("song EQ")),
             this._songEqFilterZoom,
@@ -61165,24 +61394,26 @@ You should be redirected to the song at:<br /><br />
           this._sampleLoadingStatusContainer
         )
       );
-      this._instrumentSettingsArea = div27(
+      this._songDetailsButton = button28({ class: "details-button" });
+      this._instrumentSettingsArea = div28(
         { class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
         this._modulatorGroup
       );
-      this._settingsArea = div27(
+      this._settingsArea = div28(
         { class: "settings-area noSelection" },
-        div27(
+        div28(
           { class: "version-area" },
-          div27(
-            { style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText};` },
-            this._songTitleInputBox.input
+          div28(
+            { style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText}; display:flex;` },
+            this._songTitleInputBox.input,
+            this._songDetailsButton
           )
         ),
-        div27(
+        div28(
           { class: "play-pause-area" },
           this._volumeBarBox,
-          div27(
+          div28(
             { class: "playback-bar-controls" },
             this._playButton,
             this._pauseButton,
@@ -61191,7 +61422,7 @@ You should be redirected to the song at:<br /><br />
             this._prevBarButton,
             this._nextBarButton
           ),
-          div27(
+          div28(
             { class: "playback-volume-controls" },
             span9({ class: "volume-speaker" }),
             this._volumeSlider.container
@@ -61202,7 +61433,7 @@ You should be redirected to the song at:<br /><br />
         this._songSettingsArea,
         this._instrumentSettingsArea
       );
-      this.mainLayer = div27(
+      this.mainLayer = div28(
         { class: "beepboxEditor", tabIndex: "0" },
         //this._tabs.container,
         this._patternArea,
@@ -61253,6 +61484,9 @@ You should be redirected to the song at:<br /><br />
       this.lastOutVolumeCapR = 0;
       this.patternUsed = false;
       this._modRecTimeout = -1;
+      this._openDetails = /* @__PURE__ */ __name(() => {
+        this._openPrompt("songDetails");
+      }, "_openDetails");
       this._whenSampleLoadingStatusClicked = /* @__PURE__ */ __name(() => {
         this._openPrompt("sampleLoadingStatus");
       }, "_whenSampleLoadingStatusClicked");
@@ -61407,7 +61641,7 @@ You should be redirected to the song at:<br /><br />
         }
         if (!this.doc.song.getChannelIsMod(this.doc.channel)) {
           this._customInstrumentSettingsGroup.style.display = "";
-          this._panSliderRow.style.display = "";
+          this._panKnobRow.style.display = "";
           this._panDropdownGroup.style.display = this._openPanDropdown ? "" : "none";
           this._panContainer.style.display = "";
           this._detuneSliderRow.style.display = "";
@@ -61775,13 +62009,12 @@ You should be redirected to the song at:<br /><br />
             this._bitcrusherContainer.style.display = "none";
           }
           if (effectsIncludePanning(instrument.effects)) {
-            this._panSliderRow.style.display = "";
             if (this._openPanDropdown)
               this._panDropdownGroup.style.display = "";
             this._panSlider.updateValue(instrument.pan);
+            this._panKnob.updateValue(instrument.pan);
             this._panContainer.style.display = "";
           } else {
-            this._panSliderRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
             this._panContainer.style.display = "none";
           }
@@ -61930,7 +62163,7 @@ You should be redirected to the song at:<br /><br />
           this._panDelaySlider.input.title = "" + instrument.panDelay;
           this._arpeggioSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
           this._arpeggioSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
-          this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
+          this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat * 10) + " beat(s)";
           this._eqFilterSimpleCutSlider.updateValue(instrument.eqFilterSimpleCut);
           this._eqFilterSimplePeakSlider.updateValue(instrument.eqFilterSimplePeak);
           this._noteFilterSimpleCutSlider.updateValue(instrument.noteFilterSimpleCut);
@@ -61996,7 +62229,7 @@ You should be redirected to the song at:<br /><br />
           this._envelopeDropdownGroup.style.display = "none";
           this._detuneSliderRow.style.display = "none";
           this._detuneContainer.style.display = "none";
-          this._panSliderRow.style.display = "none";
+          this._panKnobRow.style.display = "none";
           this._panDropdownGroup.style.display = "none";
           this._panContainer.style.display = "none";
           this._pulseWidthDropdownGroup.style.display = "none";
@@ -62478,7 +62711,7 @@ You should be redirected to the song at:<br /><br />
             }
           }
           this._customInstrumentSettingsGroup.style.display = "none";
-          this._panSliderRow.style.display = "none";
+          this._panKnobRow.style.display = "none";
           this._panDropdownGroup.style.display = "none";
           this._instrumentVolumeSliderRow.style.display = "none";
           this._instrumentTypeSelectRow.style.setProperty("display", "none");
@@ -63354,7 +63587,7 @@ You should be redirected to the song at:<br /><br />
         }
       }, "_toggleRecord");
       this._animate = /* @__PURE__ */ __name(() => {
-        this._modSliderUpdate();
+        this._modSliderAndKnobUpdate();
         if (this.doc.prefs.displayVolumeBar) {
           this._volumeUpdate();
         }
@@ -63954,33 +64187,33 @@ You should be redirected to the song at:<br /><br />
         this._showModSliders[i] = [];
         this._modSliderValues[i] = [];
       }
-      this._phaseModGroup.appendChild(div27(
+      this._phaseModGroup.appendChild(div28(
         { class: "selectRow", style: `color: ${ColorConfig.secondaryText}; height: 1em; margin-top: 0.5em;` },
-        div27({ style: "margin-right: .1em; visibility: hidden;" }, "1."),
-        div27({ style: "width: 3em; margin-right: 3em;", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("operatorFrequency"), "onclick") }, "freq"),
-        div27({ style: "width: 5em; margin-right: 1.5em;", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("operatorVolume"), "onclick") }, "volume")
+        div28({ style: "margin-right: .1em; visibility: hidden;" }, "1."),
+        div28({ style: "width: 3em; margin-right: 3em;", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("operatorFrequency"), "onclick") }, "freq"),
+        div28({ style: "width: 5em; margin-right: 1.5em;", class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("operatorVolume"), "onclick") }, "volume")
       ));
       for (let i = 0; i < Config.operatorCount + 2; i++) {
         const operatorIndex = i;
-        const operatorNumber = div27({ style: "margin-right: 0px; color: " + ColorConfig.secondaryText + ";" }, i + 1 + "");
+        const operatorNumber = div28({ style: "margin-right: 0px; color: " + ColorConfig.secondaryText + ";" }, i + 1 + "");
         const frequencySelect = buildOptions2(select14({ style: "width: 100%;", title: "Frequency" }), Config.operatorFrequencies.map((freq) => freq.name));
-        const amplitudeSlider = new Slider(input19({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this.doc, (oldValue, newValue) => new ChangeOperatorAmplitude(this.doc, operatorIndex, oldValue, newValue), false);
+        const amplitudeSlider = new Slider(input20({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this.doc, (oldValue, newValue) => new ChangeOperatorAmplitude(this.doc, operatorIndex, oldValue, newValue), false);
         const waveformSelect = buildOptions2(select14({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map((wave) => wave.name));
-        const waveformDropdown = button27({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(4 /* FM */, i), "onclick") }, "\u25BC");
+        const waveformDropdown = button28({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(4 /* FM */, i), "onclick") }, "\u25BC");
         const waveformDropdownHint = span9({ class: "tip", style: "margin-left: 10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("operatorWaveform"), "onclick") }, "wave");
-        const waveformPulsewidthSlider = new Slider(input19({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this.doc, (oldValue, newValue) => new ChangeOperatorPulseWidth(this.doc, operatorIndex, oldValue, newValue), true);
-        const waveformDropdownRow = div27(
+        const waveformPulsewidthSlider = new Slider(input20({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this.doc, (oldValue, newValue) => new ChangeOperatorPulseWidth(this.doc, operatorIndex, oldValue, newValue), true);
+        const waveformDropdownRow = div28(
           { class: "selectRow" },
           waveformDropdownHint,
           waveformPulsewidthSlider.container,
-          div27({ class: "selectContainer", style: "width: 6em; margin-left: .3em;" }, waveformSelect)
+          div28({ class: "selectContainer", style: "width: 6em; margin-left: .3em;" }, waveformSelect)
         );
-        const waveformDropdownGroup = div27({ class: "operatorRow" }, waveformDropdownRow);
-        const row = div27(
+        const waveformDropdownGroup = div28({ class: "operatorRow" }, waveformDropdownRow);
+        const row = div28(
           { class: "selectRow" },
           operatorNumber,
           waveformDropdown,
-          div27({ class: "selectContainer", style: "width: 3em; margin-right: .3em;" }, frequencySelect),
+          div28({ class: "selectContainer", style: "width: 3em; margin-right: .3em;" }, frequencySelect),
           amplitudeSlider.container
         );
         this._phaseModGroup.appendChild(row);
@@ -64003,7 +64236,7 @@ You should be redirected to the song at:<br /><br />
         });
       }
       this._drumsetGroup.appendChild(
-        div27(
+        div28(
           { class: "selectRow" },
           span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("drumsetEnvelope"), "onclick") }, "envelope"),
           span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("drumsetSpectrum"), "onclick") }, "spectrum"),
@@ -64020,9 +64253,9 @@ You should be redirected to the song at:<br /><br />
         envelopeSelect.addEventListener("change", () => {
           this.doc.record(new ChangeDrumsetEnvelope(this.doc, drumIndex, envelopeSelect.selectedIndex));
         });
-        const row = div27(
+        const row = div28(
           { class: "selectRow" },
-          div27({ class: "selectContainer", style: "width: 5em; margin-right: .3em;" }, envelopeSelect),
+          div28({ class: "selectContainer", style: "width: 5em; margin-right: .3em;" }, envelopeSelect),
           this._drumsetSpectrumEditors[i].container
         );
         this._drumsetGroup.appendChild(row);
@@ -64040,19 +64273,19 @@ You should be redirected to the song at:<br /><br />
       for (let mod2 = 0; mod2 < Config.modCount; mod2++) {
         let modChannelBox = select14({ style: "width: 100%; color: currentColor; text-overflow:ellipsis;" });
         let modInstrumentBox = select14({ style: "width: 100%; color: currentColor;" });
-        let modNameRow = div27(
+        let modNameRow = div28(
           { class: "operatorRow", style: "height: 1em; margin-bottom: 0.65em;" },
-          div27({ class: "tip", style: "width: 10%; max-width: 5.4em;", id: "modChannelText" + mod2, onclick: /* @__PURE__ */ __name(() => this._openPrompt("modChannel"), "onclick") }, "ch"),
-          div27({ class: "selectContainer", style: "width: 35%;" }, modChannelBox),
-          div27({ class: "tip", style: "width: 1.2em; margin-left: 0.8em;", id: "modInstrumentText" + mod2, onclick: /* @__PURE__ */ __name(() => this._openPrompt("modInstrument"), "onclick") }, "ins"),
-          div27({ class: "selectContainer", style: "width: 10%;" }, modInstrumentBox)
+          div28({ class: "tip", style: "width: 10%; max-width: 5.4em;", id: "modChannelText" + mod2, onclick: /* @__PURE__ */ __name(() => this._openPrompt("modChannel"), "onclick") }, "ch"),
+          div28({ class: "selectContainer", style: "width: 35%;" }, modChannelBox),
+          div28({ class: "tip", style: "width: 1.2em; margin-left: 0.8em;", id: "modInstrumentText" + mod2, onclick: /* @__PURE__ */ __name(() => this._openPrompt("modInstrument"), "onclick") }, "ins"),
+          div28({ class: "selectContainer", style: "width: 10%;" }, modInstrumentBox)
         );
         let modSetBox = select14();
         let modFilterBox = select14();
         let modEnvelopeBox = select14();
-        let modSetRow = div27({ class: "selectRow", id: "modSettingText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modSet"), "onclick") }, "Setting: "), span9({ class: "tip", style: "font-size:x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modSetInfo" + mod2), "onclick") }, "?"), div27({ class: "selectContainer" }, modSetBox));
-        let modFilterRow = div27({ class: "selectRow", id: "modFilterText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modFilter" + mod2), "onclick") }, "Target: "), div27({ class: "selectContainer" }, modFilterBox));
-        let modEnvelopeRow = div27({ class: "selectRow", id: "modEnvelopeText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modEnvelope"), "onclick") }, "Envelope: "), div27({ class: "selectContainer" }, modEnvelopeBox));
+        let modSetRow = div28({ class: "selectRow", id: "modSettingText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modSet"), "onclick") }, "Setting: "), span9({ class: "tip", style: "font-size:x-small;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modSetInfo" + mod2), "onclick") }, "?"), div28({ class: "selectContainer" }, modSetBox));
+        let modFilterRow = div28({ class: "selectRow", id: "modFilterText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modFilter" + mod2), "onclick") }, "Target: "), div28({ class: "selectContainer" }, modFilterBox));
+        let modEnvelopeRow = div28({ class: "selectRow", id: "modEnvelopeText" + mod2, style: "margin-bottom: 0.9em; color: currentColor;" }, span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("modEnvelope"), "onclick") }, "Envelope: "), div28({ class: "selectContainer" }, modEnvelopeBox));
         let modTarget = SVG.svg({ style: "transform: translate(0px, 1px);", width: "1.5em", height: "1em", viewBox: "0 0 200 200" }, [
           SVG.path({ d: "M90 155 l0 -45 -45 0 c-25 0 -45 -4 -45 -10 0 -5 20 -10 45 -10 l45 0 0 -45 c0 -25 5 -45 10 -45 6 0 10 20 10 45 l0 45 45 0 c25 0 45 5 45 10 0 6 -20 10 -45 10 l -45 0 0 45 c0 25 -4 45 -10 45 -5 0 -10 -20 -10 -45z" }),
           SVG.path({ d: "M42 158 c-15 -15 -16 -38 -2 -38 6 0 10 7 10 15 0 8 7 15 15 15 8 0 15 5 15 10 0 14 -23 13 -38 -2z" }),
@@ -64070,7 +64303,7 @@ You should be redirected to the song at:<br /><br />
         this._modEnvelopeRows.push(modEnvelopeRow);
         this._modEnvelopeBoxes.push(modEnvelopeBox);
         this._modTargetIndicators.push(modTarget);
-        this._modulatorGroup.appendChild(div27({ style: "margin: 3px 0; font-weight: bold; margin-bottom: 0.7em; text-align: center; color: " + ColorConfig.secondaryText + "; background: " + ColorConfig.uiWidgetBackground + ";" }, ["Modulator " + (mod2 + 1), modTarget]));
+        this._modulatorGroup.appendChild(div28({ style: "margin: 3px 0; font-weight: bold; margin-bottom: 0.7em; text-align: center; color: " + ColorConfig.secondaryText + "; background: " + ColorConfig.uiWidgetBackground + ";" }, ["Modulator " + (mod2 + 1), modTarget]));
         this._modulatorGroup.appendChild(modNameRow);
         this._modulatorGroup.appendChild(modSetRow);
         this._modulatorGroup.appendChild(modFilterRow);
@@ -64130,6 +64363,7 @@ You should be redirected to the song at:<br /><br />
       this._prevBarButton.addEventListener("click", this._whenPrevBarPressed);
       this._nextBarButton.addEventListener("click", this._whenNextBarPressed);
       this._volumeSlider.input.addEventListener("input", this._setVolumeSlider);
+      this._songDetailsButton.addEventListener("click", this._openDetails);
       this._zoomInButton.addEventListener("click", this._zoomIn);
       this._zoomOutButton.addEventListener("click", this._zoomOut);
       this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
@@ -64493,7 +64727,7 @@ You should be redirected to the song at:<br /><br />
         group.style.display = "none";
       }
     }
-    _modSliderUpdate() {
+    _modSliderAndKnobUpdate() {
       if (!this.doc.synth.playing) {
         this._hasActiveModSliders = false;
         this._songEqFilterEditor.render();
@@ -64502,9 +64736,15 @@ You should be redirected to the song at:<br /><br />
             if (this._showModSliders[setting][index] == true) {
               this._showModSliders[setting][index] = false;
               this._newShowModSliders[setting][index] = false;
+              this._modSliderValues[setting][index] = NaN;
               let slider = this.getSliderForModSetting(setting, index);
+              let knob = this.getKnobForModSetting(setting, index);
               if (slider != null) {
                 slider.container.classList.remove("modSlider");
+              }
+              if (knob != null) {
+                knob.updateModulation(null);
+                knob.container.classList.remove("modKnob");
               }
             }
           }
@@ -64513,53 +64753,49 @@ You should be redirected to the song at:<br /><br />
         let instrument = this.doc.getCurrentInstrument();
         const anyModActive = this.doc.synth.isAnyModActive(this.doc.channel, instrument);
         if (anyModActive) {
-          let updateModSlider = function(editor2, slider, setting, channel, instrument3, index) {
-            if (editor2.doc.synth.isModActive(setting, channel, instrument3)) {
-              if (Config.modulators[setting].maxIndex > 0) {
-                const envelope = editor2.doc.synth.song.channels[channel].instruments[instrument3].envelopes[index];
-                if (!envelope) return false;
-                switch (setting) {
-                  case Config.modulators.dictionary["individual envelope speed"].index: {
-                    if (envelope.tempEnvelopeSpeed == null || envelope.tempEnvelopeSpeed == void 0) {
-                      return false;
-                    }
-                    break;
-                  }
-                  case Config.modulators.dictionary["individual envelope lower bound"].index: {
-                    if (envelope.tempEnvelopeLowerBound == null || envelope.tempEnvelopeLowerBound == void 0) {
-                      return false;
-                    }
-                    break;
-                  }
-                  case Config.modulators.dictionary["individual envelope upper bound"].index: {
-                    if (envelope.tempEnvelopeUpperBound == null || envelope.tempEnvelopeUpperBound == void 0) {
-                      return false;
-                    }
-                    break;
-                  }
-                }
-              }
-              let currentVal = (editor2.doc.synth.getModValue(setting, channel, instrument3, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
-              if (Config.modulators[setting].invertSliderIndicator == true) {
-                currentVal = 1 - currentVal;
-              }
-              if (currentVal != editor2._modSliderValues[setting][index]) {
-                editor2._modSliderValues[setting][index] = currentVal;
-                slider.container.style.setProperty("--mod-position", currentVal * 96 + 2 + "%");
-              }
-              return true;
+          let updateModControl = function(editor2, setting, channel, instrument2, index) {
+            if (!editor2.doc.synth.isModActive(setting, channel, instrument2)) {
+              return false;
             }
-            return false;
+            if (Config.modulators[setting].maxIndex > 0) {
+              const envelope = editor2.doc.synth.song.channels[channel].instruments[instrument2].envelopes[index];
+              if (!envelope) return false;
+              switch (setting) {
+                case Config.modulators.dictionary["individual envelope speed"].index:
+                  if (envelope.tempEnvelopeSpeed == null) return false;
+                  break;
+                case Config.modulators.dictionary["individual envelope lower bound"].index:
+                  if (envelope.tempEnvelopeLowerBound == null) return false;
+                  break;
+                case Config.modulators.dictionary["individual envelope upper bound"].index:
+                  if (envelope.tempEnvelopeUpperBound == null) return false;
+                  break;
+              }
+            }
+            let currentVal = (editor2.doc.synth.getModValue(setting, channel, instrument2, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
+            if (Config.modulators[setting].invertSliderIndicator) {
+              currentVal = 1 - currentVal;
+            }
+            if (currentVal != editor2._modSliderValues[setting][index]) {
+              editor2._modSliderValues[setting][index] = currentVal;
+              let knob = editor2.getKnobForModSetting(setting, index);
+              let slider = editor2.getSliderForModSetting(setting, index);
+              if (knob != null) {
+                knob.updateModulation(currentVal);
+              }
+              if (slider != null) {
+                slider.container.style.setProperty(
+                  "--mod-position",
+                  currentVal * 96 + 2 + "%"
+                );
+              }
+            }
+            return true;
           };
-          __name(updateModSlider, "updateModSlider");
-          let instrument2 = this.doc.getCurrentInstrument();
+          __name(updateModControl, "updateModControl");
           for (let setting = 0; setting < Config.modulators.length; setting++) {
             for (let index = 0; index <= Config.modulators[setting].maxIndex; index++) {
-              this._newShowModSliders[setting][index] = Boolean(this._showModSliders[setting][index]);
-              let slider = this.getSliderForModSetting(setting, index);
-              if (slider != null) {
-                this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this.doc.channel, instrument2, index);
-              }
+              this._newShowModSliders[setting][index] = updateModControl(this, setting, this.doc.channel, instrument, index);
             }
           }
         } else if (this._hasActiveModSliders) {
@@ -64570,25 +64806,36 @@ You should be redirected to the song at:<br /><br />
           }
         }
         if (anyModActive || this._hasActiveModSliders) {
-          let anySliderActive = false;
+          let anyKnobActive = false;
           for (let setting = 0; setting < Config.modulators.length; setting++) {
             for (let index = 0; index <= Config.modulators[setting].maxIndex; index++) {
               if (this._newShowModSliders[setting][index] != this._showModSliders[setting][index]) {
                 this._showModSliders[setting][index] = this._newShowModSliders[setting][index];
+                let knob = this.getKnobForModSetting(setting, index);
                 let slider = this.getSliderForModSetting(setting, index);
-                if (slider != null) {
-                  if (this._showModSliders[setting][index] == true) {
+                if (this._showModSliders[setting][index]) {
+                  if (knob != null) {
+                    knob.container.classList.add("modKnob");
+                  }
+                  if (slider != null) {
                     slider.container.classList.add("modSlider");
-                  } else {
+                  }
+                } else {
+                  if (knob != null) {
+                    knob.container.classList.remove("modKnob");
+                    knob.updateModulation(null);
+                  }
+                  if (slider != null) {
                     slider.container.classList.remove("modSlider");
                   }
                 }
               }
-              if (this._newShowModSliders[setting][index] == true)
-                anySliderActive = true;
+              if (this._newShowModSliders[setting][index] == true) {
+                anyKnobActive = true;
+              }
             }
           }
-          this._hasActiveModSliders = anySliderActive;
+          this._hasActiveModSliders = anyKnobActive;
         }
       }
     }
@@ -64703,6 +64950,15 @@ You should be redirected to the song at:<br /><br />
           return null;
       }
     }
+    getKnobForModSetting(setting, index) {
+      index = index == void 0 ? 0 : index;
+      switch (setting) {
+        case Config.modulators.dictionary["pan"].index:
+          return this._panKnob;
+        default:
+          return null;
+      }
+    }
     _openPrompt(promptName) {
       this.doc.openPrompt(promptName);
       this._setPrompt(promptName);
@@ -64790,6 +65046,9 @@ You should be redirected to the song at:<br /><br />
           case "generateEuclideanRhythm":
             this.prompt = new EuclideanRhythmPrompt(this.doc);
             break;
+          case "songDetails":
+            this.prompt = new SongDetailsPrompt(this.doc);
+            break;
           case "customTheme":
             this.prompt = new CustomThemePrompt(this.doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer"));
             break;
@@ -64866,6 +65125,12 @@ You should be redirected to the song at:<br /><br />
         this.doc.recordingModulators = false;
         this.doc.record(new ChangeHoldingModRecording(this.doc, null, null, null));
       }
+      if (this.doc.song.showSongDetails && EditorConfig.showSongDetailsAlert && this.doc.prefs.promptSongDetails) {
+        alert(
+          (this.doc.song.title != "" ? this.doc.song.title : "Untitled") + (this.doc.song.author != "" ? "\n\nBy " + this.doc.song.author : "") + (this.doc.song.description != "" ? "\n\n\n" + this.doc.song.description : "")
+        );
+      }
+      EditorConfig.showSongDetailsAlert = false;
     }
     _renderInstrumentBar(channel, instrumentIndex, colors) {
       if (this.doc.song.layeredInstruments || this.doc.song.patternInstruments) {
@@ -64876,7 +65141,7 @@ You should be redirected to the song at:<br /><br />
         this._instrumentsButtonBar.style.setProperty("--background-color-dim", colors.secondaryChannel);
         const maxInstrumentsPerChannel = this.doc.song.getMaxInstrumentsPerChannel();
         while (this._instrumentButtons.length < channel.instruments.length) {
-          const instrumentButton = button27(String(this._instrumentButtons.length + 1));
+          const instrumentButton = button28(String(this._instrumentButtons.length + 1));
           this._instrumentButtons.push(instrumentButton);
           this._instrumentsButtonBar.insertBefore(instrumentButton, this._instrumentRemoveButton);
         }

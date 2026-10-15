@@ -1,4 +1,4 @@
-/*import { HTML } from "imperative-html/dist/esm/elements-strict";
+import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 // import { Config } from "../synth/SynthConfig";
@@ -10,9 +10,9 @@ const {button, div, h2, input, br, textarea} = HTML;
 export class SongDetailsPrompt implements Prompt {
 	private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
 	private readonly _okayButton: HTMLButtonElement = button({class: "okayButton", style: "width:45%;"}, "Okay");
-	private readonly _songTitle: HTMLInputElement = input({ placeholder:"Enter Title Here", type: "text", style: "width: 100%;", value: this._doc.song.title, maxlength: 30, "autofocus": "autofocus" });
-	private readonly _songAuthor: HTMLInputElement = input({ placeholder:"Enter Name Here", type: "text", style: "width: 100%;", value: this._doc.song.author, maxlength: 30 });
-	private readonly _songDescription: HTMLTextAreaElement = textarea({ placeholder:"Enter Description Here", style: "width: 100%; resize: none; background: var(--editor-background); color: white; height: 64px; border: 0.5px solid var(--input-box-outline); font-size: 14px;", maxlength: 1200 }, this._doc.song.description);
+	private readonly _songTitle: HTMLInputElement = input({ placeholder:"Enter Title Here", type: "text", style: "width: 100%;", maxlength: 30, "autofocus": "autofocus" });
+	private readonly _songAuthor: HTMLInputElement = input({ placeholder:"Enter Name Here", type: "text", style: "width: 100%;", maxlength: 30 });
+	private readonly _songDescription: HTMLTextAreaElement = textarea({ placeholder:"Enter Description Here", style: "width: 100%; resize: none; background: var(--editor-background); color: white; height: 64px; border: 0.5px solid var(--input-box-outline); font-size: 14px;", maxlength: 1200 });
 	// private readonly _songWebLink: HTMLInputElement = input({ type: "text", style: "width: 13em;", value: "https://example.com", maxlength: 30 });
 	private readonly _showSongDetailsBox: HTMLInputElement = input({style: "width: 3em; margin-left: 1em;", type: "checkbox"});
 	private readonly _computedSamplesLabel: HTMLDivElement = div({ style: "width: 10em;" }, new Text("0:00"));
@@ -37,17 +37,17 @@ export class SongDetailsPrompt implements Prompt {
 			"Show info on load: ",
 			this._showSongDetailsBox,
 		),
-		div({ style: "display: flex; flex-direction: column; align-items: baseline;" },
-			"Song Theme: ",
-			this._doc.song.setSongTheme,
-			),	
+		//div({ style: "display: flex; flex-direction: column; align-items: baseline;" },
+		//	"Song Theme: ",
+		//	this._doc.song.setSongTheme,
+		//	),	
 		div({ style: "text-align: left;" },
 			div({style:"display:flex; gap: 3px; margin-bottom: 1em;"},"Song Length: ", this._computedSamplesLabel,),
-		// br(),
-		div({style:"margin-bottom: 0.5em;"},"Pitch Channels: " + this._doc.song.pitchChannelCount),
-		div({style:"margin-bottom: 0.5em;"},"Noise Channels: " + this._doc.song.noiseChannelCount),
-		div({},"Mod Channels: " + this._doc.song.modChannelCount),
 		br(),
+		//div({style:"margin-bottom: 0.5em;"},"Pitch Channels: " + this._doc.song.pitchChannelCount),
+		//div({style:"margin-bottom: 0.5em;"},"Noise Channels: " + this._doc.song.noiseChannelCount),
+		//div({},"Mod Channels: " + this._doc.song.modChannelCount),
+		//br(),
 		"URL Length: " + location.href.length, this._cantShortenLabel,
 		br(),
 		),
@@ -63,6 +63,10 @@ export class SongDetailsPrompt implements Prompt {
 		
 	constructor(private _doc: SongDocument) {	
 		this._showSongDetailsBox.checked = this._doc.song.showSongDetails;
+
+		this._songTitle.value = this._doc.song.title;
+		this._songAuthor.value = this._doc.song.author;
+		this._songDescription.value = this._doc.song.description;
 
 		this._cantShortenLabel.style.display = (location.href.length > ( window.localStorage.getItem("shortenerStrategySelect") == "isgd" ? 5010 : 12233)) ? "": "none";
 
@@ -97,4 +101,3 @@ export class SongDetailsPrompt implements Prompt {
 		this._doc.record(group, true);
 	}
 }
-    */

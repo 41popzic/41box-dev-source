@@ -34,6 +34,8 @@ export class EditorConfig {
 
     public static customSamples: string[] | null;
 
+    public static showSongDetailsAlert: boolean = true;
+
     public static readonly presetCategories: DictionaryArray<PresetCategory> = toNameMap([
         {
             // The order of this array needs to line up with the order of the InstrumentType declarations in SynthConfig.ts. (changes.ts' random instrument generation relies on this, for one.)

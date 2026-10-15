@@ -1,6 +1,5 @@
 // Copyright (C) 2020 John Nesky, distributed under the MIT license.
 // A few wrapper classes that add functionality onto existing HTML elements, namely binding some events to an implementation-specified change class
-// I've decided to add knob to this though it's custom made
 
 import { Change } from "./Change";
 import { HTML } from "imperative-html/dist/esm/elements-strict";

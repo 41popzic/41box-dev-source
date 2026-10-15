@@ -2459,7 +2459,7 @@ if (playSong && !this.countInMetronome) {
                             }
                             if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
                                 // if (useStrumSpeed) strumOffsetParts += Config.strumSpeedScale[instrument.strumParts];
-                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
+                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts * 10;
                             }
 
                             const atNoteStart: boolean = (Config.ticksPerPart * noteStartPart == currentTick);

@@ -393,6 +393,9 @@ export class Song {
     private static readonly _variant = 0x70; //"p" ~ 41box //where's the p in 41box you ask?? there isn't. it's from my display name -41popzic
 
     public title!: string;
+    public author: string;
+    public description: string;
+    public showSongDetails: boolean;
     public titleNotifier: Function[] = [];
     public scale!: number;
     public scaleCustom: boolean[] = [];
@@ -694,6 +697,10 @@ export class Song {
 
         //This is the tab's display name
         this.title = "Unnamed";
+        // New song details (every mod should have this)
+        this.author = "";
+        this.description = "";
+        this.showSongDetails = false;
         this.titleNotifier.forEach(o => o());
 
         if (andResetChannels) {
@@ -753,6 +760,24 @@ export class Song {
         for (let i: number = 0; i < encodedSongTitle.length; i++) {
             buffer.push(encodedSongTitle.charCodeAt(i));
         }
+
+        // Length of the song author string
+        var encodedAuthorTitle: string = encodeURIComponent(this.author);
+        buffer.push(base64IntToCharCode[encodedAuthorTitle.length >> 6], base64IntToCharCode[encodedAuthorTitle.length & 0x3f]);
+
+        for (let i: number = 0; i < encodedAuthorTitle.length; i++) {
+            buffer.push(encodedAuthorTitle.charCodeAt(i));
+        }
+
+        // Length of the song description string
+        var encodedDescriptionTitle: string = encodeURIComponent(this.description);
+        buffer.push(base64IntToCharCode[encodedDescriptionTitle.length >> 6], base64IntToCharCode[encodedDescriptionTitle.length & 0x3f]);
+
+        for (let i: number = 0; i < encodedDescriptionTitle.length; i++) {
+            buffer.push(encodedDescriptionTitle.charCodeAt(i));
+        }
+
+        buffer.push(base64IntToCharCode[this.showSongDetails?1:0]);
 
         buffer.push(SongTagCode.channelCount, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
         buffer.push(SongTagCode.scale, base64IntToCharCode[this.scale]);
@@ -1693,6 +1718,21 @@ export class Song {
                 this.titleNotifier.forEach(o => o());
 
                 charIndex += songNameLength;
+                if ((fromUltraBox && !beforeSix)||(from41Box && !beforeFour)) {
+                    // Length of song author string
+                    var songAuthorLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.author = decodeURIComponent(compressed.substring(charIndex, charIndex + songAuthorLength));
+
+                    charIndex += songAuthorLength;
+
+                    // Length of song description string
+                    var songDescriptionLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.description = decodeURIComponent(compressed.substring(charIndex, charIndex + songDescriptionLength));
+
+                    charIndex += songDescriptionLength;
+
+                    this.showSongDetails = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1;
+                }
             } break;
             case SongTagCode.channelCount: {
                 this.pitchChannelCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -4145,6 +4185,9 @@ export class Song {
             "name": this.title,
             "format": Song._format,
             "version": Song._latest41BoxVersion,
+            "author": this.author,
+            "description": this.description,
+            "showSongDetails": this.showSongDetails,
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,
@@ -4209,6 +4252,18 @@ export class Song {
 
         if (jsonObject["name"] != undefined) {
             this.title = jsonObject["name"];
+        }
+
+        if (jsonObject["author"] != undefined) {
+            this.author = jsonObject["author"];
+        }
+
+        if (jsonObject["description"] != undefined) {
+            this.description = jsonObject["description"];
+        }
+
+        if (jsonObject["showSongDetails"] != undefined) {
+            this.showSongDetails = jsonObject["showSongDetails"];
         }
 
         if (jsonObject["customSamples"] != undefined) {

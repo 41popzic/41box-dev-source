@@ -305,6 +305,8 @@ export class Preferences {
 	public selectiveRandom: SelectiveInstrumentSettings = new SelectiveInstrumentSettings();
 	public selectivePaste: SelectiveInstrumentSettings = new SelectiveInstrumentSettings();
 
+	public promptSongDetails: boolean;
+
 	public shortcuts: Dictionary<Shortcut>;
 	
 	constructor() {
@@ -346,6 +348,7 @@ export class Preferences {
 		this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
 		this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
 		this.oldModNotes = window.localStorage.getItem("oldModNotes") == "true";
+		this.promptSongDetails = window.localStorage.getItem("promptSongDetails") != "false";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "pianoTransposingC";
 		this.bassOffset = (+(<any>window.localStorage.getItem("bassOffset"))) || 0;
 		this.layout = window.localStorage.getItem("layout") || "wide long";
@@ -407,6 +410,7 @@ export class Preferences {
 		window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
 		window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
 		window.localStorage.setItem("oldModNotes", this.oldModNotes ? "true" : "false");
+		window.localStorage.setItem("promptSongDetails", this.promptSongDetails ? "true" : "false");
 		window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
 		window.localStorage.setItem("bassOffset", String(this.bassOffset));
 		window.localStorage.setItem("layout", this.layout);
