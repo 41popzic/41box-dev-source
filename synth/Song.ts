@@ -1549,38 +1549,35 @@ export class Song {
         let fromUltraBox: boolean = false;
         let fromSlarmoosBox: boolean = false;
         let from41Box: boolean = false;
+        let fromAbyssBox: boolean = false; // Not currently used
         //let fromJukeBox: boolean = false;
         // let fromMidbox: boolean;
         // let fromDogebox2: boolean;
-        // let fromAbyssBox: boolean;
 
         // Detect variant here. If version doesn't match known variant, assume it is a vanilla string which does not report variant.
         if (variantTest == 0x6A) { //"j"
             fromJummBox = true;
             charIndex++;
-        } else if (variantTest == 0x67) { //"g"
+        } else if (variantTest == 0x67) { //g
             fromGoldBox = true;
             charIndex++;
-        } else if (variantTest == 0x75) { //"u"
+        } else if (variantTest == 0x75) { //u
             fromUltraBox = true;
             charIndex++;
-        } else if (variantTest == 0x64) { //"d" 
+        } else if (variantTest == 0x64) { //d
             fromJummBox = true;
             // to-do: add explicit dogebox2 support
             //fromDogeBox2 = true;
             charIndex++;
-        } else if (variantTest == 0x61) { //"a" Abyssbox does urls the same as ultrabox //not quite anymore, but oh well
-            fromUltraBox = true;
-            charIndex++;
-        } else if (variantTest == 0x73) { //"s"
+        } else if (variantTest == 0x73) { //s
             fromSlarmoosBox = true
             charIndex++;
-        } else if (variantTest == 0x70) { //"p"
+        } else if (variantTest == 0x70) { //p
             from41Box = true
             charIndex++;    
-        //} else if (variantTest == 0x4A) { //"J"
-        //    fromJukeBox = true
-        //    charIndex++;    
+        } else if (variantTest == 0x61) { //a
+            fromAbyssBox = true
+            charIndex++;    
         } else {
             fromBeepBox = true;
         }

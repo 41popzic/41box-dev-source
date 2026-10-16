@@ -10147,6 +10147,7 @@ var beepbox = (() => {
       let fromUltraBox = false;
       let fromSlarmoosBox = false;
       let from41Box = false;
+      let fromAbyssBox = false;
       if (variantTest == 106) {
         fromJummBox = true;
         charIndex++;
@@ -10159,14 +10160,14 @@ var beepbox = (() => {
       } else if (variantTest == 100) {
         fromJummBox = true;
         charIndex++;
-      } else if (variantTest == 97) {
-        fromUltraBox = true;
-        charIndex++;
       } else if (variantTest == 115) {
         fromSlarmoosBox = true;
         charIndex++;
       } else if (variantTest == 112) {
         from41Box = true;
+        charIndex++;
+      } else if (variantTest == 97) {
+        fromAbyssBox = true;
         charIndex++;
       } else {
         fromBeepBox = true;
