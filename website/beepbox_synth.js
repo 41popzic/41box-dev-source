@@ -12550,6 +12550,7 @@ var beepbox = (() => {
       this.initToDefault(true);
       if (!jsonObject) return;
       if (jsonFormat == "auto") {
+        if (jsonObject["format"] == "AbyssBox") jsonFormat = "slarmoosbox";
         if (jsonObject["format"] == "BeepBox") {
           if (jsonObject["riff"] != void 0) {
             jsonFormat = "modbox";
