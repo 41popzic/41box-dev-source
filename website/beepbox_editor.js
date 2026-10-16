@@ -61635,8 +61635,12 @@ You should be redirected to the song at:<br /><br />
           div28(
             { class: "selectRow" },
             span9({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("key"), "onclick") }, "key "),
-            this._octaveStepper,
-            div28({ class: "selectContainer" }, this._keySelect)
+            span9(
+              { style: "display: flex;" },
+              div28({ class: "selectContainer" }, this._keySelect),
+              this._octaveStepper
+            )
+            // Thanks theepicosity
           ),
           /*div({ class: "selectRow" },
               span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "),

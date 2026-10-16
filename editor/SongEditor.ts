@@ -1493,7 +1493,10 @@ export class SongEditor {
             ),
             div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("key") }, "key "),
-                this._octaveStepper, div({ class: "selectContainer" }, this._keySelect),
+                    span({ style: "display: flex;" },
+                        div({ class: "selectContainer" }, this._keySelect),
+                        this._octaveStepper,
+                    ) // Thanks theepicosity
             ),
             /*div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "),
