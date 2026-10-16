@@ -735,7 +735,7 @@ export class PatternEditor {
             const modPlayhead: number = this._doc.synth.playhead - playheadBar;
 
             // note flash
-            for (var i = 0; i < noteFlashElements.length; i++) {
+            /*for (var i = 0; i < noteFlashElements.length; i++) {
                 var element: SVGPathElement = noteFlashElements[i];
                 const noteStart: number = Number(element.getAttribute("note-start")) / (this._doc.song.beatsPerBar * Config.partsPerBeat)
                 const noteEnd: number = Number(element.getAttribute("note-end")) / (this._doc.song.beatsPerBar * Config.partsPerBeat)
@@ -745,7 +745,7 @@ export class PatternEditor {
                 } else {
                     element.style.opacity = "0"
                 }
-            }
+            }*/
 
             let localPlayhead = this._doc.synth.playhead - (this._doc.bar + this._barOffset);
             this.playheadX = localPlayhead;
