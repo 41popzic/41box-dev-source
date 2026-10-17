@@ -20229,16 +20229,16 @@ var beepbox = (function (exports) {
                 fromJummBox = true;
                 charIndex++;
             }
-            else if (variantTest == 0x61) {
-                fromUltraBox = true;
-                charIndex++;
-            }
             else if (variantTest == 0x73) {
                 fromSlarmoosBox = true;
                 charIndex++;
             }
             else if (variantTest == 0x70) {
                 from41Box = true;
+                charIndex++;
+            }
+            else if (variantTest == 0x61) {
+                fromUltraBox = true;
                 charIndex++;
             }
             else {

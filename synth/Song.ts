@@ -1549,7 +1549,7 @@ export class Song {
         let fromUltraBox: boolean = false;
         let fromSlarmoosBox: boolean = false;
         let from41Box: boolean = false;
-        let fromAbyssBox: boolean = false; // Not currently used
+        //let fromAbyssBox: boolean = false; // Not currently used
         //let fromJukeBox: boolean = false;
         // let fromMidbox: boolean;
         // let fromDogebox2: boolean;
@@ -1576,7 +1576,7 @@ export class Song {
             from41Box = true
             charIndex++;    
         } else if (variantTest == 0x61) { //a
-            fromAbyssBox = true
+            fromUltraBox = true // No support yet
             charIndex++;    
         } else {
             fromBeepBox = true;
