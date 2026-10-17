@@ -819,8 +819,8 @@ var beepbox = (function (exports) {
         { name: "corrupt", voices: 2, spread: 18.0, offset: 48.0, expression: 0.7, sign: 0.7 },
     ]);
     Config.customUnisonIndex = 63;
-    Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "flanger", "phaser"];
-    Config.effectOrder = [2, 10, 11, 7, 8, 9, 5, 14, 3, 4, 1, 6, 0, 13, 15, 16];
+    Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "flanger", "phaser"];
+    Config.effectOrder = [2, 10, 11, 12, 7, 8, 9, 5, 14, 3, 4, 1, 6, 0, 13, 15, 16];
     Config.noteSizeMax = 6;
     Config.volumeRange = 50;
     Config.volumeLogScale = 0.1428;
@@ -1760,6 +1760,9 @@ var beepbox = (function (exports) {
     }
     function effectsIncludeGranular(effects) {
         return (effects & (1 << 14)) != 0;
+    }
+    function effectsIncludeNoteRange(effects) {
+        return (effects & (1 << 12)) != 0;
     }
     function effectsIncludePhaser(effects) {
         return (effects & (1 << 16)) != 0;
@@ -14788,6 +14791,8 @@ var beepbox = (function (exports) {
             this.flangerFeedback = 0;
             this.flangerMix = 0;
             this.slideTicks = 0;
+            this.upperNoteLimit = Config.maxPitch;
+            this.lowerNoteLimit = 0;
             this.algorithm = 0;
             this.feedbackType = 0;
             this.algorithm6Op = 1;
@@ -14890,6 +14895,8 @@ var beepbox = (function (exports) {
             this.flangerMix = 26;
             this.slideTicks = 3;
             this.strumParts = 1;
+            this.upperNoteLimit = Config.maxPitch;
+            this.lowerNoteLimit = 0;
             this.pan = Config.panCenter;
             this.panDelay = 0;
             this.pitchShift = Config.pitchShiftCenter;
@@ -15235,6 +15242,10 @@ var beepbox = (function (exports) {
                 instrumentObject["reverbDelay"] = this.reverbDelay;
                 instrumentObject["reverbShelfHz"] = this.reverbShelfHz;
                 instrumentObject["reverbShelfGain"] = this.reverbShelfGain;
+            }
+            if (effectsIncludeNoteRange(this.effects)) {
+                instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
+                instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
             }
             if (this.type != 4) {
                 instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
@@ -15676,6 +15687,12 @@ var beepbox = (function (exports) {
                 this.reverbDelay = 0;
                 this.reverbShelfHz = 32;
                 this.reverbShelfGain = 6;
+            }
+            if (instrumentObject["upperNoteLimit"] != undefined) {
+                this.upperNoteLimit = instrumentObject["upperNoteLimit"];
+            }
+            if (instrumentObject["lowerNoteLimit"] != undefined) {
+                this.lowerNoteLimit = instrumentObject["lowerNoteLimit"];
             }
             if (instrumentObject["pulseWidth"] != undefined) {
                 this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
@@ -16651,7 +16668,7 @@ var beepbox = (function (exports) {
                     const noteLengthTicks = noteEndTick - noteStartTick;
                     const maximumSlideTicks = noteLengthTicks * 0.5;
                     let slideTicks = instrument.slideTicks * 0.5;
-                    slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
+                    slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks * 3);
                     if (tone.prevNote != null && !tone.forceContinueAtStart) {
                         if (tickTimeStartReal - noteStartTick < slideTicks) {
                             prevSlideStart = true;
@@ -19746,6 +19763,10 @@ var beepbox = (function (exports) {
                         buffer.push(base64IntToCharCode[instrument.reverbShelfHz]);
                         buffer.push(base64IntToCharCode[instrument.reverbShelfGain]);
                     }
+                    if (effectsIncludeNoteRange(instrument.effects)) {
+                        buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
+                        buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
+                    }
                     if (effectsIncludeGranular(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.granular]);
                         buffer.push(base64IntToCharCode[instrument.grainSize]);
@@ -21487,6 +21508,10 @@ var beepbox = (function (exports) {
                                         if (!beforeFour && from41Box)
                                             instrument.reverbShelfGain = clamp(0, Config.reverbShelfGainRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     }
+                                }
+                                if (effectsIncludeNoteRange(instrument.effects)) {
+                                    instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                                 if (effectsIncludeGranular(instrument.effects)) {
                                     instrument.granular = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -25342,14 +25367,16 @@ var beepbox = (function (exports) {
                                     const chordOfCompatibleInstrument = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern, prevPattern, instrumentIndex, transition, chord, note, lastNote, patternForcesContinueAtStart);
                                     if (chordOfCompatibleInstrument != null) {
                                         prevNoteForThisInstrument = lastNote;
-                                        tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevNoteForThisInstrument.pitches.length;
+                                        let prevPitchesForThisInstrument = prevNoteForThisInstrument.pitches;
+                                        tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevPitchesForThisInstrument.length;
                                         forceContinueAtStart = patternForcesContinueAtStart;
                                     }
                                 }
                             }
                         }
                         else if (prevNoteForThisInstrument != null) {
-                            tonesInPrevNote = chord.singleTone ? 1 : prevNoteForThisInstrument.pitches.length;
+                            let prevPitchesForThisInstrument = prevNoteForThisInstrument.pitches;
+                            tonesInPrevNote = chord.singleTone ? 1 : prevPitchesForThisInstrument.length;
                         }
                         if (note.end == partsPerBar) {
                             let nextPattern = (this.nextBar == null) ? null : song.getPattern(channelIndex, this.nextBar);
@@ -25360,16 +25387,21 @@ var beepbox = (function (exports) {
                                     const chordOfCompatibleInstrument = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern, nextPattern, instrumentIndex, transition, chord, note, firstNote, nextPatternForcesContinueAtStart);
                                     if (chordOfCompatibleInstrument != null) {
                                         nextNoteForThisInstrument = firstNote;
-                                        tonesInNextNote = chordOfCompatibleInstrument.singleTone ? 1 : nextNoteForThisInstrument.pitches.length;
+                                        let nextPitchesForThisInstrument = nextNoteForThisInstrument.pitches;
+                                        tonesInNextNote = chordOfCompatibleInstrument.singleTone ? 1 : nextPitchesForThisInstrument.length;
                                         forceContinueAtEnd = nextPatternForcesContinueAtStart;
                                     }
                                 }
                             }
                         }
                         else if (nextNoteForThisInstrument != null) {
-                            tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length;
+                            let nextPitchesForThisInstrument = nextNoteForThisInstrument.pitches;
+                            tonesInNextNote = chord.singleTone ? 1 : nextPitchesForThisInstrument.length;
                         }
-                        if (chord.singleTone) {
+                        let filteredPitches = note.pitches;
+                        if (effectsIncludeNoteRange(instrument.effects))
+                            filteredPitches = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                        if (chord.singleTone && !(filteredPitches.length <= 0)) {
                             const atNoteStart = (Config.ticksPerPart * note.start == currentTick);
                             let tone;
                             if (toneList.count() <= toneCount) {
@@ -25391,10 +25423,10 @@ var beepbox = (function (exports) {
                                 tone = toneList.get(toneCount);
                             }
                             toneCount++;
-                            for (let i = 0; i < note.pitches.length; i++) {
-                                tone.pitches[i] = note.pitches[i];
+                            for (let i = 0; i < filteredPitches.length; i++) {
+                                tone.pitches[i] = filteredPitches[i];
                             }
-                            tone.pitchCount = note.pitches.length;
+                            tone.pitchCount = filteredPitches.length;
                             tone.chordSize = 1;
                             tone.instrumentIndex = instrumentIndex;
                             tone.note = note;
@@ -25413,12 +25445,13 @@ var beepbox = (function (exports) {
                         else {
                             const transition = instrument.getTransition();
                             if (((transition.isSeamless && !transition.slides && chord.strumParts == 0) || forceContinueAtStart) && (Config.ticksPerPart * note.start == currentTick) && prevNoteForThisInstrument != null) {
-                                this.moveTonesIntoOrderedTempMatchedList(toneList, note.pitches);
+                                this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
                             }
                             let strumOffsetParts = 0;
-                            for (let i = 0; i < note.pitches.length; i++) {
+                            for (let i = 0; i < filteredPitches.length; i++) {
                                 let prevNoteForThisTone = (tonesInPrevNote > i) ? prevNoteForThisInstrument : null;
                                 let noteForThisTone = note;
+                                let pitchesForThisTone = filteredPitches;
                                 let nextNoteForThisTone = (tonesInNextNote > i) ? nextNoteForThisInstrument : null;
                                 let noteStartPart = noteForThisTone.start + strumOffsetParts;
                                 let passedEndOfNote = false;
@@ -25426,6 +25459,9 @@ var beepbox = (function (exports) {
                                     if (toneList.count() > i && (transition.isSeamless || forceContinueAtStart) && prevNoteForThisTone != null) {
                                         nextNoteForThisTone = noteForThisTone;
                                         noteForThisTone = prevNoteForThisTone;
+                                        pitchesForThisTone = noteForThisTone.pitches;
+                                        if (effectsIncludeNoteRange(instrument.effects))
+                                            pitchesForThisTone = pitchesForThisTone.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                                         prevNoteForThisTone = null;
                                         noteStartPart = noteForThisTone.start + strumOffsetParts;
                                         passedEndOfNote = true;
@@ -25440,7 +25476,7 @@ var beepbox = (function (exports) {
                                 }
                                 if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
                                     if (useStrumSpeed)
-                                        strumOffsetParts += instrument.strumParts * 10;
+                                        strumOffsetParts += instrument.strumParts;
                                 }
                                 const atNoteStart = (Config.ticksPerPart * noteStartPart == currentTick);
                                 let tone;
@@ -25468,9 +25504,9 @@ var beepbox = (function (exports) {
                                     tone = toneList.get(toneCount);
                                 }
                                 toneCount++;
-                                tone.pitches[0] = noteForThisTone.pitches[i];
+                                tone.pitches[0] = pitchesForThisTone[i];
                                 tone.pitchCount = 1;
-                                tone.chordSize = noteForThisTone.pitches.length;
+                                tone.chordSize = pitchesForThisTone.length;
                                 tone.instrumentIndex = instrumentIndex;
                                 tone.note = noteForThisTone;
                                 tone.noteStartPart = noteStartPart;

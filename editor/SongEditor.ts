@@ -3666,12 +3666,12 @@ export class SongEditor {
             this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
             this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
 
-            this._upperNoteLimitRow.firstChild!.textContent = "upper note limit [" + Piano.getPitchName(
+            this._upperNoteLimitRow.firstChild.textContent = "upper note limit [" + Piano.getPitchName(
                 (instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
                 instrument.upperNoteLimit,
                 this.doc.song.octave, true)
                 + "]:"
-            this._lowerNoteLimitRow.firstChild!.textContent = "lower note limit [" + Piano.getPitchName(
+            this._lowerNoteLimitRow.firstChild.textContent = "lower note limit [" + Piano.getPitchName(
                 (instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
                 instrument.lowerNoteLimit,
                 this.doc.song.octave, true)

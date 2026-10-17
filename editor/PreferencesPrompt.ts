@@ -626,14 +626,14 @@ export class PreferencesPrompt implements Prompt {
 	private _selectedTheme: string;
 
 	private readonly _themeList = this._makeThemeList();
-	private readonly _themeButtonText = div({ class: "themeButtonText"},
+	private readonly _themeButtonText = div({ class: "themeButtonText", style: "display: grid; align-items: center" },
 		"cool theme button"
 	);
 	private readonly _themeButton = button({ style: ` width:100%; display:flex; justify-content:space-between; align-items:center padding:6px 10px; box-sizing:border-box;` },
 		this._themeButtonText,
 	);
 
-	private readonly _themeMenu = div({ style: `display:none; position:absolute; top:100%; left:0; width:100%; max-height:300px; overflow-y:auto; background:${ColorConfig.uiWidgetBackground}; border:1px solid ${ColorConfig.uiWidgetFocus}; border-radius:4px; box-sizing:border-box; z-index:10;`},
+	private readonly _themeMenu = div({ style: `display:none; position:absolute; top:100%; left:0; width:100%; max-height:300px; overflow-y: auto; background:${ColorConfig.uiWidgetBackground}; border:1px solid ${ColorConfig.uiWidgetFocus}; border-radius:4px; box-sizing:border-box; z-index:10;`},
 		this._themeList
 	);
 
@@ -768,7 +768,7 @@ export class PreferencesPrompt implements Prompt {
 		)
 	);
 
-	private readonly _themeArea: HTMLDivElement = div({ style: "display: none; overflow-y: visible; overflow-x: hidden;" },
+	private readonly _themeArea: HTMLDivElement = div({ style: "display: none; overflow: visible;" },
 		h2("Theme"),
 		div({ style: "text-align: left;" },	
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
@@ -928,7 +928,7 @@ export class PreferencesPrompt implements Prompt {
     private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 
-	public readonly container: HTMLDivElement = div({ class: "prompt noSelection recordingSetupPrompt", style: "width: 600px; max-height: 90%;" },
+	public readonly container: HTMLDivElement = div({ class: "prompt noSelection recordingSetupPrompt", style: "width: 600px; max-height: 90%; overflow: visible" },
 		div({ style: "display: flex; flex-direction: row; justify-content: space-evenly;" },
 			this._generalAreaButton,
 			this._appearanceAreaButton,
@@ -1023,25 +1023,34 @@ export class PreferencesPrompt implements Prompt {
 		//this._themeSelect.addEventListener("change", this._previewTheme);
 		this._selectedTheme = this.lastTheme ?? ColorConfig.defaultTheme;
 
-		const currentTheme = themes
-			.flatMap(group => group.items)
-			.find(theme => theme.id === this._selectedTheme);
+		const currentTheme = themes.flatMap(group => group.items).find(theme => theme.id === this._selectedTheme);
 
 		this._themeButtonText.textContent = currentTheme?.name ?? this._selectedTheme;
 
 		document.addEventListener("mousedown", this._clickOutside);
-		
+			
 		this._themeButton.addEventListener("click", () => {
 			this._dropdownOpen = !this._dropdownOpen;
 			this._themeMenu.style.display = this._dropdownOpen ? "" : "none";
+
+			if (this._dropdownOpen) this._positionThemeMenu();
+		});
+
+		window.addEventListener("resize", () => {
+			if (this._dropdownOpen) this._positionThemeMenu();
 		});
 
 		this._themeMenu.addEventListener("mouseleave", () => {
+			if (!this._dropdownOpen) return;
+
 			ColorConfig.setTheme(this._selectedTheme);
 
-			const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+			const selectedTheme = themes
+				.flatMap(group => group.items)
+				.find(t => t.id === this._selectedTheme);
 
-			this._themeButtonText.textContent = selectedTheme?.name ?? this._selectedTheme;
+			this._themeButtonText.textContent =
+				selectedTheme?.name ?? this._selectedTheme;
 		});
 
 		this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
@@ -1251,7 +1260,7 @@ export class PreferencesPrompt implements Prompt {
 	private _clickOutside = (event: MouseEvent): void => {
 		const target = event.target as Node;
 
-		if (this._themeMenu.contains(target) || this._themeButton.contains(target)) {
+		if (this._themeMenu.contains(target) || this._themeButton.contains(target) || this._dropdownOpen == false) {
 			return;
 		}
 
@@ -1480,6 +1489,25 @@ export class PreferencesPrompt implements Prompt {
 					recordRebindButton.addEventListener("click", this._whenRecordRebind);
 				}
 			}
+		}
+	}
+	
+	private _positionThemeMenu(): void {
+		const buttonRect = this._themeButton.getBoundingClientRect();
+
+		const spaceBelow = window.innerHeight - buttonRect.bottom;
+		const spaceAbove = buttonRect.top;
+
+		if (spaceAbove > spaceBelow) {
+			// Open upwards.
+			this._themeMenu.style.top = "auto";
+			this._themeMenu.style.bottom = "100%";
+			this._themeMenu.style.maxHeight = `${spaceAbove}px`;
+		} else {
+			// Open downwards.
+			this._themeMenu.style.top = "100%";
+			this._themeMenu.style.bottom = "auto";
+			this._themeMenu.style.maxHeight = `${spaceBelow}px`;
 		}
 	}
 }
