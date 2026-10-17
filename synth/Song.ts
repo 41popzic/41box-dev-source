@@ -4238,7 +4238,7 @@ export class Song {
 
         // Code for auto-detect mode; if statements that are lower down have 'higher priority'
         if (jsonFormat == "auto") {
-            if (jsonObject["format"] == "AbyssBox") jsonFormat = "slarmoosbox"
+            // if (jsonObject["format"] == "AbyssBox") jsonFormat = "ultrabox" // Nope
             if (jsonObject["format"] == "BeepBox") {
                 // Assume that if there is a "riff" song setting then it must be modbox
                 if (jsonObject["riff"] != undefined) {

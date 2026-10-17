@@ -2229,14 +2229,14 @@ export class SongEditor {
     }
 
     private _loopTypeEvent = (): void => {
-    if (this.doc.song.loopType == 3) {
-        this.doc.synth.loopRepeatCount = 0;
-        this._loopEditor.container.style.display = "none"; // setting the display to none instead of the opacity to 0 makes it so then you can't edit the values when in this mode
-        SongEditor._styleElement.textContent = SongEditor._setLoopIcon[3];
-        this.doc.synth.loopBarStart = -1;
-        this.doc.synth.loopBarEnd = -1;
-        this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
-        this._trackAndMuteContainer.style.marginBottom = "0.3em";
+        if (this.doc.song.loopType == 3) {
+            this.doc.synth.loopRepeatCount = 0;
+            this._loopEditor.container.style.display = "none"; // setting the display to none instead of the opacity to 0 makes it so then you can't edit the values when in this mode
+            SongEditor._styleElement.textContent = SongEditor._setLoopIcon[3];
+            this.doc.synth.loopBarStart = -1;
+            this.doc.synth.loopBarEnd = -1;
+            this._loopEditor.setLoopAt(this.doc.synth.loopBarStart, this.doc.synth.loopBarEnd);
+            this._trackAndMuteContainer.style.marginBottom = "0.3em";
         } else if (this.doc.song.loopType == 2) {
             this.doc.synth.loopRepeatCount = -1;
             this._loopEditor.container.style.display = "none";
@@ -2251,7 +2251,6 @@ export class SongEditor {
             SongEditor._styleElement.textContent = SongEditor._setLoopIcon[1];	
             this._trackAndMuteContainer.style.marginBottom = "0.3em";
         }
-
     }
 
     private _updateSampleLoadingBar(_e: Event): void {

@@ -11,6 +11,7 @@ import { ColorConfig } from "./ColorConfig";
 import { KeyboardLayout } from "./KeyboardLayout";
 import { Piano } from "./Piano";
 import { Layout } from "./Layout";
+import { themes } from "./ThemeConfig";
 
 const { button, label, div, p, h2, h3, form, input, select, option } = HTML;
 
@@ -523,7 +524,7 @@ export class PreferencesPrompt implements Prompt {
 				}
 			}`,});
 
-	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
+	/*private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
 		/*optgroup({ label: "41Box Themes"},
             option({ value: "41box" }, "Inter Toxic"),
             option({ value: "inter-energized" }, "Inter Energized"),
@@ -536,7 +537,7 @@ export class PreferencesPrompt implements Prompt {
             option({ value: "dark classic" }, "BeepBox Dark"),
             option({ value: "dark competition" }, "BeepBox Competition Dark"),
         ),
-        optgroup({ label: "JummBox Themes" },*/
+        optgroup({ label: "JummBox Themes" },
 			option({ value: "forest" }, "Forest"),
 			option({ value: "canyon" }, "Canyon"),
 			option({ value: "midnight" }, "Midnight"),
@@ -620,8 +621,26 @@ export class PreferencesPrompt implements Prompt {
 		),
         optgroup({ label: "Misc"},
             option({ value: "custom" }, "Custom"),
-        )*/
+        )
+	);*/
+	private _selectedTheme: string;
+
+	private readonly _themeList = this._makeThemeList();
+	private readonly _themeButtonText = div({ class: "themeButtonText"},
+		"cool theme button"
 	);
+	private readonly _themeButton = button({ style: ` width:100%; display:flex; justify-content:space-between; align-items:center padding:6px 10px; box-sizing:border-box;` },
+		this._themeButtonText,
+	);
+
+	private readonly _themeMenu = div({ style: `display:none; position:absolute; top:100%; left:0; width:100%; max-height:300px; overflow-y:auto; background:${ColorConfig.uiWidgetBackground}; border:1px solid ${ColorConfig.uiWidgetFocus}; border-radius:4px; box-sizing:border-box; z-index:10;`},
+		this._themeList
+	);
+
+	private _previewFrame: number | null = null;
+	private _dropdownOpen = false;
+
+	private readonly lastTheme: string | null = window.localStorage.getItem("colorTheme")
 
 	private readonly _customThemeFileInput: HTMLInputElement = input({ type: "file", accept: "image/*", text: "choose editor background image"});
 	private readonly _customThemeFileInput2: HTMLInputElement = input({ type: "file", accept: "image/*", text: "choose website background image" });
@@ -754,7 +773,7 @@ export class PreferencesPrompt implements Prompt {
 		div({ style: "text-align: left;" },	
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
 				"Color palette:",
-				div({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeSelect),
+				div({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeButton, this._themeMenu),
 			),
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
 				"Custom color palette data:",
@@ -956,9 +975,9 @@ export class PreferencesPrompt implements Prompt {
 
 		(<any>this._layoutForm.elements)["layout"].value = this._doc.prefs.layout;
 
-		if (this._lastTheme != null) {
-			this._themeSelect.value = this._lastTheme;
-		}
+		//if (this._lastTheme != null) {
+		//	this._themeSelect.value = this._lastTheme;
+		//}
         
         this._colorInput.value = this._doc.prefs.customColors || "";
 
@@ -1001,7 +1020,29 @@ export class PreferencesPrompt implements Prompt {
 		this._customThemeFileInput2.addEventListener("change", this._whenCustomThemeFileSelected2);
         this._customThemeFileReset.addEventListener("click", this._resetCustomThemeFile);
 		this._colorInput.addEventListener("change", this._whenColorsChanged);
-		this._themeSelect.addEventListener("change", this._previewTheme);
+		//this._themeSelect.addEventListener("change", this._previewTheme);
+		this._selectedTheme = this.lastTheme ?? ColorConfig.defaultTheme;
+
+		const currentTheme = themes
+			.flatMap(group => group.items)
+			.find(theme => theme.id === this._selectedTheme);
+
+		this._themeButtonText.textContent = currentTheme?.name ?? this._selectedTheme;
+
+		document.addEventListener("mousedown", this._clickOutside);
+		
+		this._themeButton.addEventListener("click", () => {
+			this._dropdownOpen = !this._dropdownOpen;
+			this._themeMenu.style.display = this._dropdownOpen ? "" : "none";
+		});
+
+		this._themeMenu.addEventListener("mouseleave", () => {
+			ColorConfig.setTheme(this._selectedTheme);
+
+			const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+
+			this._themeButtonText.textContent = selectedTheme?.name ?? this._selectedTheme;
+		});
 
 		this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
 		this._themeAreaButton.addEventListener("click", this._renderThemeArea);
@@ -1084,7 +1125,7 @@ export class PreferencesPrompt implements Prompt {
 
 		this._doc.prefs.layout = (<any>this._layoutForm.elements)["layout"].value;
 
-		this._doc.prefs.colorTheme = this._themeSelect.value;
+		this._doc.prefs.colorTheme = this._selectedTheme;
         this._newTheme = true
 
 		this._doc.prefs.customColors = this._colorInput.value;
@@ -1134,6 +1175,91 @@ export class PreferencesPrompt implements Prompt {
 		this._close();
 		if (localStorage.getItem("customLayout") != this._layoutInput.value) setTimeout(() => { window.location.reload(); }, 50); // Someone explain why this is broken
 	}
+
+	private _makeThemeList(): HTMLElement {
+		const themeContainer = HTML.div();
+
+		for (const group of themes) {
+
+			const groupContainer = HTML.div();
+
+			const heading = HTML.div({ style: ` display:flex; align-items:center; cursor:pointer; font-style:italic; font-weight:bold; font-size:13px; padding:4px 8px 4px 10px; user-select:none;`},
+				div({ style: "margin-left:6px;" }, group.group)
+			);
+
+			const itemsContainer = HTML.div();
+
+			for (const theme of group.items) {
+
+				const item = HTML.div({ class: "themeItem", style: `font-weight: normal; font-size: 13px; padding: 4px 8px 4px 40px; text-align: left; cursor: pointer; user-select: none; `},
+					theme.name
+				);
+
+				if (theme.id === this._selectedTheme) {
+					item.classList.add("selected");
+				}
+
+				item.addEventListener("mouseenter", () => {
+					this._themeButtonText.textContent = theme.name;
+					item.style.background = "rgba(70, 120, 255, 0.5)";
+
+					if (this._previewFrame != null) {
+						cancelAnimationFrame(this._previewFrame);
+					}
+
+					this._previewFrame = requestAnimationFrame(() => {
+						ColorConfig.setTheme(theme.id);
+						this._previewFrame = null;
+					});
+				});
+
+				item.addEventListener("mouseout", () => {
+					item.style.background = "";
+
+					if (this._previewFrame != null) {
+						cancelAnimationFrame(this._previewFrame);
+						this._previewFrame = null;
+					}
+
+					const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+
+					this._themeButtonText.textContent =selectedTheme?.name ?? this._selectedTheme;
+				});
+
+				item.addEventListener("click", () => {
+					this._selectedTheme = theme.id;
+
+					ColorConfig.setTheme(theme.id);
+					this._themeButtonText.textContent = theme.name;
+
+					themeContainer.querySelectorAll(".themeItem").forEach(el => el.classList.remove("selected"));
+
+					item.classList.add("selected");
+				});
+				
+				itemsContainer.appendChild(item);
+			}
+
+			groupContainer.appendChild(heading);
+			groupContainer.appendChild(itemsContainer);
+
+			themeContainer.appendChild(groupContainer);
+		}
+		return themeContainer;
+	}
+
+	private _clickOutside = (event: MouseEvent): void => {
+		const target = event.target as Node;
+
+		if (this._themeMenu.contains(target) || this._themeButton.contains(target)) {
+			return;
+		}
+
+		this._dropdownOpen = false;
+		this._themeMenu.style.display = "none";
+
+		ColorConfig.setTheme(this._selectedTheme);
+	};
 
 	private _renderAppearanceArea = (event: Event): void => {
 		event.preventDefault();
@@ -1238,15 +1364,10 @@ export class PreferencesPrompt implements Prompt {
         }
 	}
 
-	private _previewTheme = (): void => {
-		ColorConfig.setTheme(this._themeSelect.value);
-		this._doc.prefs.customColors = "";
-	}
-
 	private _whenColorsChanged = (): void => {
 		this._doc.prefs.customColors = this._colorInput.value;
 		this._doc.prefs.colorTheme = "custom";
-		this._themeSelect.value = "custom";
+		this._selectedTheme = "custom";
 		this._mustReload = true;
 	}
 

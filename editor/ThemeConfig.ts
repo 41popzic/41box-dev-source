@@ -7,7 +7,7 @@ interface ThemeGroup {
 }
 
 export const themes: ThemeGroup[] = [
-	{
+	/*{
 		group: "41Box Themes",
 		items: [
 			{ id: "41box", name: "Inter Toxic" },
@@ -17,7 +17,7 @@ export const themes: ThemeGroup[] = [
 			{ id: "inter-forest", name: "Inter Forest" },
 			{ id: "inter-moonlight", name: "Inter Moonlight" },
 		]
-	},
+	},*/
 	{
 		group: "BeepBox Themes",
 		items: [
@@ -51,7 +51,7 @@ export const themes: ThemeGroup[] = [
 			{ id: "slushie", name: "Slushie" },
 		],
 	},
-	{
+	/*{
 		group: "ModBox Themes",
 		items: [
 			{ id: "modbox classic", name: "Modbox" },
@@ -120,5 +120,5 @@ export const themes: ThemeGroup[] = [
 			{ id: "abyssbox light", name: "AbyssBox Light"},
 			{ id: "light classic", name: "BeepBox Light" },
 		]
-	}
+	}*/
 ];

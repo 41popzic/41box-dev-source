@@ -17599,6 +17599,11 @@ content: "";
 	font-weight: bold;
 }
 
+//.beepboxEditor select:hover {
+	//outline: 1px solid #fff;
+//}
+// This looks hella vibecoded wtf
+
 .select2-container .select2-selection--single {
   height: auto;
 }
@@ -27159,7 +27164,6 @@ li.select2-results__option[role=group] > strong:hover {
       this.initToDefault(true);
       if (!jsonObject) return;
       if (jsonFormat == "auto") {
-        if (jsonObject["format"] == "AbyssBox") jsonFormat = "slarmoosbox";
         if (jsonObject["format"] == "BeepBox") {
           if (jsonObject["riff"] != void 0) {
             jsonFormat = "modbox";
@@ -55078,17 +55082,17 @@ You should be redirected to the song at:<br /><br />
 
   // editor/ThemeConfig.ts
   var themes = [
-    {
-      group: "41Box Themes",
-      items: [
-        { id: "41box", name: "Inter Toxic" },
-        { id: "inter-energized", name: "Inter Energized" },
-        { id: "inter-nebula", name: "Inter Nebula" },
-        { id: "inter-autumn", name: "Inter Autumn" },
-        { id: "inter-forest", name: "Inter Forest" },
-        { id: "inter-moonlight", name: "Inter Moonlight" }
-      ]
-    },
+    /*{
+    	group: "41Box Themes",
+    	items: [
+    		{ id: "41box", name: "Inter Toxic" },
+    		{ id: "inter-energized", name: "Inter Energized" },
+    		{ id: "inter-nebula", name: "Inter Nebula" },
+    		{ id: "inter-autumn", name: "Inter Autumn" },
+    		{ id: "inter-forest", name: "Inter Forest" },
+    		{ id: "inter-moonlight", name: "Inter Moonlight" },
+    	]
+    },*/
     {
       group: "BeepBox Themes",
       items: [
@@ -55121,78 +55125,77 @@ You should be redirected to the song at:<br /><br />
         { id: "greyscale", name: "Greyscale" },
         { id: "slushie", name: "Slushie" }
       ]
-    },
-    {
-      group: "ModBox Themes",
-      items: [
-        { id: "modbox classic", name: "Modbox" },
-        { id: "modbox 2", name: "Modbox 2.0" },
-        { id: "modbox arctic", name: "Arctic" },
-        { id: "modbox cinnamon", name: "Cinnamon Roll [!]" },
-        { id: "modbox ocean", name: "Ocean" },
-        { id: "modbox rainbow", name: "Rainbow [!]" },
-        { id: "modbox float", name: "Float [!]" },
-        { id: "modbox windows", name: "Windows" },
-        { id: "modbox grassland", name: "Grassland" },
-        { id: "modbox dessert", name: "Dessert" },
-        { id: "modbox kahoot", name: "Kahootiest" },
-        { id: "modbox bitbeam", name: "Beam to the Bit [!]" },
-        { id: "modbox egg", name: "Pretty Egg" },
-        { id: "modbox pony", name: "Poniryoshka" },
-        { id: "modbox gameboy", name: "Gameboy [!]" },
-        { id: "modbox woodkid", name: "Woodkid [!]" },
-        { id: "modbox midnight", name: "Midnight [!]" },
-        { id: "modbox snedbox", name: "Snedbox" },
-        { id: "modbox unnamed", name: "unnamed [!]" },
-        { id: "modbox halloween", name: "Halloween [!]" },
-        { id: "modbox frozen", name: "FrozenOver\u2744\uFE0F [!]" }
-      ]
-    },
-    {
-      group: "Mod Themes",
-      items: [
-        { id: "jummbox classic", name: "JummBox Classic" },
-        { id: "sandbox classic", name: "Sandbox" },
-        { id: "harrybox", name: "Haileybox" },
-        //{ id: "shitbox 3.0", name: "Shitbox 1.0/3.0"},
-        { id: "shitbox 2.0", name: "Shitbox 2.0" },
-        { id: "nerdbox", name: "Nerdbox" },
-        //{ id: "brucebox", name: "Brucebox"},
-        { id: "zefbox", name: "Zefbox" },
-        { id: "cardboardbox classic", name: "Cardboardbox" },
-        { id: "blubox classic", name: "Blubox" },
-        { id: "dogebox classic", name: "Dogebox" },
-        { id: "wackybox", name: "Wackybox" },
-        { id: "todbox dark mode", name: "Todbox Dark Mode" },
-        { id: "mainbox 1.0", name: "Mainbox" },
-        { id: "microbox", name: "MicroBox" },
-        { id: "paandorasbox", name: "PaandorasBox" },
-        { id: "foxbox", name: "FoxBox" },
-        { id: "midbox", name: "Midbox" },
-        { id: "dogebox2", name: "DogeBox2" },
-        { id: "abyssbox classic", name: "AbyssBox Classic" },
-        { id: "piano abyss", name: "AbyssBox Piano" },
-        { id: "slarmoosbox", name: "Slarmoo's Box" },
-        { id: "nepbox", name: "Nepbox" },
-        { id: "nepbox laffey", name: "Nepbox Laffey" },
-        { id: "ultrabox dark", name: "UltraBox" },
-        { id: "voxonium", name: "Voxonium" },
-        //{ id: "nepbox laffey", name: "Nepbox Laffey"},
-        { id: "axobox", name: "AxoBox" },
-        { id: "lemmbox dark", name: "LemmBox" },
-        { id: "fmbox", name: "FMBox" }
-      ]
-    },
-    {
-      group: "Light Themes",
-      items: [
-        { id: "inverse", name: "Inverse" },
-        { id: "roe light", name: "Roe Light" },
-        { id: "jummbox light", name: "JummBox Light" },
-        { id: "abyssbox light", name: "AbyssBox Light" },
-        { id: "light classic", name: "BeepBox Light" }
-      ]
     }
+    /*{
+    	group: "ModBox Themes",
+    	items: [
+    		{ id: "modbox classic", name: "Modbox" },
+    		{ id: "modbox 2", name: "Modbox 2.0"},
+    		{ id: "modbox arctic", name: "Arctic"},
+    		{ id: "modbox cinnamon", name: "Cinnamon Roll [!]"},
+    		{ id: "modbox ocean", name: "Ocean"},
+    		{ id: "modbox rainbow", name: "Rainbow [!]"},
+    		{ id: "modbox float", name: "Float [!]"},
+    		{ id: "modbox windows", name: "Windows"},
+    		{ id: "modbox grassland", name: "Grassland"},
+    		{ id: "modbox dessert", name: "Dessert"},
+    		{ id: "modbox kahoot", name: "Kahootiest"},
+    		{ id: "modbox bitbeam", name: "Beam to the Bit [!]"},
+    		{ id: "modbox egg", name: "Pretty Egg"},
+    		{ id: "modbox pony", name: "Poniryoshka"},
+    		{ id: "modbox gameboy", name: "Gameboy [!]"},
+    		{ id: "modbox woodkid", name: "Woodkid [!]"},
+    		{ id: "modbox midnight", name: "Midnight [!]"},
+    		{ id: "modbox snedbox", name: "Snedbox"},
+    		{ id: "modbox unnamed", name: "unnamed [!]"},
+    		{ id: "modbox halloween", name: "Halloween [!]"},
+    		{ id: "modbox frozen", name: "FrozenOver❄️ [!]"}
+    	]
+    },
+    {
+    	group: "Mod Themes",
+    	items: [
+    		{ id: "jummbox classic", name: "JummBox Classic" },
+    		{ id: "sandbox classic", name: "Sandbox"},
+    		{ id: "harrybox", name: "Haileybox"},
+    		//{ id: "shitbox 3.0", name: "Shitbox 1.0/3.0"},
+    		{ id: "shitbox 2.0", name: "Shitbox 2.0"},
+    		{ id: "nerdbox", name: "Nerdbox"},
+    		//{ id: "brucebox", name: "Brucebox"},
+    		{ id: "zefbox", name: "Zefbox"},
+    		{ id: "cardboardbox classic", name: "Cardboardbox"},
+    		{ id: "blubox classic", name: "Blubox"},
+    		{ id: "dogebox classic", name: "Dogebox"},
+    		{ id: "wackybox", name: "Wackybox"},
+    		{ id: "todbox dark mode", name: "Todbox Dark Mode"},
+    		{ id: "mainbox 1.0", name: "Mainbox"},
+    		{ id: "microbox", name: "MicroBox"},
+    		{ id: "paandorasbox", name: "PaandorasBox"},
+    		{ id: "foxbox", name: "FoxBox"},
+    		{ id: "midbox", name: "Midbox"},
+    		{ id: "dogebox2", name: "DogeBox2"},
+    		{ id: "abyssbox classic", name: "AbyssBox Classic"},
+    		{ id: "piano abyss", name: "AbyssBox Piano"},
+    		{ id: "slarmoosbox", name: "Slarmoo's Box"},
+    		{ id: "nepbox", name: "Nepbox"},
+    		{ id: "nepbox laffey", name: "Nepbox Laffey"},
+    		{ id: "ultrabox dark", name: "UltraBox"},
+    		{ id: "voxonium", name: "Voxonium"},
+    		//{ id: "nepbox laffey", name: "Nepbox Laffey"},
+    		{ id: "axobox", name: "AxoBox"},
+    		{ id: "lemmbox dark", name: "LemmBox"},
+    		{ id: "fmbox", name: "FMBox"},
+    	]
+    },
+    {	group: "Light Themes",
+    	items: [
+    		{ id: "inverse", name: "Inverse" },
+    		{ id: "roe light", name: "Roe Light" },
+    		{ id: "jummbox light", name: "JummBox Light"},
+    		{ id: "abyssbox light", name: "AbyssBox Light"},
+    		{ id: "light classic", name: "BeepBox Light" },
+    	]
+    }*/
   ];
 
   // editor/ThemePrompt.ts
@@ -59401,106 +59404,22 @@ You should be redirected to the song at:<br /><br />
 				}
 			}`
       });
-      this._themeSelect = select13(
-        { style: "width: 100%;" },
-        /*optgroup({ label: "41Box Themes"},
-                  option({ value: "41box" }, "Inter Toxic"),
-                  option({ value: "inter-energized" }, "Inter Energized"),
-                  option({ value: "inter-nebula" }, "Inter Nebula"),
-                  option({ value: "inter-autumn" }, "Inter Autumn"),
-                  option({ value: "inter-forest" }, "Inter Forest"),
-                  option({ value: "inter-moonlight" }, "Inter Moonlight"),
-              ),
-        optgroup({ label: "BeepBox Themes"},
-                  option({ value: "dark classic" }, "BeepBox Dark"),
-                  option({ value: "dark competition" }, "BeepBox Competition Dark"),
-              ),
-              optgroup({ label: "JummBox Themes" },*/
-        option13({ value: "forest" }, "Forest"),
-        option13({ value: "canyon" }, "Canyon"),
-        option13({ value: "midnight" }, "Midnight"),
-        option13({ value: "beachcombing" }, "Beachcombing"),
-        option13({ value: "violet verdant" }, "Violet Verdant"),
-        option13({ value: "sunset" }, "Sunset"),
-        option13({ value: "autumn" }, "Autumn"),
-        option13({ value: "fruit" }, "Shadowfruit"),
-        option13({ value: "toxic" }, "Toxic"),
-        option13({ value: "roe" }, "Roe"),
-        option13({ value: "moonlight" }, "Moonlight"),
-        option13({ value: "portal" }, "Portal"),
-        option13({ value: "fusion" }, "Fusion"),
-        option13({ value: "nebula" }, "Nebula"),
-        option13({ value: "amoled dark" }, "High Contrast Dark"),
-        option13({ value: "energized" }, "Energized"),
-        option13({ value: "neapolitan" }, "Neapolitan"),
-        option13({ value: "poly" }, "Poly"),
-        option13({ value: "blutonium" }, "Blutonium"),
-        option13({ value: "greyscale" }, "Greyscale"),
-        option13({ value: "slushie" }, "Slushie")
-        /*),
-              optgroup({ label: "ModBox Themes"},
-        	option({ value: "modbox classic" }, "Modbox"),
-        	option({ value: "modbox 2" }, "Modbox 2.0"),
-        	option({ value: "modbox arctic" }, "Arctic"),
-        	option({ value: "modbox cinnamon" }, "Cinammon Roll [!]"),
-        	option({ value: "modbox ocean" }, "Ocean"),
-        	option({ value: "modbox rainbow" }, "Rainbow [!]"),
-        	option({ value: "modbox float" }, "Float [!]"),
-        	option({ value: "modbox windows" }, "Windows"),
-        	option({ value: "modbox grassland" }, "Grassland"),
-        	option({ value: "modbox dessert" }, "Dessert"),
-        	option({ value: "modbox kahoot" }, "Kahootiest"),
-        	option({ value: "modbox bitbeam" }, "Beam to the Bit [!]"),
-        	option({ value: "modbox egg" }, "Pretty Egg"),
-        	option({ value: "modbox pony" }, "Poniryoshka"),
-        	option({ value: "modbox gameboy" }, "Gameboy [!]"),
-        	option({ value: "modbox woodkid" }, "Woodkid [!]"),
-        	option({ value: "modbox midnight" }, "MIdnight [!]"),
-        	option({ value: "modbox snedbox" }, "Snedbox"),
-        	option({ value: "modbox unnamed" }, "unnamed [!]"),
-        	option({ value: "modbox halloween" }, "Halloween [!]"),
-        	option({ value: "modbox frozen" }, "FrozenOver❄️ [!]"),
-              ),
-        optgroup({ label: "Mod Themes" },
-        	option({ value: "jummbox classic" }, "JummBox Dark"),
-        	// let's retire this again.
-        	// option({ value: "jummbox light" }, "JummBox Light"),
-        	option({ value: "sandbox classic" }, "Sandbox"),
-        	option({ value: "harrybox" }, "Haileybox"),
-        	option({ value: "brucebox" }, "Brucebox"),
-        	option({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"),
-        	option({ value: "shitbox 2.0" }, "Shitbox 2.0"),
-        	option({ value: "nerdbox" }, "NerdBox"),
-        	option({ value: "zefbox" }, "Zefbox"),
-        	option({ value: "cardboardbox classic" }, "Cardboardbox"),
-        	option({ value: "blubox classic" }, "Blubox"),
-        	option({ value: "dogebox classic" }, "Dogebox"),
-        	option({ value: "wackybox" }, "Wackybox"),
-        	option({ value: "todbox dark mode" }, "Todbox Dark Mode"),
-        	option({ value: "mainbox 1.0" }, "Mainbox"),
-        	option({ value: "microbox" }, "MicroBox"),
-        	option({ value: "paandorasbox" }, "PaandorasBox"),
-        	option({ value: "foxbox" }, "FoxBox"),
-        	option({ value: "midbox" }, "Midbox"),
-        	option({ value: "dogebox2" }, "Dogebox2"),
-        	option({ value: "abyssbox classic"}, "AbyssBox Classic"),
-        	option({ value: "piano abyss"}, "AbyssBox Piano"),
-        	option({ value: "nepbox" }, "Nepbox"),
-        	option({ value: "nepbox laffey" }, "Nepbox Laffey"),
-        	option({ value: "slarmoosbox" }, "Slarmoo's Box"),
-        	option({ value: "ultrabox dark" }, "UltraBox"),
-        ),
-        optgroup({ label: "Light Themes" },
-        	option({ value: "inverse" }, "Inverse"),
-        	option({ value: "roe light" }, "Roe Light"),
-                  option({ value: "jummbox light" }, "JummBox Light"),
-        	option({ value: "abyssbox light" }, "AbyssBox Light"),
-        	option({ value: "light classic" }, "BeepBox Light"),
-        ),
-              optgroup({ label: "Misc"},
-                  option({ value: "custom" }, "Custom"),
-              )*/
+      this._themeList = this._makeThemeList();
+      this._themeButtonText = div26(
+        { class: "themeButtonText" },
+        "cool theme button"
       );
+      this._themeButton = button26(
+        { style: ` width:100%; display:flex; justify-content:space-between; align-items:center padding:6px 10px; box-sizing:border-box;` },
+        this._themeButtonText
+      );
+      this._themeMenu = div26(
+        { style: `display:none; position:absolute; top:100%; left:0; width:100%; max-height:300px; overflow-y:auto; background:${ColorConfig.uiWidgetBackground}; border:1px solid ${ColorConfig.uiWidgetFocus}; border-radius:4px; box-sizing:border-box; z-index:10;` },
+        this._themeList
+      );
+      this._previewFrame = null;
+      this._dropdownOpen = false;
+      this.lastTheme = window.localStorage.getItem("colorTheme");
       this._customThemeFileInput = input18({ type: "file", accept: "image/*", text: "choose editor background image" });
       this._customThemeFileInput2 = input18({ type: "file", accept: "image/*", text: "choose website background image" });
       this._colorInput = input18({ type: "text", style: "width: auto" });
@@ -59647,7 +59566,7 @@ You should be redirected to the song at:<br /><br />
           label5(
             { style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
             "Color palette:",
-            div26({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeSelect)
+            div26({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeButton, this._themeMenu)
           ),
           label5(
             { style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
@@ -59911,7 +59830,7 @@ You should be redirected to the song at:<br /><br />
         this._doc.prefs.promptSongDetails = this._promptSongDetails.checked;
         this._doc.prefs.rainbowLoop = this._rainbowifyLoop.checked;
         this._doc.prefs.layout = this._layoutForm.elements["layout"].value;
-        this._doc.prefs.colorTheme = this._themeSelect.value;
+        this._doc.prefs.colorTheme = this._selectedTheme;
         this._newTheme = true;
         this._doc.prefs.customColors = this._colorInput.value;
         if (this._resetCustomTheme) {
@@ -59954,6 +59873,15 @@ You should be redirected to the song at:<br /><br />
           window.location.reload();
         }, 50);
       }, "_confirm");
+      this._clickOutside = /* @__PURE__ */ __name((event) => {
+        const target = event.target;
+        if (this._themeMenu.contains(target) || this._themeButton.contains(target)) {
+          return;
+        }
+        this._dropdownOpen = false;
+        this._themeMenu.style.display = "none";
+        ColorConfig.setTheme(this._selectedTheme);
+      }, "_clickOutside");
       this._renderAppearanceArea = /* @__PURE__ */ __name((event) => {
         event.preventDefault();
         this._appearanceArea.style.display = "";
@@ -60047,14 +59975,10 @@ You should be redirected to the song at:<br /><br />
           }
         }
       }, "_renderKeyboardLayoutPreview");
-      this._previewTheme = /* @__PURE__ */ __name(() => {
-        ColorConfig.setTheme(this._themeSelect.value);
-        this._doc.prefs.customColors = "";
-      }, "_previewTheme");
       this._whenColorsChanged = /* @__PURE__ */ __name(() => {
         this._doc.prefs.customColors = this._colorInput.value;
         this._doc.prefs.colorTheme = "custom";
-        this._themeSelect.value = "custom";
+        this._selectedTheme = "custom";
         this._mustReload = true;
       }, "_whenColorsChanged");
       this._whenCustomThemeFileSelected = /* @__PURE__ */ __name(() => {
@@ -60178,9 +60102,6 @@ You should be redirected to the song at:<br /><br />
       this._promptSongDetails.checked = this._doc.prefs.promptSongDetails;
       this._rainbowifyLoop.checked = this._doc.prefs.rainbowLoop;
       this._layoutForm.elements["layout"].value = this._doc.prefs.layout;
-      if (this._lastTheme != null) {
-        this._themeSelect.value = this._lastTheme;
-      }
       this._colorInput.value = this._doc.prefs.customColors || "";
       this._autoPlay.checked = this._doc.prefs.autoPlay;
       this._autoFollow.checked = this._doc.prefs.autoFollow;
@@ -60212,7 +60133,19 @@ You should be redirected to the song at:<br /><br />
       this._customThemeFileInput2.addEventListener("change", this._whenCustomThemeFileSelected2);
       this._customThemeFileReset.addEventListener("click", this._resetCustomThemeFile);
       this._colorInput.addEventListener("change", this._whenColorsChanged);
-      this._themeSelect.addEventListener("change", this._previewTheme);
+      this._selectedTheme = this.lastTheme ?? ColorConfig.defaultTheme;
+      const currentTheme = themes.flatMap((group) => group.items).find((theme) => theme.id === this._selectedTheme);
+      this._themeButtonText.textContent = currentTheme?.name ?? this._selectedTheme;
+      document.addEventListener("mousedown", this._clickOutside);
+      this._themeButton.addEventListener("click", () => {
+        this._dropdownOpen = !this._dropdownOpen;
+        this._themeMenu.style.display = this._dropdownOpen ? "" : "none";
+      });
+      this._themeMenu.addEventListener("mouseleave", () => {
+        ColorConfig.setTheme(this._selectedTheme);
+        const selectedTheme = themes.flatMap((group) => group.items).find((t) => t.id === this._selectedTheme);
+        this._themeButtonText.textContent = selectedTheme?.name ?? this._selectedTheme;
+      });
       this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
       this._themeAreaButton.addEventListener("click", this._renderThemeArea);
       this._layoutAreaButton.addEventListener("click", this._renderLayoutArea);
@@ -60227,6 +60160,58 @@ You should be redirected to the song at:<br /><br />
     }
     static {
       __name(this, "PreferencesPrompt");
+    }
+    _makeThemeList() {
+      const themeContainer = HTML.div();
+      for (const group of themes) {
+        const groupContainer = HTML.div();
+        const heading = HTML.div(
+          { style: ` display:flex; align-items:center; cursor:pointer; font-style:italic; font-weight:bold; font-size:13px; padding:4px 8px 4px 10px; user-select:none;` },
+          div26({ style: "margin-left:6px;" }, group.group)
+        );
+        const itemsContainer = HTML.div();
+        for (const theme of group.items) {
+          const item = HTML.div(
+            { class: "themeItem", style: `font-weight: normal; font-size: 13px; padding: 4px 8px 4px 40px; text-align: left; cursor: pointer; user-select: none; ` },
+            theme.name
+          );
+          if (theme.id === this._selectedTheme) {
+            item.classList.add("selected");
+          }
+          item.addEventListener("mouseenter", () => {
+            this._themeButtonText.textContent = theme.name;
+            item.style.background = "rgba(70, 120, 255, 0.5)";
+            if (this._previewFrame != null) {
+              cancelAnimationFrame(this._previewFrame);
+            }
+            this._previewFrame = requestAnimationFrame(() => {
+              ColorConfig.setTheme(theme.id);
+              this._previewFrame = null;
+            });
+          });
+          item.addEventListener("mouseout", () => {
+            item.style.background = "";
+            if (this._previewFrame != null) {
+              cancelAnimationFrame(this._previewFrame);
+              this._previewFrame = null;
+            }
+            const selectedTheme = themes.flatMap((group2) => group2.items).find((t) => t.id === this._selectedTheme);
+            this._themeButtonText.textContent = selectedTheme?.name ?? this._selectedTheme;
+          });
+          item.addEventListener("click", () => {
+            this._selectedTheme = theme.id;
+            ColorConfig.setTheme(theme.id);
+            this._themeButtonText.textContent = theme.name;
+            themeContainer.querySelectorAll(".themeItem").forEach((el) => el.classList.remove("selected"));
+            item.classList.add("selected");
+          });
+          itemsContainer.appendChild(item);
+        }
+        groupContainer.appendChild(heading);
+        groupContainer.appendChild(itemsContainer);
+        themeContainer.appendChild(groupContainer);
+      }
+      return themeContainer;
     }
   };
 

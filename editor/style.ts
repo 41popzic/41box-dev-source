@@ -1103,6 +1103,11 @@ content: "";
 	font-weight: bold;
 }
 
+//.beepboxEditor select:hover {
+	//outline: 1px solid #fff;
+//}
+// This looks hella vibecoded wtf
+
 .select2-container .select2-selection--single {
   height: auto;
 }
