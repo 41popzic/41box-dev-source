@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Chord, Envelope, Config, getArpeggioPitchIndex, getPulseWidthRatio, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, OperatorWave, GranularEnvelopeType, flangerRateValues, effectsIncludePhaser } from "./SynthConfig";
+import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Chord, Envelope, Config, getArpeggioPitchIndex, getPulseWidthRatio, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, OperatorWave, GranularEnvelopeType, flangerRateValues, effectsIncludePhaser, effectsIncludeNoteRange } from "./SynthConfig";
 import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter } from "./filtering";
@@ -2273,6 +2273,7 @@ if (playSong && !this.countInMetronome) {
                     tone.forceContinueAtStart = forceContinueAtStart;
                     tone.forceContinueAtEnd = forceContinueAtEnd;
                 }
+                
             }
             // Automatically free or release seamless tones if there's no new note to take over.
             while (toneList.count() > modToneCount) {
@@ -2293,18 +2294,20 @@ if (playSong && !this.countInMetronome) {
             let prevNote: Note | null = null;
             let nextNote: Note | null = null;
 
+            // Bit Obvious, but this if statement is getting what notes are supposed to be played and what the previous note is.
             if (playSong && pattern != null && !channel.muted && (!this.isRecording || this.liveInputChannel != channelIndex)) {
                 for (let i: number = 0; i < pattern.notes.length; i++) {
-                    if (pattern.notes[i].end <= currentPart) {
+                    if (pattern.notes[i].end <= currentPart) { // All notes that this applies to is a previous note
                         prevNote = pattern.notes[i];
-                    } else if (pattern.notes[i].start <= currentPart && pattern.notes[i].end > currentPart) {
+                    } else if (pattern.notes[i].start <= currentPart && pattern.notes[i].end > currentPart) { // This is the current note
                         note = pattern.notes[i];
-                    } else if (pattern.notes[i].start > currentPart) {
+                    } else if (pattern.notes[i].start > currentPart) { // All notes this applies to is a next note
                         nextNote = pattern.notes[i];
                         break;
                     }
                 }
 
+                // If the previous or next note isn't right before or after the current note, then it'll set itself as null.
                 if (note != null) {
                     if (prevNote != null && prevNote.end != note.start) prevNote = null;
                     if (nextNote != null && nextNote.start != note.end) nextNote = null;
@@ -2353,13 +2356,19 @@ if (playSong && !this.countInMetronome) {
                                 const chordOfCompatibleInstrument: Chord | null = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern!, prevPattern, instrumentIndex, transition, chord, note, lastNote, patternForcesContinueAtStart);
                                 if (chordOfCompatibleInstrument != null) {
                                     prevNoteForThisInstrument = lastNote;
-                                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevNoteForThisInstrument.pitches.length
+                                    let prevPitchesForThisInstrument: number[] = prevNoteForThisInstrument.pitches;
+                                    // @TODO: This may or may not be needed, I'm not entirely sure yet...
+                                    // if (effectsIncludeNoteRange(instrument.effects)) prevPitchesForThisInstrument = prevPitchesForThisInstrument.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevPitchesForThisInstrument.length;
                                     forceContinueAtStart = patternForcesContinueAtStart;
                                 }
                             }
                         }
                     } else if (prevNoteForThisInstrument != null) {
-                        tonesInPrevNote = chord.singleTone ? 1 : prevNoteForThisInstrument.pitches.length
+                        let prevPitchesForThisInstrument: number[] = prevNoteForThisInstrument.pitches;
+                        // @TODO: This may or may not be needed, I'm not entirely sure yet...
+                        // if (effectsIncludeNoteRange(instrument.effects)) prevPitchesForThisInstrument = prevPitchesForThisInstrument.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                        tonesInPrevNote = chord.singleTone ? 1 : prevPitchesForThisInstrument.length
                     }
                     if (note.end == partsPerBar) {
                         // If the end of the note coincides with the end of the pattern, look for an
@@ -2372,16 +2381,24 @@ if (playSong && !this.countInMetronome) {
                                 const chordOfCompatibleInstrument: Chord | null = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern!, nextPattern, instrumentIndex, transition, chord, note, firstNote, nextPatternForcesContinueAtStart);
                                 if (chordOfCompatibleInstrument != null) {
                                     nextNoteForThisInstrument = firstNote;
-                                    tonesInNextNote = chordOfCompatibleInstrument.singleTone ? 1 : nextNoteForThisInstrument.pitches.length
+                                    let nextPitchesForThisInstrument: number[] = nextNoteForThisInstrument.pitches;
+                                    // @TODO: This may or may not be needed, I'm not entirely sure yet...
+                                    // if (effectsIncludeNoteRange(instrument.effects)) nextPitchesForThisInstrument = nextPitchesForThisInstrument.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                                    tonesInNextNote = chordOfCompatibleInstrument.singleTone ? 1 : nextPitchesForThisInstrument.length;
                                     forceContinueAtEnd = nextPatternForcesContinueAtStart;
                                 }
                             }
                         }
                     } else if (nextNoteForThisInstrument != null) {
-                        tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length
+                        let nextPitchesForThisInstrument: number[] = nextNoteForThisInstrument.pitches;
+                        // @TODO: This may or may not be needed, I'm not entirely sure yet...
+                        // if (effectsIncludeNoteRange(instrument.effects)) nextPitchesForThisInstrument = nextPitchesForThisInstrument.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                        tonesInNextNote = chord.singleTone ? 1 : nextPitchesForThisInstrument.length;
                     }
 
-                    if (chord.singleTone) {
+                    let filteredPitches: number[] = note.pitches;
+                    if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                    if (chord.singleTone && !(filteredPitches.length <= 0)) {
                         const atNoteStart: boolean = (Config.ticksPerPart * note.start == currentTick);
                         let tone: Tone;
                         if (toneList.count() <= toneCount) {
@@ -2401,10 +2418,10 @@ if (playSong && !this.countInMetronome) {
                         }
                         toneCount++;
 
-                        for (let i: number = 0; i < note.pitches.length; i++) {
-                            tone.pitches[i] = note.pitches[i];
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
+                            tone.pitches[i] = filteredPitches[i];
                         }
-                        tone.pitchCount = note.pitches.length;
+                        tone.pitchCount = filteredPitches.length;
                         tone.chordSize = 1;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = note;
@@ -2423,14 +2440,15 @@ if (playSong && !this.countInMetronome) {
                         const transition: Transition = instrument.getTransition();
 
                         if (((transition.isSeamless && !transition.slides && chord.strumParts == 0) || forceContinueAtStart) && (Config.ticksPerPart * note.start == currentTick) && prevNoteForThisInstrument != null) {
-                            this.moveTonesIntoOrderedTempMatchedList(toneList, note.pitches);
+                            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
                         }
 
                         let strumOffsetParts: number = 0;
-                        for (let i: number = 0; i < note.pitches.length; i++) {
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
 
                             let prevNoteForThisTone: Note | null = (tonesInPrevNote > i) ? prevNoteForThisInstrument : null;
                             let noteForThisTone: Note = note;
+                            let pitchesForThisTone: number[] = filteredPitches;
                             let nextNoteForThisTone: Note | null = (tonesInNextNote > i) ? nextNoteForThisInstrument : null;
                             let noteStartPart: number = noteForThisTone.start + strumOffsetParts;
                             let passedEndOfNote: boolean = false;
@@ -2444,6 +2462,8 @@ if (playSong && !this.countInMetronome) {
                                     // Continue the previous note's chord until the current one takes over.
                                     nextNoteForThisTone = noteForThisTone;
                                     noteForThisTone = prevNoteForThisTone;
+                                    pitchesForThisTone = noteForThisTone.pitches;
+                                    if (effectsIncludeNoteRange(instrument.effects)) pitchesForThisTone = pitchesForThisTone.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                                     prevNoteForThisTone = null;
                                     noteStartPart = noteForThisTone.start + strumOffsetParts;
                                     passedEndOfNote = true;
@@ -2459,7 +2479,7 @@ if (playSong && !this.countInMetronome) {
                             }
                             if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
                                 // if (useStrumSpeed) strumOffsetParts += Config.strumSpeedScale[instrument.strumParts];
-                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts * 10;
+                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
                             }
 
                             const atNoteStart: boolean = (Config.ticksPerPart * noteStartPart == currentTick);
@@ -2485,9 +2505,9 @@ if (playSong && !this.countInMetronome) {
                             }
                             toneCount++;
 
-                            tone.pitches[0] = noteForThisTone.pitches[i];
+                            tone.pitches[0] = pitchesForThisTone[i];
                             tone.pitchCount = 1;
-                            tone.chordSize = noteForThisTone.pitches.length;
+                            tone.chordSize = pitchesForThisTone.length;
                             tone.instrumentIndex = instrumentIndex;
                             tone.note = noteForThisTone;
                             tone.noteStartPart = noteStartPart;

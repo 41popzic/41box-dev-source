@@ -3,7 +3,7 @@
 import { InstrumentType } from "./synth";
 import { EnvelopeSettings } from "./Envelope";
 import { FilterSettings } from "./Filter";
-import { Dictionary, DictionaryArray, toNameMap, SustainType, EnvelopeType, EffectType, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, LFOEnvelopeTypes, effectsIncludePhaser, } from "./SynthConfig";
+import { Dictionary, DictionaryArray, toNameMap, SustainType, EnvelopeType, EffectType, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeNoteRange, effectsIncludeRingModulation, effectsIncludeGranular, effectsIncludeFlanger, LFOEnvelopeTypes, effectsIncludePhaser, } from "./SynthConfig";
 import { clamp, fadeInSettingToSeconds, secondsToFadeInSetting, fadeOutSettingToTicks, ticksToFadeOutSetting, detuneToCents, centsToDetune, fittingPowerOfTwo } from "./utils";
 
 // Settings that were available to old versions of BeepBox but are no longer available in the
@@ -301,6 +301,9 @@ export class Instrument {
 
     public slideTicks: number = 0;
 
+    public upperNoteLimit: number = Config.maxPitch;
+    public lowerNoteLimit: number = 0;
+
     public algorithm: number = 0;
     public feedbackType: number = 0;
     public algorithm6Op: number = 1;
@@ -440,6 +443,9 @@ export class Instrument {
 
         this.slideTicks = 3;
         this.strumParts = 1;
+
+        this.upperNoteLimit = Config.maxPitch;
+        this.lowerNoteLimit = 0;
 
         this.pan = Config.panCenter;
         this.panDelay = 0;
@@ -813,7 +819,10 @@ export class Instrument {
             instrumentObject["reverbShelfHz"] = this.reverbShelfHz;
             instrumentObject["reverbShelfGain"] = this.reverbShelfGain;
         }
-
+        if (effectsIncludeNoteRange(this.effects)) {
+            instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
+            instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
+        }
         if (this.type != InstrumentType.drumset) {
             instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
             instrumentObject["fadeOutTicks"] = fadeOutSettingToTicks(this.fadeOut); // No backward compatibility sigh
@@ -1283,7 +1292,12 @@ export class Instrument {
             this.reverbShelfHz = 32;
             this.reverbShelfGain = 6;
         }
-
+        if (instrumentObject["upperNoteLimit"] != undefined) {
+            this.upperNoteLimit = instrumentObject["upperNoteLimit"]
+        }
+        if (instrumentObject["lowerNoteLimit"] != undefined) {
+            this.lowerNoteLimit = instrumentObject["lowerNoteLimit"]
+        }
         if (instrumentObject["pulseWidth"] != undefined) {
             this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
         } else {

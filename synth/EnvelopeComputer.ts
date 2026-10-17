@@ -156,7 +156,7 @@ export class EnvelopeComputer {
                 //if (synth.isModActive(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex)) { //modulation
                 //    slideTicks = Config.maxSlideTicks + 1 - synth.getModValue(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex, false);
                 //}
-                slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks / 2);
+                slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks * 3); // Strange
                 if (tone.prevNote != null && !tone.forceContinueAtStart) {
                     if (tickTimeStartReal - noteStartTick < slideTicks) {
                         prevSlideStart = true;

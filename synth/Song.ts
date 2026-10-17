@@ -1,6 +1,6 @@
 // Copyright (c) John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, Envelope, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, LFOEnvelopeTypes, RandomEnvelopeTypes, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludeNoteFilter, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludePhaser } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, Envelope, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, LFOEnvelopeTypes, RandomEnvelopeTypes, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludeNoteFilter, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludePhaser, effectsIncludeNoteRange } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { Channel } from "./Channel";
 import { Instrument, LegacySettings } from "./Instrument";
@@ -1020,9 +1020,10 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.reverbShelfHz]);
                     buffer.push(base64IntToCharCode[instrument.reverbShelfGain]);
                 }
-                // if (effectsIncludeNoteRange(instrument.effects)) {
-                //     buffer.push(base64IntToCharCode[instrument.noteRange]);
-                // }
+                if (effectsIncludeNoteRange(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
+                    buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
+                }
                 if (effectsIncludeGranular(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.granular]);
                     buffer.push(base64IntToCharCode[instrument.grainSize]);
@@ -2864,6 +2865,10 @@ export class Song {
                             if (!beforeFour && from41Box) instrument.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                             if (!beforeFour && from41Box) instrument.reverbShelfGain = clamp(0, Config.reverbShelfGainRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                         }
+                    }
+                    if (effectsIncludeNoteRange(instrument.effects)) {
+                        instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
                         instrument.granular = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
