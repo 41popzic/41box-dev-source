@@ -974,10 +974,6 @@ export class PreferencesPrompt implements Prompt {
 		this._rainbowifyLoop.checked = this._doc.prefs.rainbowLoop;
 
 		(<any>this._layoutForm.elements)["layout"].value = this._doc.prefs.layout;
-
-		//if (this._lastTheme != null) {
-		//	this._themeSelect.value = this._lastTheme;
-		//}
         
         this._colorInput.value = this._doc.prefs.customColors || "";
 
@@ -1043,20 +1039,61 @@ export class PreferencesPrompt implements Prompt {
 		this._themeMenu.addEventListener("mouseleave", () => {
 			if (!this._dropdownOpen) return;
 
-			ColorConfig.setTheme(this._selectedTheme);
+			ColorConfig.setTheme(this._lastTheme);
 
-			const selectedTheme = themes
-				.flatMap(group => group.items)
-				.find(t => t.id === this._selectedTheme);
+			const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
 
-			this._themeButtonText.textContent =
-				selectedTheme?.name ?? this._selectedTheme;
+			this._themeButtonText.textContent =selectedTheme?.name ?? this._selectedTheme;
+		});
+
+		this.container.addEventListener("wheel", (event: WheelEvent) => {
+			if (!this._dropdownOpen) return;
+			if (this._themeMenu.contains(event.target as Node)) return;
+
+			event.preventDefault();
+		}, { passive: false, capture: true });
+
+		this.container.addEventListener("touchmove", (event: TouchEvent) => {
+			if (!this._dropdownOpen) return;
+			if (this._themeMenu.contains(event.target as Node)) return;
+
+			event.preventDefault();
+		}, { passive: false, capture: true });
+
+		this.container.addEventListener("keydown", (event: KeyboardEvent) => {
+			if (!this._dropdownOpen) return;
+
+			if (event.key === "Escape") { // For good measures
+				this._dropdownOpen = false;
+				this._themeMenu.style.display = "none";
+
+				const originalTheme = this._lastTheme ?? ColorConfig.defaultTheme;
+
+				ColorConfig.setTheme(originalTheme);
+				this._selectedTheme = originalTheme;
+
+				// Restore the button text
+				const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === originalTheme);
+
+				this._themeButtonText.textContent = selectedTheme?.name ?? originalTheme;
+
+				this._themeMenu.querySelectorAll(".themeItem").forEach(item => {
+					item.classList.remove("selected");
+				});
+
+				const selectedItem = Array.from(this._themeMenu.querySelectorAll<HTMLElement>(".themeItem")).find(item => {
+					return themes.flatMap(group => group.items).some(theme => theme.id === originalTheme && theme.name === item.textContent);
+				});
+
+				selectedItem?.classList.add("selected");
+
+				this._themeButton.focus();
+			}
 		});
 
 		this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
 		this._themeAreaButton.addEventListener("click", this._renderThemeArea);
 		this._layoutAreaButton.addEventListener("click", this._renderLayoutArea);
-		//this._customLayoutEditButton.addEventListener("click", this.);
         this._layoutInput.addEventListener("change", this._whenLayoutChanged);
         this._resetButton.addEventListener("click", this._reset);
 		this._generalAreaButton.addEventListener("click", this._renderGeneralArea);
@@ -1073,6 +1110,8 @@ export class PreferencesPrompt implements Prompt {
 		} else if (!this._newTheme) {
 			ColorConfig.setTheme(ColorConfig.defaultTheme);
 		}
+		this._dropdownOpen = false;
+		this._themeMenu.style.display = "none";
 		this._doc.prompt = null;
 		this._doc.undo();
 		if (this._mustReload) {
@@ -1106,11 +1145,6 @@ export class PreferencesPrompt implements Prompt {
 			this._recordRebind = "";
 			this._renderShortcuts();
 		}
-/*
-        if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
-            this._confirm();
-        } // Nothing happens for now because the custom layout input requires the enter key.
-			*/ 
     }
 
     private _confirm = (): void => {
@@ -1267,7 +1301,7 @@ export class PreferencesPrompt implements Prompt {
 		this._dropdownOpen = false;
 		this._themeMenu.style.display = "none";
 
-		ColorConfig.setTheme(this._selectedTheme);
+		ColorConfig.setTheme(this._lastTheme);
 	};
 
 	private _renderAppearanceArea = (event: Event): void => {

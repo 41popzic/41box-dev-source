@@ -55149,6 +55149,8 @@ You should be redirected to the song at:<br /><br />
                 else if (!this._newTheme) {
                     ColorConfig.setTheme(ColorConfig.defaultTheme);
                 }
+                this._dropdownOpen = false;
+                this._themeMenu.style.display = "none";
                 this._doc.prompt = null;
                 this._doc.undo();
                 if (this._mustReload) {
@@ -55243,7 +55245,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 this._dropdownOpen = false;
                 this._themeMenu.style.display = "none";
-                ColorConfig.setTheme(this._selectedTheme);
+                ColorConfig.setTheme(this._lastTheme);
             };
             this._renderAppearanceArea = (event) => {
                 event.preventDefault();
@@ -55507,12 +55509,45 @@ You should be redirected to the song at:<br /><br />
                 var _a;
                 if (!this._dropdownOpen)
                     return;
-                ColorConfig.setTheme(this._selectedTheme);
-                const selectedTheme = themes
-                    .flatMap(group => group.items)
-                    .find(t => t.id === this._selectedTheme);
-                this._themeButtonText.textContent =
-                    (_a = selectedTheme === null || selectedTheme === void 0 ? void 0 : selectedTheme.name) !== null && _a !== void 0 ? _a : this._selectedTheme;
+                ColorConfig.setTheme(this._lastTheme);
+                const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
+                this._themeButtonText.textContent = (_a = selectedTheme === null || selectedTheme === void 0 ? void 0 : selectedTheme.name) !== null && _a !== void 0 ? _a : this._selectedTheme;
+            });
+            this.container.addEventListener("wheel", (event) => {
+                if (!this._dropdownOpen)
+                    return;
+                if (this._themeMenu.contains(event.target))
+                    return;
+                event.preventDefault();
+            }, { passive: false, capture: true });
+            this.container.addEventListener("touchmove", (event) => {
+                if (!this._dropdownOpen)
+                    return;
+                if (this._themeMenu.contains(event.target))
+                    return;
+                event.preventDefault();
+            }, { passive: false, capture: true });
+            this.container.addEventListener("keydown", (event) => {
+                var _a, _b;
+                if (!this._dropdownOpen)
+                    return;
+                if (event.key === "Escape") {
+                    this._dropdownOpen = false;
+                    this._themeMenu.style.display = "none";
+                    const originalTheme = (_a = this._lastTheme) !== null && _a !== void 0 ? _a : ColorConfig.defaultTheme;
+                    ColorConfig.setTheme(originalTheme);
+                    this._selectedTheme = originalTheme;
+                    const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === originalTheme);
+                    this._themeButtonText.textContent = (_b = selectedTheme === null || selectedTheme === void 0 ? void 0 : selectedTheme.name) !== null && _b !== void 0 ? _b : originalTheme;
+                    this._themeMenu.querySelectorAll(".themeItem").forEach(item => {
+                        item.classList.remove("selected");
+                    });
+                    const selectedItem = Array.from(this._themeMenu.querySelectorAll(".themeItem")).find(item => {
+                        return themes.flatMap(group => group.items).some(theme => theme.id === originalTheme && theme.name === item.textContent);
+                    });
+                    selectedItem === null || selectedItem === void 0 ? void 0 : selectedItem.classList.add("selected");
+                    this._themeButton.focus();
+                }
             });
             this._appearanceAreaButton.addEventListener("click", this._renderAppearanceArea);
             this._themeAreaButton.addEventListener("click", this._renderThemeArea);
