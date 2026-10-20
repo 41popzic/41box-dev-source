@@ -55698,6 +55698,9 @@ You should be redirected to the song at:<br /><br />
             for (const group of themes) {
                 const groupContainer = HTML.div();
                 const heading = HTML.div({ style: ` display:flex; align-items:center; cursor:pointer; font-style:italic; font-weight:bold; font-size:13px; padding:4px 8px 4px 10px; user-select:none;` }, div$2({ style: "margin-left:6px;" }, group.group));
+                heading.addEventListener("mouseenter", () => {
+                    ColorConfig.setTheme(this._lastTheme);
+                });
                 const itemsContainer = HTML.div();
                 for (const theme of group.items) {
                     const item = HTML.div({ class: "themeItem", style: `font-weight: normal; font-size: 13px; padding: 4px 8px 4px 40px; text-align: left; cursor: pointer; user-select: none; ` }, theme.name);

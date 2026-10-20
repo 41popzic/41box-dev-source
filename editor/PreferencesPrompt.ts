@@ -1242,6 +1242,10 @@ export class PreferencesPrompt implements Prompt {
 				div({ style: "margin-left:6px;" }, group.group)
 			);
 
+			heading.addEventListener("mouseenter", () => {
+				ColorConfig.setTheme(this._lastTheme);
+			});
+
 			const itemsContainer = HTML.div();
 
 			for (const theme of group.items) {
@@ -1278,7 +1282,7 @@ export class PreferencesPrompt implements Prompt {
 
 					const selectedTheme = themes.flatMap(group => group.items).find(t => t.id === this._selectedTheme);
 
-					this._themeButtonText.textContent =selectedTheme?.name ?? this._selectedTheme;
+					this._themeButtonText.textContent = selectedTheme?.name ?? this._selectedTheme;
 				});
 
 				item.addEventListener("click", () => {
