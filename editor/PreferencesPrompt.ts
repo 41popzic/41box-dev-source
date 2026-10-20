@@ -666,10 +666,10 @@ export class PreferencesPrompt implements Prompt {
     private readonly _keyboardLayout: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "wickiHayden" }, "Wicki-Hayden"),
         option({ value: "songScale" }, "selected song scale"),
-        option({ value: "pianoAtC" }, "piano starting at C :)"),
-        option({ value: "pianoAtA" }, "piano starting at A :("),
-        option({ value: "pianoTransposingC" }, "piano transposing C :) to song key"),
-        option({ value: "pianoTransposingA" }, "piano transposing A :( to song key"),
+        option({ value: "pianoAtC" }, "piano starting at C (major))"),
+        option({ value: "pianoAtA" }, "piano starting at A (minor)"),
+        option({ value: "pianoTransposingC" }, "piano transposing C (major) to song key"),
+        option({ value: "pianoTransposingA" }, "piano transposing A (minor) to song key"),
     );
     private readonly _bassOffset: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "0" }, "disabled"),
@@ -691,12 +691,12 @@ export class PreferencesPrompt implements Prompt {
 
 	private readonly _resetDefaultButton: HTMLButtonElement = button({ style: "height: auto; margin: 1em;" }, "Reset to Defaults");
 
-	private readonly _appearanceAreaButton: HTMLButtonElement = button({ class: "appearanceAreaButton", style: "width:16%;" }, "Appearance");
-	private readonly _themeAreaButton: HTMLButtonElement = button({ class: "themeAreaButton", style: "width:16%;" }, "Theme");
-	private readonly _layoutAreaButton: HTMLButtonElement = button({ class: "layoutAreaButton", style: "width:16%;" }, "Layout");
-	private readonly _generalAreaButton: HTMLButtonElement = button({ class: "generalAreaButton", style: "width:16%;" }, "General");
-	private readonly _recordingAreaButton: HTMLButtonElement = button({ class: "recordingAreaButton", style: "width:16%;" }, "Recording");
-	private readonly _keybindAreaButton: HTMLButtonElement = button({ class: "keybindAreaButton", style: "width:16%;" }, "Shortcuts");
+	private readonly _appearanceAreaButton: HTMLButtonElement = button({ class: "appearanceAreaButton", style: "width:6em; height:3em" }, "Appearance");
+	private readonly _themeAreaButton: HTMLButtonElement = button({ class: "themeAreaButton", style: "width:6em; height:3em" }, "Theme");
+	private readonly _layoutAreaButton: HTMLButtonElement = button({ class: "layoutAreaButton", style: "width:6em; height:3em" }, "Layout");
+	private readonly _generalAreaButton: HTMLButtonElement = button({ class: "generalAreaButton", style: "width:6em; height:3em" }, "General");
+	private readonly _recordingAreaButton: HTMLButtonElement = button({ class: "recordingAreaButton", style: "width:6em; height:3em" }, "Recording");
+	private readonly _keybindAreaButton: HTMLButtonElement = button({ class: "keybindAreaButton", style: "width:6em; height:3em" }, "Shortcuts");
 
 	private readonly _appearanceArea: HTMLDivElement = div({ style: "display: none; overflow-y: visible; overflow-x: hidden;" },
 		h2("Appearance"),
@@ -768,15 +768,15 @@ export class PreferencesPrompt implements Prompt {
 		)
 	);
 
-	private readonly _themeArea: HTMLDivElement = div({ style: "display: none; overflow: visible;" },
+	private readonly _themeArea: HTMLDivElement = div({ style: "min-width: 100%; display: none; overflow: visible;" },
 		h2("Theme"),
 		div({ style: "text-align: left;" },	
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
-				"Color palette:",
+				"Color theme:",
 				div({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeButton, this._themeMenu),
 			),
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
-				"Custom color palette data:",
+				"Custom color theme data:",
 				div({ style: "width: 50%; text-align: center;" }, this._colorInput)
 			),
 			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
@@ -928,26 +928,36 @@ export class PreferencesPrompt implements Prompt {
     private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 
-	public readonly container: HTMLDivElement = div({ class: "prompt noSelection recordingSetupPrompt", style: "width: 600px; max-height: 90%; overflow: visible" },
-		div({ style: "display: flex; flex-direction: row; justify-content: space-evenly;" },
-			this._generalAreaButton,
-			this._appearanceAreaButton,
-			this._themeAreaButton,
-			this._layoutAreaButton,
-			this._recordingAreaButton,
-			this._keybindAreaButton,
-		),
+	private readonly _buttonsContainer: HTMLDivElement = div({ style: `display: flex; flex-direction: column; justify-content: flex-start; flex: 0 0 100px; gap: 7px;`},
+		this._generalAreaButton,
+		this._appearanceAreaButton,
+		this._themeAreaButton,
+		this._layoutAreaButton,
+		this._recordingAreaButton,
+		this._keybindAreaButton,
+	);
+
+	private readonly _areasContainer: HTMLDivElement = div({ style: `flex: 1; min-width: 0; min-height: 0; overflow-y: auto;`},
 		this._generalArea,
 		this._appearanceArea,
-		this._themeArea,
 		this._layoutArea,
 		this._recordingArea,
 		this._keybindArea,
-        div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
-            this._okayButton,
-        ),
-        this._cancelButton,
-    );
+	);
+
+	public readonly container: HTMLDivElement = div({ class: "prompt noSelection recordingSetupPrompt", style: `width: 600px; max-height: 90%; display: flex; flex-direction: column; overflow: visible;`},
+		div({ style: `display: flex; flex-direction: row; min-height: 0; min-width: 0; flex: 1`},
+			this._buttonsContainer,
+			div({ class: "borderThingy", style: "display: flex; flex: 1; min-width: 0; min-height: 0; overflow: visible" },
+				this._themeArea,
+				this._areasContainer,
+			)
+		),
+		div({ style: `display: flex; flex-direction: row-reverse; justify-content: space-between; flex-shrink: 0;`},
+			this._okayButton,
+			this._cancelButton,
+		),
+	);
 
 	private _lastTheme: string | null = window.localStorage.getItem("colorTheme");
 	private _newTheme: boolean = false;
@@ -1102,6 +1112,8 @@ export class PreferencesPrompt implements Prompt {
 		this._okayButton.addEventListener("click", this._confirm);
 		this._cancelButton.addEventListener("click", this._close);
 		this.container.addEventListener("keydown", this._whenKeyPressed);
+
+		this._selectAreaButton(this._generalAreaButton); // Doesn't work automatically
 	}
 
 	private _close = (): void => {
@@ -1304,8 +1316,26 @@ export class PreferencesPrompt implements Prompt {
 		ColorConfig.setTheme(this._lastTheme);
 	};
 
+	private _selectAreaButton = (selectedButton: HTMLButtonElement): void => {
+		const buttons = [
+			this._generalAreaButton,
+			this._appearanceAreaButton,
+			this._themeAreaButton,
+			this._layoutAreaButton,
+			this._recordingAreaButton,
+			this._keybindAreaButton,
+		];
+
+		for (const button of buttons) {
+			button.classList.toggle("selectedAreaButton", button === selectedButton);
+		}
+	};
+
 	private _renderAppearanceArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._appearanceAreaButton);
+
 		this._appearanceArea.style.display = "";
 		this._themeArea.style.display = "none";
 		this._layoutArea.style.display = "none";
@@ -1316,6 +1346,9 @@ export class PreferencesPrompt implements Prompt {
 
 	private _renderThemeArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._themeAreaButton);
+
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "";
 		this._layoutArea.style.display = "none";
@@ -1326,6 +1359,9 @@ export class PreferencesPrompt implements Prompt {
 
 	private _renderLayoutArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._layoutAreaButton);
+
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
 		this._layoutArea.style.display = "";
@@ -1336,6 +1372,9 @@ export class PreferencesPrompt implements Prompt {
 
 	private _renderGeneralArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._generalAreaButton);
+
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
 		this._layoutArea.style.display = "none";
@@ -1346,6 +1385,9 @@ export class PreferencesPrompt implements Prompt {
 
 	private _renderRecordingArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._recordingAreaButton);
+
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
 		this._layoutArea.style.display = "none";
@@ -1356,6 +1398,9 @@ export class PreferencesPrompt implements Prompt {
 
 	private _renderKeybindArea = (event: Event): void => {
 		event.preventDefault();
+
+		this._selectAreaButton(this._keybindAreaButton);
+
 		this._appearanceArea.style.display = "none";
 		this._themeArea.style.display = "none";
 		this._layoutArea.style.display = "none";

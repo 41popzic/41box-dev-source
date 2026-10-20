@@ -2806,7 +2806,7 @@ export class SongEditor {
                     this._promptContainerBG.style.display = "";
                     this._promptContainerBG.style.backgroundColor = "var(--editor-background)";
                     this._promptContainerBG.style.backdropFilter = "";
-                    this._promptContainerBG.style.opacity = "0.5";
+                    this._promptContainerBG.style.opacity = "0.3";
                 }
                 this._promptContainer.appendChild(this.prompt.container);
                 document.body.appendChild(this._promptContainerBG);

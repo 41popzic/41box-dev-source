@@ -983,13 +983,123 @@ content: "";
 	text-align: center;
 	background: ${ColorConfig.editorBackground};
 	border-radius: 5px;
-	border: 4px solid ${ColorConfig.uiWidgetBackground};
+	border: 1px solid ${ColorConfig.uiWidgetBackground};
 	color: ${ColorConfig.primaryText};
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	box-shadow: 5px 5px 20px 10px rgba(87, 87, 87, 0.08);
+	//box-shadow: 5px 5px 20px 10px rgba(87, 87, 87, 0.08);
+}
+
+/* oh gosh */
+
+.beepboxEditor .generalAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .generalAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .appearanceAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .appearanceAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .themeAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .themeAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .layoutAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .layoutAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .recordingAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .recordingAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .keybindAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+	
+.beepboxEditor .keybindAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .borderThingy {
+	border: 1px solid ${ColorConfig.uiWidgetFocus};
+	padding: 2px;
+	margin-left: -4px;
+	padding-top: 12px;
+	border-top: none;
+	border-right: none;
+	position: relative;
+	overflow-y: visible;
+}
+
+.beepboxEditor .borderThingy::before {
+    content: "";
+    position: absolute;
+    top: -0px;
+    left: -0px;
+    width: calc(100% - 20px);
+    border-top: 1px solid ${ColorConfig.uiWidgetFocus};
+}
+
+.beepboxEditor .borderThingy::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: -2px;
+    bottom: -2px;
+    border-right: 1px solid ${ColorConfig.uiWidgetFocus};
+}
+
+.beepboxEditor .selectedAreaButton {
+    position: relative;
+    border: 1px solid ${ColorConfig.uiWidgetFocus};
+	padding: 2px 4px;
+    border-right: none;
+    z-index: 1;
+}
+
+.beepboxEditor .selectedAreaButton::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 100%;
+    width: 18.667px;
+    height: calc(100% + 2px);
+    background: linear-gradient(${ColorConfig.uiWidgetFocus}, ${ColorConfig.uiWidgetFocus}) top / 100% 1px no-repeat, linear-gradient(${ColorConfig.uiWidgetFocus}, ${ColorConfig.uiWidgetFocus}) bottom / 100% 1px no-repeat;
+    pointer-events: none;
+}
+
+.beepboxEditor .selectedAreaButton::after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: -21px;
+    bottom: -1px;
+    width: 3px;
+    background: ${ColorConfig.editorBackground};
+    pointer-events: none;
+    z-index: -5;
 }
 
 .beepboxEditor .prompt > *:not(:first-child):not(.cancelButton) {

@@ -15072,13 +15072,123 @@ content: "";
 	text-align: center;
 	background: ${ColorConfig.editorBackground};
 	border-radius: 5px;
-	border: 4px solid ${ColorConfig.uiWidgetBackground};
+	border: 1px solid ${ColorConfig.uiWidgetBackground};
 	color: ${ColorConfig.primaryText};
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	box-shadow: 5px 5px 20px 10px rgba(87, 87, 87, 0.08);
+	//box-shadow: 5px 5px 20px 10px rgba(87, 87, 87, 0.08);
+}
+
+/* oh gosh */
+
+.beepboxEditor .generalAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .generalAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .appearanceAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .appearanceAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .themeAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .themeAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .layoutAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .layoutAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .recordingAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .recordingAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .keybindAreaButton {
+    background: ${ColorConfig.editorBackground};
+}
+	
+.beepboxEditor .keybindAreaButton:focus {
+    background: ${ColorConfig.editorBackground};
+}
+
+.beepboxEditor .borderThingy {
+	border: 1px solid ${ColorConfig.uiWidgetFocus};
+	padding: 2px;
+	margin-left: -4px;
+	padding-top: 12px;
+	border-top: none;
+	border-right: none;
+	position: relative;
+	overflow-y: visible;
+}
+
+.beepboxEditor .borderThingy::before {
+    content: "";
+    position: absolute;
+    top: -0px;
+    left: -0px;
+    width: calc(100% - 20px);
+    border-top: 1px solid ${ColorConfig.uiWidgetFocus};
+}
+
+.beepboxEditor .borderThingy::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: -2px;
+    bottom: -2px;
+    border-right: 1px solid ${ColorConfig.uiWidgetFocus};
+}
+
+.beepboxEditor .selectedAreaButton {
+    position: relative;
+    border: 1px solid ${ColorConfig.uiWidgetFocus};
+	padding: 2px 4px;
+    border-right: none;
+    z-index: 1;
+}
+
+.beepboxEditor .selectedAreaButton::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 100%;
+    width: 18.667px;
+    height: calc(100% + 2px);
+    background: linear-gradient(${ColorConfig.uiWidgetFocus}, ${ColorConfig.uiWidgetFocus}) top / 100% 1px no-repeat, linear-gradient(${ColorConfig.uiWidgetFocus}, ${ColorConfig.uiWidgetFocus}) bottom / 100% 1px no-repeat;
+    pointer-events: none;
+}
+
+.beepboxEditor .selectedAreaButton::after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: -21px;
+    bottom: -1px;
+    width: 3px;
+    background: ${ColorConfig.editorBackground};
+    pointer-events: none;
+    z-index: -5;
 }
 
 .beepboxEditor .prompt > *:not(:first-child):not(.cancelButton) {
@@ -55110,7 +55220,7 @@ You should be redirected to the song at:<br /><br />
             this._closePromptByClickoff = input$2({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
             this._defaultScaleSelect = buildOptions$1(select$1({ style: "width: 100%;" }), Config.scales.map(scale => scale.name));
             this._keyboardMode = select$1({ style: "width: 100%;" }, option$1({ value: "useCapsLockForNotes" }, "use caps lock to play notes"), option$1({ value: "pressControlForShortcuts" }, "press " + EditorConfig.ctrlName + " for shortcuts"));
-            this._keyboardLayout = select$1({ style: "width: 100%;" }, option$1({ value: "wickiHayden" }, "Wicki-Hayden"), option$1({ value: "songScale" }, "selected song scale"), option$1({ value: "pianoAtC" }, "piano starting at C :)"), option$1({ value: "pianoAtA" }, "piano starting at A :("), option$1({ value: "pianoTransposingC" }, "piano transposing C :) to song key"), option$1({ value: "pianoTransposingA" }, "piano transposing A :( to song key"));
+            this._keyboardLayout = select$1({ style: "width: 100%;" }, option$1({ value: "wickiHayden" }, "Wicki-Hayden"), option$1({ value: "songScale" }, "selected song scale"), option$1({ value: "pianoAtC" }, "piano starting at C (major))"), option$1({ value: "pianoAtA" }, "piano starting at A (minor)"), option$1({ value: "pianoTransposingC" }, "piano transposing C (major) to song key"), option$1({ value: "pianoTransposingA" }, "piano transposing A (minor) to song key"));
             this._bassOffset = select$1({ style: "width: 100%;" }, option$1({ value: "0" }, "disabled"), option$1({ value: "-1" }, "before"), option$1({ value: "1" }, "after"));
             this._keyboardLayoutPreview = div$2({ style: "display: grid; row-gap: 4px; margin: 4px auto; font-size: 10px;" });
             this._enableMidi = input$2({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
@@ -55123,21 +55233,23 @@ You should be redirected to the song at:<br /><br />
             this._shortcutLabels = div$2();
             this._recordRebind = "";
             this._resetDefaultButton = button$2({ style: "height: auto; margin: 1em;" }, "Reset to Defaults");
-            this._appearanceAreaButton = button$2({ class: "appearanceAreaButton", style: "width:16%;" }, "Appearance");
-            this._themeAreaButton = button$2({ class: "themeAreaButton", style: "width:16%;" }, "Theme");
-            this._layoutAreaButton = button$2({ class: "layoutAreaButton", style: "width:16%;" }, "Layout");
-            this._generalAreaButton = button$2({ class: "generalAreaButton", style: "width:16%;" }, "General");
-            this._recordingAreaButton = button$2({ class: "recordingAreaButton", style: "width:16%;" }, "Recording");
-            this._keybindAreaButton = button$2({ class: "keybindAreaButton", style: "width:16%;" }, "Shortcuts");
+            this._appearanceAreaButton = button$2({ class: "appearanceAreaButton", style: "width:6em; height:3em" }, "Appearance");
+            this._themeAreaButton = button$2({ class: "themeAreaButton", style: "width:6em; height:3em" }, "Theme");
+            this._layoutAreaButton = button$2({ class: "layoutAreaButton", style: "width:6em; height:3em" }, "Layout");
+            this._generalAreaButton = button$2({ class: "generalAreaButton", style: "width:6em; height:3em" }, "General");
+            this._recordingAreaButton = button$2({ class: "recordingAreaButton", style: "width:6em; height:3em" }, "Recording");
+            this._keybindAreaButton = button$2({ class: "keybindAreaButton", style: "width:6em; height:3em" }, "Shortcuts");
             this._appearanceArea = div$2({ style: "display: none; overflow-y: visible; overflow-x: hidden;" }, h2$1("Appearance"), div$2({ style: "text-align: left;" }, label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, 'Highlight "fifth" note:', div$2({ style: "width: 50%; text-align: center;" }, this._showFifth)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, 'Highlight "third" note:', div$2({ style: "width: 50%; text-align: center;" }, this._showThird)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, 'Advanced Color Scheme:', div$2({ style: "width: 50%; text-align: center;" }, this._ACS)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, 'Flash notes when played:', div$2({ style: "width: 50%; text-align: center;" }, this._notesFlashWhenPlayed)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Blur background while in prompt:"), div$2({ style: "width: 50%; text-align: center;" }, this._frostedGlassBackground)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show all channels:", div$2({ style: "width: 50%; text-align: center;" }, this._showChannels)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show instrument scrollbars:", div$2({ style: "width: 50%; text-align: center;" }, this._showInstrumentScrollbars)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Show instrument copy/paste buttons:"), div$2({ style: "width: 50%; text-align: center;" }, this._instrumentCopyPaste)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Show instrument import/export buttons:"), div$2({ style: "width: 50%; text-align: center;" }, this._instrumentImportExport)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Show instrument buttons at top:"), div$2({ style: "width: 50%; text-align: center;" }, this._instrumentButtonsAtTop)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show piano keys:", div$2({ style: "width: 50%; text-align: center;" }, this._showLetters)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show volume bar:", div$2({ style: "width: 50%; text-align: center;" }, this._displayVolumeBar)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show oscilloscope:", div$2({ style: "width: 50%; text-align: center;" }, this._showOscilloscope)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show sample loading status:", div$2({ style: "width: 50%; text-align: center;" }, this._showSampleLoadingStatus)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Show description:", div$2({ style: "width: 50%; text-align: center;" }, this._showDescription)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Rainbowify Song Loop:", div$2({ style: "width: 50%; text-align: center;" }, this._rainbowifyLoop))));
-            this._themeArea = div$2({ style: "display: none; overflow: visible;" }, h2$1("Theme"), div$2({ style: "text-align: left;" }, label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Color palette:", div$2({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeButton, this._themeMenu)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Custom color palette data:", div$2({ style: "width: 50%; text-align: center;" }, this._colorInput)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Editor background image:"), div$2({ style: "width: 50%; text-align: center;" }, this._customThemeFileInput)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Website background image:"), div$2({ style: "width: 50%; text-align: center;" }, this._customThemeFileInput2)), div$2({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._customThemeFileReset)));
+            this._themeArea = div$2({ style: "min-width: 100%; display: none; overflow: visible;" }, h2$1("Theme"), div$2({ style: "text-align: left;" }, label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Color theme:", div$2({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._themeButton, this._themeMenu)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Custom color theme data:", div$2({ style: "width: 50%; text-align: center;" }, this._colorInput)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Editor background image:"), div$2({ style: "width: 50%; text-align: center;" }, this._customThemeFileInput)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Website background image:"), div$2({ style: "width: 50%; text-align: center;" }, this._customThemeFileInput2)), div$2({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._customThemeFileReset)));
             this._layoutArea = div$2({ style: "display: none; overflow-y: visible; overflow-x: hidden;" }, h2$1("Layout"), div$2({ style: "text-align: left;" }, h3({ style: "text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, "Layout"), div$2({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, div$2({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, ""), div$2({ style: "width: 90%; height: 30em; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._layoutForm), div$2({ style: "width: 10%; text-align: center; margin-top: 0.5em; margin-bottom: 0.5em;" }, "")), h2$1("Custom Layout"), p({ style: "text-align: left; margin: 0; margin-left: 1em; margin-bottom: 5px;" }, "Replace the text below with your custom layout data to load it:"), div$2({ style: "display: grid; place-items: center; margin: 0 20px;" }, this._layoutInput), div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._resetButton), div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" })));
             this._recordingArea = div$2({ style: "display: none; overflow-y: visible; overflow-x: hidden;" }, h2$1("Recording"), div$2({ style: "text-align: left;" }, label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Always show recording button:", div$2({ style: "width: 50%; text-align: center;" }, this._showRecordButton)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Snap recorded notes to rhythm:"), div$2({ style: "width: 50%; text-align: center;" }, this._snapRecordedNotesToRhythm)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Ignore recorded notes outside of the scale:"), div$2({ style: "width: 50%; text-align: center;" }, this._ignorePerformedNotesNotInScale)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Recording keyboard layout:", div$2({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._keyboardLayout)), div$2({ style: "display: flex; margin-top: 0.5em; margin-bottom: 0.5em;" }, this._keyboardLayoutPreview), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 0.5em; height: 2em;" }, "Shortcut / Recording mode:", div$2({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._keyboardMode)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Enable MIDI performance:", div$2({ style: "width: 50%; text-align: center;" }, this._enableMidi)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Record with metronome:", div$2({ style: "width: 50%; text-align: center;" }, this._metronomeWhileRecording)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, div$2({ style: "width: 50%;" }, "Count-in recording with metronome:"), div$2({ style: "width: 50%; text-align: center;" }, this._metronomeCountIn)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Bass channel offset:", div$2({ class: "selectContainer", style: "width: 50%; text-align: center;" }, this._bassOffset))));
             this._generalArea = div$2({ style: "overflow-y: visible; overflow-x: hidden;" }, h2$1("General"), div$2({ style: "text-align: left;" }, label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Auto-play on load:", div$2({ style: "width: 50%; text-align: center;" }, this._autoPlay)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Automatically view current bar:", div$2({ style: "width: 50%; text-align: center;" }, this._autoFollow)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Hear preview of placed notes:", div$2({ style: "width: 50%; text-align: center;" }, this._enableNotePreview)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Place notes out of scale:", div$2({ style: "width: 50%; text-align: center;" }, this._notesOutsideScale)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Set default scale:", div$2({ style: "width: 50%; text-align: center;", class: "selectContainer" }, this._defaultScaleSelect)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Always use fine note volume:", div$2({ style: "width: 50%; text-align: center;" }, this._alwaysFineNoteVol)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Enable octave scroll bar:", div$2({ style: "width: 50%; text-align: center;" }, this._showScrollBar)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Enable channel muting:", div$2({ style: "width: 50%; text-align: center;" }, this._enableChannelMuting)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Enable song data in URL:", div$2({ style: "width: 50%; text-align: center;" }, this._displayBrowserUrl)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Close prompts on click-off:", div$2({ style: "width: 50%; text-align: center;" }, this._closePromptByClickoff)), label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" }, "Prompt song details on load:", div$2({ style: "width: 50%; text-align: center;" }, this._promptSongDetails))));
             this._keybindArea = div$2({ style: "display: none;  overflow-y: visible; overflow-x: hidden;" }, h2$1("Shortcuts"), this._shortcutLabels, this._resetDefaultButton);
             this._okayButton = button$2({ class: "okayButton", style: "width:45%;" }, "Okay");
             this._cancelButton = button$2({ class: "cancelButton" });
-            this.container = div$2({ class: "prompt noSelection recordingSetupPrompt", style: "width: 600px; max-height: 90%; overflow: visible" }, div$2({ style: "display: flex; flex-direction: row; justify-content: space-evenly;" }, this._generalAreaButton, this._appearanceAreaButton, this._themeAreaButton, this._layoutAreaButton, this._recordingAreaButton, this._keybindAreaButton), this._generalArea, this._appearanceArea, this._themeArea, this._layoutArea, this._recordingArea, this._keybindArea, div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._buttonsContainer = div$2({ style: `display: flex; flex-direction: column; justify-content: flex-start; flex: 0 0 100px; gap: 7px;` }, this._generalAreaButton, this._appearanceAreaButton, this._themeAreaButton, this._layoutAreaButton, this._recordingAreaButton, this._keybindAreaButton);
+            this._areasContainer = div$2({ style: `flex: 1; min-width: 0; min-height: 0; overflow-y: auto;` }, this._generalArea, this._appearanceArea, this._layoutArea, this._recordingArea, this._keybindArea);
+            this.container = div$2({ class: "prompt noSelection recordingSetupPrompt", style: `width: 600px; max-height: 90%; display: flex; flex-direction: column; overflow: visible;` }, div$2({ style: `display: flex; flex-direction: row; min-height: 0; min-width: 0; flex: 1` }, this._buttonsContainer, div$2({ class: "borderThingy", style: "display: flex; flex: 1; min-width: 0; min-height: 0; overflow: visible" }, this._themeArea, this._areasContainer)), div$2({ style: `display: flex; flex-direction: row-reverse; justify-content: space-between; flex-shrink: 0;` }, this._okayButton, this._cancelButton));
             this._lastTheme = window.localStorage.getItem("colorTheme");
             this._newTheme = false;
             this._resetCustomTheme = false;
@@ -55247,8 +55359,22 @@ You should be redirected to the song at:<br /><br />
                 this._themeMenu.style.display = "none";
                 ColorConfig.setTheme(this._lastTheme);
             };
+            this._selectAreaButton = (selectedButton) => {
+                const buttons = [
+                    this._generalAreaButton,
+                    this._appearanceAreaButton,
+                    this._themeAreaButton,
+                    this._layoutAreaButton,
+                    this._recordingAreaButton,
+                    this._keybindAreaButton,
+                ];
+                for (const button of buttons) {
+                    button.classList.toggle("selectedAreaButton", button === selectedButton);
+                }
+            };
             this._renderAppearanceArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._appearanceAreaButton);
                 this._appearanceArea.style.display = "";
                 this._themeArea.style.display = "none";
                 this._layoutArea.style.display = "none";
@@ -55258,6 +55384,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._renderThemeArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._themeAreaButton);
                 this._appearanceArea.style.display = "none";
                 this._themeArea.style.display = "";
                 this._layoutArea.style.display = "none";
@@ -55267,6 +55394,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._renderLayoutArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._layoutAreaButton);
                 this._appearanceArea.style.display = "none";
                 this._themeArea.style.display = "none";
                 this._layoutArea.style.display = "";
@@ -55276,6 +55404,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._renderGeneralArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._generalAreaButton);
                 this._appearanceArea.style.display = "none";
                 this._themeArea.style.display = "none";
                 this._layoutArea.style.display = "none";
@@ -55285,6 +55414,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._renderRecordingArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._recordingAreaButton);
                 this._appearanceArea.style.display = "none";
                 this._themeArea.style.display = "none";
                 this._layoutArea.style.display = "none";
@@ -55294,6 +55424,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._renderKeybindArea = (event) => {
                 event.preventDefault();
+                this._selectAreaButton(this._keybindAreaButton);
                 this._appearanceArea.style.display = "none";
                 this._themeArea.style.display = "none";
                 this._layoutArea.style.display = "none";
@@ -55560,6 +55691,7 @@ You should be redirected to the song at:<br /><br />
             this._okayButton.addEventListener("click", this._confirm);
             this._cancelButton.addEventListener("click", this._close);
             this.container.addEventListener("keydown", this._whenKeyPressed);
+            this._selectAreaButton(this._generalAreaButton);
         }
         _makeThemeList() {
             const themeContainer = HTML.div();
@@ -60383,7 +60515,7 @@ You should be redirected to the song at:<br /><br />
                         this._promptContainerBG.style.display = "";
                         this._promptContainerBG.style.backgroundColor = "var(--editor-background)";
                         this._promptContainerBG.style.backdropFilter = "";
-                        this._promptContainerBG.style.opacity = "0.5";
+                        this._promptContainerBG.style.opacity = "0.3";
                     }
                     this._promptContainer.appendChild(this.prompt.container);
                     document.body.appendChild(this._promptContainerBG);
