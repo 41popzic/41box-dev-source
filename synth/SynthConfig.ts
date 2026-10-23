@@ -1639,7 +1639,7 @@ export class Config {
     public static readonly modChannelCountMin: number = 0;
     public static readonly modChannelCountMax: number = 60;
     public static readonly noiseInterval: number = 6;
-    public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency. //did you ever freaking do this -41popzic
+    public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
     public static readonly drumCount: number = 12;
     public static readonly pitchOctaves: number = 8;
     public static readonly modCount: number = 6;
