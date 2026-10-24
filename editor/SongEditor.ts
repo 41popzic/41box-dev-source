@@ -23,7 +23,7 @@ import { Channel } from "../synth/Channel"
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
-import { InputBox, Slider } from "./HTMLWrapper";
+import { DoubleSlider, InputBox, Slider } from "./HTMLWrapper";
 import { Knob } from "./Knob";
 import { ImportPrompt } from "./ImportPrompt";
 import { ChannelRow } from "./ChannelRow";
@@ -1104,11 +1104,14 @@ export class SongEditor {
     private readonly _bitcrusherFreqRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "freq-crush"), this._bitcrusherFreqSlider.container);
     private readonly _bitcrusherContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "bitcrush"), this._bitcrusherQuantizationRow, this._bitcrusherFreqRow)
     
-    private readonly _upperNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
-    private readonly _upperNoteLimitRow: HTMLElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "upper note limit"), this._upperNoteLimitInputBox);
-    private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
-    private readonly _lowerNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "lower note limit"), this._lowerNoteLimitInputBox);
-    private readonly _noteRangeContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "note range"), this._upperNoteLimitRow, this._lowerNoteLimitRow)
+    //private readonly _upperNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    //private readonly _upperNoteLimitRow: HTMLElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "upper note limit"), this._upperNoteLimitInputBox);
+    //private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    //private readonly _lowerNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "lower note limit"), this._lowerNoteLimitInputBox);
+    private readonly _noteRangeDoubSlider: DoubleSlider = new DoubleSlider(this.doc, (oldValue: number, newValue: number) => new ChangeLowerLimit(this.doc, oldValue, newValue), (oldValue: number, newValue: number) => new ChangeUpperLimit(this.doc, oldValue, newValue), 60, 60, 0, Config.maxPitch, 0);
+    private readonly _noteRangeDoubSliderContainer: HTMLDivElement = div({ style: "max-width: 9em" }, this._noteRangeDoubSlider.container) // Thanks slarmoooo
+    private readonly _noteRangeDoubRow: HTMLDivElement = div({ style: "margin-top: 0.667em;", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteRange") }, "range"), this._noteRangeDoubSliderContainer);    
+    private readonly _noteRangeContainer: HTMLDivElement = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span({ class: "effectTitle" }, "note range"), this._noteRangeDoubRow);
 
     private readonly _stringSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeStringSustain(this.doc, oldValue, newValue), false);
     private readonly _stringSustainLabel: HTMLSpanElement = span({ class: "tip", onclick: () => this._openPrompt("stringSustain") }, "sustain");
@@ -2005,9 +2008,6 @@ export class SongEditor {
         this._unisonOffsetInputBox.addEventListener("input", () => { this.doc.record(new ChangeUnisonOffset(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].unisonOffset, Math.min(Config.unisonOffsetMax, Math.max(Config.unisonOffsetMin, +this._unisonOffsetInputBox.value)))) });
         this._unisonExpressionInputBox.addEventListener("input", () => { this.doc.record(new ChangeUnisonExpression(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].unisonExpression, Math.min(Config.unisonExpressionMax, Math.max(Config.unisonExpressionMin, +this._unisonExpressionInputBox.value)))) });
         this._unisonSignInputBox.addEventListener("input", () => { this.doc.record(new ChangeUnisonSign(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].unisonSign, Math.min(Config.unisonSignMax, Math.max(Config.unisonSignMin, +this._unisonSignInputBox.value)))) });
-
-        this._upperNoteLimitInputBox.addEventListener("input", () => { this.doc.record(new ChangeUpperLimit(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].upperNoteLimit, (Math.min(Config.maxPitch, Math.max(0.0, Math.round(+this._upperNoteLimitInputBox.value)))))) });
-        this._lowerNoteLimitInputBox.addEventListener("input", () => { this.doc.record(new ChangeLowerLimit(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].lowerNoteLimit, (Math.min(Config.maxPitch, Math.max(0.0, Math.round(+this._lowerNoteLimitInputBox.value)))))) });
 
         this._customWaveDraw.addEventListener("input", () => { this.doc.record(new ChangeCustomWave(this.doc, this._customWaveDrawCanvas.newArray)) });
         this._twoNoteArpBox.addEventListener("input", () => { this.doc.record(new ChangeFastTwoNoteArp(this.doc, this._twoNoteArpBox.checked)) });
@@ -3521,14 +3521,14 @@ export class SongEditor {
             }
 
             if (effectsIncludeNoteRange(instrument.effects)) {
-                this._upperNoteLimitRow.style.display = "";
-                this._lowerNoteLimitRow.style.display = "";
+                this._noteRangeDoubRow.style.display = "";
                 this._noteRangeContainer.style.display = "";
-                this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
-                this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
+                //this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+                //this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
+                this._noteRangeDoubSlider.updateLeft(instrument.lowerNoteLimit, true);
+                this._noteRangeDoubSlider.updateRight(instrument.upperNoteLimit, true);
             } else {
-                this._upperNoteLimitRow.style.display = "none";
-                this._lowerNoteLimitRow.style.display = "none";
+                this._noteRangeDoubRow.style.display = "none";
                 this._noteRangeContainer.style.display = "none";
             }
 
@@ -3666,17 +3666,15 @@ export class SongEditor {
             this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
             this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
 
-            this._upperNoteLimitRow.firstChild.textContent = "upper note limit [" + Piano.getPitchName(
-                (instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
-                instrument.upperNoteLimit,
-                this.doc.song.octave, true)
-                + "]:"
-            this._lowerNoteLimitRow.firstChild.textContent = "lower note limit [" + Piano.getPitchName(
+            this._noteRangeDoubRow.firstChild.textContent = "" + Piano.getPitchName(
                 (instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
                 instrument.lowerNoteLimit,
                 this.doc.song.octave, true)
-                 + "]:"
-
+                 + "-" + Piano.getPitchName(
+                (instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
+                instrument.upperNoteLimit,
+                this.doc.song.octave, true)
+                + ""
 
             if (instrument.type == InstrumentType.customChipWave) {
                 this._customWaveDrawCanvas.redrawCanvas();

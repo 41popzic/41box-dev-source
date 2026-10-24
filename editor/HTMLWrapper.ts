@@ -97,7 +97,7 @@ export class DoubleSlider {
         rightInitial: number,
         public min: number,
         public max: number,
-        midTick: boolean
+        midTick: 0 | 1 | 2
     ) {
         this._valueLeft = leftInitial;
         this._valueRight = rightInitial;
@@ -107,7 +107,7 @@ export class DoubleSlider {
         this.rightThumb = SVG.g();
         this.render();
         // A container is created around the input to allow for spec-compliant pseudo css classes (e.g ::before and ::after, which must be added to containers, not the input itself)
-        this.container = span((midTick) ? { class: "midTick", style: "position: sticky; width: 61.5%;" } : { style: "position: sticky; flex: 3" }, this._svg);
+        this.container = span((midTick == 1) ? { class: "midTick", style: "position: sticky; width: 61.5%;" } : { style: "position: sticky; flex: 3" }, this._svg);
         
         this.container.addEventListener("pointerdown", this._mouseDown);
         this.container.addEventListener("pointermove", this._mouseMove);
@@ -117,16 +117,20 @@ export class DoubleSlider {
 
     public updateLeft(value: number, render: boolean = false): DoubleSlider {
         if (value <= this._valueRight) {
-            this._valueLeft = value;
-            if (render) this.render();
+            if (value >= this.min) {
+                this._valueLeft = value;
+                if (render) this.render();
+            }
         }
         return this;
     }
 
     public updateRight(value: number, render: boolean = false): DoubleSlider {
         if (value >= this._valueLeft) {
-            this._valueRight = value;
-            if (render) this.render();
+            if (value <= this.max) {
+                this._valueRight = value;
+                if (render) this.render();
+            }
         }
         return this;
     }
@@ -137,7 +141,7 @@ export class DoubleSlider {
         const boundingRect: ClientRect = this._svg.getBoundingClientRect();
         let mouseX: number = (eventX - boundingRect.left) / (boundingRect.right - boundingRect.left);
         if (isNaN(mouseX)) return this.min;
-        return Math.max(Math.min(Math.round(mouseX * this.max), this.max), this.min);
+        return Math.round(mouseX * (this.max - this.min)) + this.min;
     }
 
     private _mouseDown = (event: PointerEvent) => {

@@ -820,7 +820,7 @@ var beepbox = (function (exports) {
     ]);
     Config.customUnisonIndex = 63;
     Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "flanger", "phaser"];
-    Config.effectOrder = [2, 10, 11, 12, 7, 8, 9, 5, 14, 3, 4, 1, 6, 0, 13, 15, 16];
+    Config.effectOrder = [2, 10, 11, 7, 8, 9, 5, 14, 3, 4, 1, 6, 0, 13, 12, 16, 15,];
     Config.noteSizeMax = 6;
     Config.volumeRange = 50;
     Config.volumeLogScale = 0.1428;
