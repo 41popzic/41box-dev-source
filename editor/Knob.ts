@@ -26,8 +26,8 @@ export class Knob {
     private innerRadius: number = 5;
     private outerRadius: number = 14.5;
 
-    constructor(private readonly _min: number, private readonly _max: number, private readonly _step: number, value: number, private readonly _bipolar: boolean, private readonly _doc: SongDocument, private readonly _getChange: ((oldValue: number, newValue: number) => Change) | null, private readonly _markings: number[] = []) {
-        this._value = this._clamp(value);
+    constructor(private readonly _min: number, private readonly _max: number, private readonly _step: number, value: number, private readonly _bipolar: boolean, private readonly _doc: SongDocument, private readonly _getChange: ((oldValue: number, newValue: number) => Change) | null, private readonly _markings: number[] = [], private readonly _highlightMarkings: boolean[] = []) {
+        this._value = this.clamp(value);
         this.container = span({ class: "knobContainer" });
         this._createMarkers();
         this.container.appendChild(this._svg);
@@ -40,13 +40,13 @@ export class Knob {
         this._addEventListeners();
     }
 
-    private _clamp(value: number): number {
+    private clamp(value: number): number {
         const clamped = Math.max(this._min, Math.min(this._max, value));
         return this._min + Math.round((clamped - this._min) / this._step) * this._step;
     }
 
-    private _setValue(value: number): void {
-        const newValue = this._clamp(value);
+    private setValue(value: number): void {
+        const newValue = this.clamp(value);
         if (newValue == this._value) return;
 
         if (this._getChange != null) {
@@ -62,7 +62,7 @@ export class Knob {
     }
 
     public updateValue(value: number): void {
-        this._value = this._clamp(value);
+        this._value = this.clamp(value);
         this._updateDisplay();
     }
 
@@ -118,19 +118,19 @@ export class Knob {
     }
 
     private _createMarkers(): void {
-        for (const value of this._markings) {
+        for (let i = 0; i < this._markings.length; i++) {
+            const value = this._markings[i];
+
             if (value < this._min || value > this._max) continue;
 
             const percentage = (value - this._min) / (this._max - this._min || 1);
-
             const angle = this._bipolar ? (percentage * 2 - 1) * 135 : -90 + percentage * 180;
-
             const radians = angle * Math.PI / 180;
 
-            const innerRadius = this.outerRadius + 2;
-            const outerRadius = this.outerRadius + 6;
+            const innerRadius = this.outerRadius + 3;
+            const outerRadius = this.outerRadius + 8;
 
-            const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: "knobMarker" });
+            const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: this._highlightMarkings[i] ? "knobMarker markerHighlight" : "knobMarker"});
 
             this._svg.appendChild(tick);
         }
@@ -151,7 +151,7 @@ export class Knob {
         const delta = this._lastY - event.clientY;
         this._lastY = event.clientY;
 
-        this._setValue(this._value + delta * this._step);
+        this.setValue(this._value + delta * this._step);
     };
 
     private _whenPointerUp = (): void => {
@@ -169,11 +169,6 @@ export class Knob {
         this._svg.addEventListener("pointerup", this._whenPointerUp);
         this._svg.addEventListener("pointercancel", this._whenPointerUp);
     }
-
-    public updateColor(color: string): void {
-        this._svg.querySelector(".knobIndicator") ?.setAttribute("stroke", color);
-    } // Might be strange to put this here
-
 
     public updateModulation(value: number | null): void {
         this._modulationValue = value;

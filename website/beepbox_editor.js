@@ -15885,8 +15885,12 @@ content: "";
 .beepboxEditor .knobMarker {
 	stroke: ${ColorConfig.blackPianoKey};
 	stroke-width: 2;
-	stroke-linecap: round;
+	stroke-linecap: butt;
 	pointer-events: none;
+}
+
+.beepboxEditor .markerHighlight {
+	stroke: currentColor;
 }
 
 .beepboxEditor .knobValueArc {
@@ -15903,6 +15907,10 @@ content: "";
 	stroke-linecap: butt;
 	pointer-events: none;
 	fill: none;
+}
+
+.beepboxEditor .miniBox:not(:hover) {
+	appearance: textfield;
 }
 
 .beepboxEditor .selectRow > :last-child {
@@ -44643,7 +44651,7 @@ You should be redirected to the song at:<br /><br />
     const { span: span$6 } = HTML;
     const { svg, circle, line, path } = SVG;
     class Knob {
-        constructor(_min, _max, _step, value, _bipolar, _doc, _getChange, _markings = []) {
+        constructor(_min, _max, _step, value, _bipolar, _doc, _getChange, _markings = [], _highlightMarkings = []) {
             this._min = _min;
             this._max = _max;
             this._step = _step;
@@ -44651,6 +44659,7 @@ You should be redirected to the song at:<br /><br />
             this._doc = _doc;
             this._getChange = _getChange;
             this._markings = _markings;
+            this._highlightMarkings = _highlightMarkings;
             this._marker = line({ x1: "20", y1: "20", x2: "20", y2: "9", class: "knobIndicator", });
             this._modulationArc = path({ class: "knobModulationArc" });
             this._valueArc = path({ class: "knobValueArc" });
@@ -44676,7 +44685,7 @@ You should be redirected to the song at:<br /><br />
                     return;
                 const delta = this._lastY - event.clientY;
                 this._lastY = event.clientY;
-                this._setValue(this._value + delta * this._step);
+                this.setValue(this._value + delta * this._step);
             };
             this._whenPointerUp = () => {
                 this._dragging = false;
@@ -44685,7 +44694,7 @@ You should be redirected to the song at:<br /><br />
                     this._change = null;
                 }
             };
-            this._value = this._clamp(value);
+            this._value = this.clamp(value);
             this.container = span$6({ class: "knobContainer" });
             this._createMarkers();
             this.container.appendChild(this._svg);
@@ -44695,12 +44704,12 @@ You should be redirected to the song at:<br /><br />
             this._updateDisplay();
             this._addEventListeners();
         }
-        _clamp(value) {
+        clamp(value) {
             const clamped = Math.max(this._min, Math.min(this._max, value));
             return this._min + Math.round((clamped - this._min) / this._step) * this._step;
         }
-        _setValue(value) {
-            const newValue = this._clamp(value);
+        setValue(value) {
+            const newValue = this.clamp(value);
             if (newValue == this._value)
                 return;
             if (this._getChange != null) {
@@ -44714,7 +44723,7 @@ You should be redirected to the song at:<br /><br />
             this._updateDisplay();
         }
         updateValue(value) {
-            this._value = this._clamp(value);
+            this._value = this.clamp(value);
             this._updateDisplay();
         }
         _updateArc() {
@@ -44755,15 +44764,16 @@ You should be redirected to the song at:<br /><br />
             this._svg.setAttribute("title", title);
         }
         _createMarkers() {
-            for (const value of this._markings) {
+            for (let i = 0; i < this._markings.length; i++) {
+                const value = this._markings[i];
                 if (value < this._min || value > this._max)
                     continue;
                 const percentage = (value - this._min) / (this._max - this._min || 1);
                 const angle = this._bipolar ? (percentage * 2 - 1) * 135 : -90 + percentage * 180;
                 const radians = angle * Math.PI / 180;
-                const innerRadius = this.outerRadius + 2;
-                const outerRadius = this.outerRadius + 6;
-                const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: "knobMarker" });
+                const innerRadius = this.outerRadius + 3;
+                const outerRadius = this.outerRadius + 8;
+                const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: this._highlightMarkings[i] ? "knobMarker markerHighlight" : "knobMarker" });
                 this._svg.appendChild(tick);
             }
         }
@@ -44772,10 +44782,6 @@ You should be redirected to the song at:<br /><br />
             this._svg.addEventListener("pointermove", this._whenPointerMove);
             this._svg.addEventListener("pointerup", this._whenPointerUp);
             this._svg.addEventListener("pointercancel", this._whenPointerUp);
-        }
-        updateColor(color) {
-            var _a;
-            (_a = this._svg.querySelector(".knobIndicator")) === null || _a === void 0 ? void 0 : _a.setAttribute("stroke", color);
         }
         updateModulation(value) {
             this._modulationValue = value;
@@ -56686,11 +56692,8 @@ You should be redirected to the song at:<br /><br />
             this._decimalOffsetSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: "99", value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDecimalOffset(this.doc, oldValue, 99 - newValue), false);
             this._decimalOffsetRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("decimalOffset") }, "‣ offset"), this._decimalOffsetSlider.container);
             this._pulseWidthDropdownGroup = div({ class: "editor-controls-alt", style: "display: none;" }, this._decimalOffsetRow);
-            this._pitchShiftSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePitchShift(this.doc, oldValue, newValue), true);
-            this._pitchShiftTonicMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
-            this._pitchShiftFifthMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 7 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 19 / 24) + "%" } })];
-            this._pitchShiftMarkerContainer = div({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
-            this._pitchShiftRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose"), this._pitchShiftMarkerContainer);
+            this._pitchShiftKnob = new Knob(0, Config.pitchShiftRange - 1, 1, 0, true, this.doc, (oldValue, newValue) => new ChangePitchShift(this.doc, oldValue, newValue), [0, 7, 12, 19, 24], [false, true, false, true]);
+            this._pitchShiftRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose"), this._pitchShiftKnob.container);
             this._pitchShiftContainer = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span({ class: "effectTitle" }, "pitch shift"), this._pitchShiftRow);
             this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue, newValue) => new ChangeDetune(this.doc, oldValue, newValue), true);
             this._detuneSliderInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
@@ -56706,9 +56709,13 @@ You should be redirected to the song at:<br /><br />
             this._bitcrusherFreqSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherFreqRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherFreq(this.doc, oldValue, newValue), false);
             this._bitcrusherFreqRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "freq-crush"), this._bitcrusherFreqSlider.container);
             this._bitcrusherContainer = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span({ class: "effectTitle" }, "bitcrush"), this._bitcrusherQuantizationRow, this._bitcrusherFreqRow);
+            this._upperNoteLimitInputBox = input({ class: "miniBox", style: "width: 3em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+            this._lowerNoteLimitInputBox = input({ class: "miniBox", style: "width: 3em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+            this._lowerNoteLimitBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "[60] "), this._lowerNoteLimitInputBox);
+            this._upperNoteLimitBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "[60] "), this._upperNoteLimitInputBox);
             this._noteRangeDoubSlider = new DoubleSlider(this.doc, (oldValue, newValue) => new ChangeLowerLimit(this.doc, oldValue, newValue), (oldValue, newValue) => new ChangeUpperLimit(this.doc, oldValue, newValue), 60, 60, 0, Config.maxPitch, 0);
             this._noteRangeDoubSliderContainer = div({ style: "max-width: 9em" }, this._noteRangeDoubSlider.container);
-            this._noteRangeDoubRow = div({ style: "margin-top: 0.667em;", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteRange") }, "range"), this._noteRangeDoubSliderContainer);
+            this._noteRangeDoubRow = div({ style: "margin-top: 0.667em;", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteRange") }, ""), this._lowerNoteLimitBoxWrapper, this._noteRangeDoubSliderContainer, this._upperNoteLimitBoxWrapper);
             this._noteRangeContainer = div({ class: "effectContainer", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span({ class: "effectTitle" }, "note range"), this._noteRangeDoubRow);
             this._stringSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeStringSustain(this.doc, oldValue, newValue), false);
             this._stringSustainLabel = span({ class: "tip", onclick: () => this._openPrompt("stringSustain") }, "sustain");
@@ -57384,11 +57391,8 @@ You should be redirected to the song at:<br /><br />
                     if (effectsIncludePitchShift(instrument.effects)) {
                         this._pitchShiftRow.style.display = "";
                         this._pitchShiftContainer.style.display = "";
-                        this._pitchShiftSlider.updateValue(instrument.pitchShift);
-                        this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
-                        for (const marker of this._pitchShiftFifthMarkers) {
-                            marker.style.display = prefs.showFifth ? "" : "none";
-                        }
+                        this._pitchShiftKnob.updateValue(instrument.pitchShift);
+                        this._pitchShiftKnob.setTitle(((instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)").toString());
                     }
                     else {
                         this._pitchShiftRow.style.display = "none";
@@ -57557,6 +57561,8 @@ You should be redirected to the song at:<br /><br />
                     if (effectsIncludeNoteRange(instrument.effects)) {
                         this._noteRangeDoubRow.style.display = "";
                         this._noteRangeContainer.style.display = "";
+                        this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+                        this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
                         this._noteRangeDoubSlider.updateLeft(instrument.lowerNoteLimit, true);
                         this._noteRangeDoubSlider.updateRight(instrument.upperNoteLimit, true);
                     }
@@ -57677,9 +57683,10 @@ You should be redirected to the song at:<br /><br />
                     this._envelopeSpeedSlider.updateValue(instrument.envelopeSpeed);
                     this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
                     this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
-                    this._noteRangeDoubRow.firstChild.textContent = "" + Piano.getPitchName((instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.lowerNoteLimit, this.doc.song.octave, true)
-                        + "-" + Piano.getPitchName((instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.upperNoteLimit, this.doc.song.octave, true)
-                        + "";
+                    this._upperNoteLimitBoxWrapper.firstChild.textContent = "[" + Piano.getPitchName((instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.upperNoteLimit, this.doc.song.octave, true)
+                        + "]";
+                    this._lowerNoteLimitBoxWrapper.firstChild.textContent = "[" + Piano.getPitchName((instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.lowerNoteLimit, this.doc.song.octave, true)
+                        + "]";
                     if (instrument.type == 9) {
                         this._customWaveDrawCanvas.redrawCanvas();
                         if (this.prompt instanceof CustomChipPrompt) {
@@ -59898,8 +59905,8 @@ You should be redirected to the song at:<br /><br />
                 this._modulatorGroup.appendChild(modFilterRow);
                 this._modulatorGroup.appendChild(modEnvelopeRow);
             }
-            this._pitchShiftSlider.container.style.setProperty("transform", "translate(0px, 3px)");
-            this._pitchShiftSlider.container.style.setProperty("width", "100%");
+            this._pitchShiftKnob.container.style.setProperty("transform", "translate(0px, 3px)");
+            this._pitchShiftKnob.container.style.setProperty("width", "100%");
             this._fileMenu.addEventListener("change", this._fileMenuHandler);
             this._editMenu.addEventListener("change", this._editMenuHandler);
             this._customWavePresetDrop.addEventListener("change", this._customWavePresetHandler);
@@ -60016,6 +60023,8 @@ You should be redirected to the song at:<br /><br />
             this._twoNoteArpBox.addEventListener("input", () => { this.doc.record(new ChangeFastTwoNoteArp(this.doc, this._twoNoteArpBox.checked)); });
             this._clicklessTransitionBox.addEventListener("input", () => { this.doc.record(new ChangeClicklessTransition(this.doc, this._clicklessTransitionBox.checked)); });
             this._aliasingBox.addEventListener("input", () => { this.doc.record(new ChangeAliasing(this.doc, this._aliasingBox.checked)); });
+            this._lowerNoteLimitInputBox.addEventListener("input", () => { this.doc.record(new ChangeLowerLimit(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].lowerNoteLimit, clamp(0, Config.maxPitch, Math.round(+this._lowerNoteLimitInputBox.value)))); });
+            this._upperNoteLimitInputBox.addEventListener("input", () => { this.doc.record(new ChangeUpperLimit(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].upperNoteLimit, clamp(0, Config.maxPitch, Math.round(+this._upperNoteLimitInputBox.value)))); });
             this._promptContainer.addEventListener("click", (event) => {
                 if (this.doc.prefs.closePromptByClickoff === true) {
                     if (this.prompt != null && this.prompt.gotMouseUp === true)
@@ -60447,8 +60456,6 @@ You should be redirected to the song at:<br /><br />
                     return this._bitcrusherQuantizationSlider;
                 case Config.modulators.dictionary["freq crush"].index:
                     return this._bitcrusherFreqSlider;
-                case Config.modulators.dictionary["pitch shift"].index:
-                    return this._pitchShiftSlider;
                 case Config.modulators.dictionary["chorus"].index:
                     return this._chorusSlider;
                 case Config.modulators.dictionary["flanger mix"].index:
@@ -60497,6 +60504,8 @@ You should be redirected to the song at:<br /><br />
             switch (setting) {
                 case Config.modulators.dictionary["pan"].index:
                     return this._panKnob;
+                case Config.modulators.dictionary["pitch shift"].index:
+                    return this._pitchShiftKnob;
                 default:
                     return null;
             }

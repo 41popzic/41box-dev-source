@@ -1796,8 +1796,12 @@ content: "";
 .beepboxEditor .knobMarker {
 	stroke: ${ColorConfig.blackPianoKey};
 	stroke-width: 2;
-	stroke-linecap: round;
+	stroke-linecap: butt;
 	pointer-events: none;
+}
+
+.beepboxEditor .markerHighlight {
+	stroke: currentColor;
 }
 
 .beepboxEditor .knobValueArc {
@@ -1814,6 +1818,10 @@ content: "";
 	stroke-linecap: butt;
 	pointer-events: none;
 	fill: none;
+}
+
+.beepboxEditor .miniBox:not(:hover) {
+	appearance: textfield;
 }
 
 .beepboxEditor .selectRow > :last-child {
