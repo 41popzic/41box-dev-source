@@ -1755,15 +1755,15 @@ content: "";
 }
 
 .beepboxEditor .effectContainer {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 50%, black);
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
-	border-radius: 6px;
-	margin: 4px 0;
+	border-radius: 2px;
+	margin: 2px -6px;
 	padding: 0.667em 0.5em !important
 }
 
 .beepboxEditor .effectTitle {
-	color: ${ColorConfig.pitchChannels};
+	color: currentColor;
 	font-weight: 1000;
 }
 
@@ -1820,7 +1820,7 @@ content: "";
 	fill: none;
 }
 
-.beepboxEditor .miniBox:not(:hover) {
+.beepboxEditor .arrowsOnHover:not(:hover) {
 	appearance: textfield;
 }
 
