@@ -304,6 +304,7 @@ export class Preferences {
 	public oldModNotes: boolean;
 	public selectiveRandom: SelectiveInstrumentSettings = new SelectiveInstrumentSettings();
 	public selectivePaste: SelectiveInstrumentSettings = new SelectiveInstrumentSettings();
+	public collapseEffectsOnLoad: boolean;
 
 	public promptSongDetails: boolean;
 
@@ -360,6 +361,7 @@ export class Preferences {
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;
 		this.selectiveRandom.fromJsonObject(JSON.parse(window.localStorage.getItem("selectiveRandom") || "{}"));
 		this.selectivePaste.fromJsonObject(JSON.parse(window.localStorage.getItem("selectivePaste") || "{}"));
+		this.collapseEffectsOnLoad = window.localStorage.getItem("collapseEffectsOnLoad") == "true";
 
 		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
 		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 1;
@@ -422,6 +424,7 @@ export class Preferences {
 		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
 		window.localStorage.setItem("selectiveRandom", this.selectiveRandom.toJsonObject());
 		window.localStorage.setItem("selectivePaste", this.selectivePaste.toJsonObject());
+		window.localStorage.setItem("collapseEffectsOnLoad", this.collapseEffectsOnLoad ? "true" : "false");
 		
 	}
 }

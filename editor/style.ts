@@ -1765,6 +1765,7 @@ content: "";
 .beepboxEditor .effectTitle {
 	color: currentColor;
 	font-weight: 1000;
+	margin: -3px 0;
 }
 
 .beepboxEditor .knobContainer {

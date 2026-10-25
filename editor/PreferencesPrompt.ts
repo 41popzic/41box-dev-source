@@ -304,6 +304,7 @@ export class PreferencesPrompt implements Prompt {
 	private readonly _showDescription: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 	private readonly _rainbowifyLoop: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 	private readonly _promptSongDetails: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
+	private readonly _collapseEffectsOnLoad: HTMLInputElement = input({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
 
 	private readonly _layoutForm: HTMLFormElement = form({ style: "display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; text-align: center;" },
 		label({ class: "layout-option" },
@@ -434,11 +435,8 @@ export class PreferencesPrompt implements Prompt {
 		),
 	);
 
-	//private readonly _customLayoutEditButton: HTMLButtonElement = button({ class: "editCustomLayout", style: "width:20em; height: 2em"}, "Edit Custom Layout");
-
 	private readonly _resetButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size);" }, "Reset to defaults");
 	
-	// only way it worked I think -41popzic
 	private readonly _layoutInput: HTMLTextAreaElement = Object.assign(document.createElement("textarea"), {
 		rows: 24, style: "resize: none; width: 100%; text-align: left", value: localStorage.getItem("customLayout") || 
 				`\
@@ -765,6 +763,10 @@ export class PreferencesPrompt implements Prompt {
 				"Rainbowify Song Loop:",
 				div({ style: "width: 50%; text-align: center;" }, this._rainbowifyLoop),
 			),
+			label({ style: "display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em; height: 2em;" },
+				"Collapse Effects on Load:",
+				div({ style: "width: 50%; text-align: center;" }, this._collapseEffectsOnLoad),
+			),
 		)
 	);
 
@@ -982,6 +984,7 @@ export class PreferencesPrompt implements Prompt {
 		this._showDescription.checked = this._doc.prefs.showDescription;
 		this._promptSongDetails.checked = this._doc.prefs.promptSongDetails;
 		this._rainbowifyLoop.checked = this._doc.prefs.rainbowLoop;
+		this._collapseEffectsOnLoad.checked = this._doc.prefs.collapseEffectsOnLoad;
 
 		(<any>this._layoutForm.elements)["layout"].value = this._doc.prefs.layout;
         
@@ -1177,6 +1180,7 @@ export class PreferencesPrompt implements Prompt {
 		this._doc.prefs.showDescription = this._showDescription.checked;
 		this._doc.prefs.promptSongDetails = this._promptSongDetails.checked;
 		this._doc.prefs.rainbowLoop = this._rainbowifyLoop.checked;
+		this._doc.prefs.collapseEffectsOnLoad = this._collapseEffectsOnLoad.checked;
 
 		this._doc.prefs.layout = (<any>this._layoutForm.elements)["layout"].value;
 
@@ -1228,7 +1232,7 @@ export class PreferencesPrompt implements Prompt {
 		this._doc.prefs.save();
 		Layout.setLayout(this._doc.prefs.layout);
 		this._close();
-		if (localStorage.getItem("customLayout") != this._layoutInput.value) setTimeout(() => { window.location.reload(); }, 50); // Someone explain why this is broken
+		setTimeout(() => { window.location.reload(); }, 50); // Custom layouts and collapsible effects; made it easier like this -41popzic
 	}
 
 	private _makeThemeList(): HTMLElement {
