@@ -3362,7 +3362,7 @@ export class SongEditor {
             if (effectsIncludeTransition(instrument.effects)) {
                 this._transitionRow.style.display = "";
                 this._transitionContainer.style.display = "";
-                this._transitionPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._transitionPreContainer.style.display = this._transitionCollapsed ? "none" : "";
                 if (this._openTransitionDropdown) {
                     this._transitionDropdownGroup.style.display = "";
                 }
@@ -3379,7 +3379,7 @@ export class SongEditor {
 
             if (effectsIncludeChord(instrument.effects)) {
                 this._chordContainer.style.display = "";
-                this._chordPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._chordPreContainer.style.display = this._chordCollapsed ? "none" : "";
                 this._chordSelectRow.style.display = "";
                 this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index) || (instrument.chord == Config.chords.dictionary["strum"].index) ? "" : "none";
                 this._chordDropdownGroup.style.display = (((instrument.chord == Config.chords.dictionary["arpeggio"].index) || (instrument.chord == Config.chords.dictionary["strum"].index)) && this._openChordDropdown) ? "" : "none";
@@ -3414,7 +3414,7 @@ export class SongEditor {
                 /*for (const marker of this._pitchShiftFifthMarkers) {
                     marker.style.display = prefs.showFifth ? "" : "none";
                 }*/                
-               this._pitchShiftPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+               this._pitchShiftPreContainer.style.display = this._pitchShiftCollapsed ? "none" : "";
             } else {
                 this._pitchShiftRow.style.display = "none";
                 this._pitchShiftContainer.style.display = "none";
@@ -3425,7 +3425,7 @@ export class SongEditor {
                 this._detuneContainer.style.display = "";
                 this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
                 this._detuneSlider.input.title = (Synth.detuneToCents(instrument.detune)) + " cent(s)";
-                this._detunePreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._detunePreContainer.style.display = this._detuneCollapsed ? "none" : "";
             } else {
                 this._detuneSliderRow.style.display = "none";
                 this._detuneContainer.style.display = "none";
@@ -3437,7 +3437,7 @@ export class SongEditor {
                     this._vibratoDropdownGroup.style.display = "";
                 setSelectedValue(this._vibratoSelect, instrument.vibrato);
                 this._vibratoContainer.style.display = "";
-                this._vibratoPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._vibratoPreContainer.style.display = this._vibratoCollapsed ? "none" : "";
             } else {
                 this._vibratoDropdownGroup.style.display = "none";
                 this._vibratoSelectRow.style.display = "none";
@@ -3452,7 +3452,7 @@ export class SongEditor {
                 this._noteFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
                 this._noteFilterTypeRow.style.display = "";
                 this._noteFilterContainer.style.display = "";
-                this._noteFilterPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._noteFilterPreContainer.style.display = this._noteFilterCollapsed ? "none" : "";
 
                 if (this.doc.synth.isFilterModActive(true, this.doc.channel, this.doc.getCurrentInstrument())) {
                     this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
@@ -3490,7 +3490,7 @@ export class SongEditor {
                 else
                     this._aliasingRow.style.display = "none";
                 this._distortionSlider.updateValue(instrument.distortion);
-                this._distortionPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._distortionPreContainer.style.display = this._distortionCollapsed ? "none" : "";
             } else {
                 this._distortionRow.style.display = "none";
                 this._aliasingRow.style.display = "none";
@@ -3503,7 +3503,7 @@ export class SongEditor {
                 this._bitcrusherContainer.style.display = "";
                 this._bitcrusherQuantizationSlider.updateValue(instrument.bitcrusherQuantization);
                 this._bitcrusherFreqSlider.updateValue(instrument.bitcrusherFreq);
-                this._bitcrusherPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._bitcrusherPreContainer.style.display = this._bitcrusherCollapsed ? "none" : "";
             } else {
                 this._bitcrusherQuantizationRow.style.display = "none";
                 this._bitcrusherFreqRow.style.display = "none";
@@ -3517,7 +3517,7 @@ export class SongEditor {
                 //this._panSlider.updateValue(instrument.pan);
                 this._panKnob.updateValue(instrument.pan);
                 this._panContainer.style.display = "";
-                this._panPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._panPreContainer.style.display = this._panCollapsed ? "none" : "";
             } else {
                 //this._panSliderRow.style.display = "none";
                 this._panDropdownGroup.style.display = "none";
@@ -3528,7 +3528,7 @@ export class SongEditor {
                 this._chorusRow.style.display = "";
                 this._chorusContainer.style.display = "";
                 this._chorusSlider.updateValue(instrument.chorus);
-                this._chorusPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._chorusPreContainer.style.display = this._chorusCollapsed ? "none" : "";
             } else {
                 this._chorusRow.style.display = "none";
                 this._chorusContainer.style.display = "none";
@@ -3540,7 +3540,7 @@ export class SongEditor {
                 this._echoDelayRow.style.display = "";
                 this._echoDelaySlider.updateValue(instrument.echoDelay);
                 this._echoContainer.style.display = "";
-                this._echoPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._echoPreContainer.style.display = this._chorusCollapsed ? "none" : "";
                 //this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
             } else {
                 this._echoSustainRow.style.display = "none";
@@ -3560,7 +3560,7 @@ export class SongEditor {
                 this._flangerFeedbackRow.style.display = "";
                 this._flangerFeedbackSlider.updateValue(instrument.flangerFeedback);
                 this._flangerContainer.style.display = "";
-                this._flangerPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._flangerPreContainer.style.display = this._flangerCollapsed ? "none" : "";
 
                 const rateIndex = Math.round( instrument.flangerRate / (Config.flangerRateRange - 1) * (flangerRateValues.length - 1));
                 this.flangerRateNum.innerHTML = " (" + (prettyNumber(flangerRateValues[rateIndex] * 1)) + " beats)";
@@ -3588,7 +3588,7 @@ export class SongEditor {
                 this._phaserFeedbackRow.style.display = "";
                 this._phaserFeedbackSlider.updateValue(instrument.phaserFeedback);
                 this._phaserContainer.style.display = "";
-                this._phaserPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._phaserPreContainer.style.display = this._phaserCollapsed ? "none" : "";
             } else {
                 this._phaserMixRow.style.display = "none";
                 this._phaserFreqRow.style.display = "none";
@@ -3600,7 +3600,7 @@ export class SongEditor {
             if (effectsIncludeNoteRange(instrument.effects)) {
                 this._noteRangeDoubRow.style.display = "";
                 this._noteRangeContainer.style.display = "";
-                this._noteRangePreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._noteRangePreContainer.style.display = this._noteRangeCollapsed ? "none" : "";
                 this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
                 this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
                 this._noteRangeDoubSlider.updateLeft(instrument.lowerNoteLimit, true);
@@ -3616,7 +3616,7 @@ export class SongEditor {
                 this._reverbShelfHzRow.style.display = "";
                 this._reverbShelfGainRow.style.display = "";
                 this._reverbContainer.style.display = "";
-                this._reverbPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._reverbPreContainer.style.display = this._reverbCollapsed ? "none" : "";
                 this._reverbMixSlider.updateValue(instrument.reverb);
                 this._reverbDelaySlider.updateValue(instrument.reverbDelay);
                 this._reverbShelfHzSlider.updateValue(instrument.reverbShelfHz);
@@ -3632,7 +3632,7 @@ export class SongEditor {
             if (effectsIncludeRingModulation(instrument.effects)) {
                 this._ringModContainerRow.style.display = "";
                 this._ringModContainer.style.display = "";
-                this._ringModPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._ringModPreContainer.style.display = this._ringModCollapsed ? "none" : "";
                 this._ringModSlider.updateValue(instrument.ringModulation);
                 this._ringModHzSlider.updateValue(instrument.ringModulationHz);
                 setSelectedValue(this._ringModWaveSelect, instrument.ringModWaveformIndex);
@@ -3645,7 +3645,7 @@ export class SongEditor {
             if (effectsIncludeGranular(instrument.effects)) {
                 this._granularContainerRow.style.display = "";
                 this._granularContainer.style.display = "";
-                this._granularPreContainer.style.display = this.doc.prefs.collapseEffectsOnLoad ? "none" : "";
+                this._granularPreContainer.style.display = this._granularCollapsed ? "none" : "";
                 this._granularSlider.updateValue(instrument.granular);
                 this._grainSizeSlider.updateValue(instrument.grainSize);
                 this._grainAmountsSlider.updateValue(instrument.grainAmounts);
