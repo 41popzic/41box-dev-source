@@ -229,19 +229,24 @@ export class Instrument {
     public tmpEqFilterEnd: FilterSettings | null;
     public tmpNoteFilterStart: FilterSettings | null;
     public tmpNoteFilterEnd: FilterSettings | null;
+    public noteFilterMuted: boolean = false;
     public envelopes: EnvelopeSettings[] = [];
     public fadeIn: number = 0;
     public fadeOut: number = Config.fadeOutNeutral;
     public envelopeCount: number = 0;
     public transition: number = Config.transitions.dictionary["normal"].index;
+    public transitionMuted: boolean = false;
     public pitchShift: number = 0;
+    public pitchShiftMuted: boolean = false;
     public detune: number = 0;
+    public detuneMuted: boolean = false;
     public vibrato: number = 0;
     public interval: number = 0;
     public vibratoDepth: number = 0;
     public vibratoSpeed: number = 10;
     public vibratoDelay: number = 0;
     public vibratoType: number = 0;
+    public vibratoMuted: boolean = false;
     public envelopeSpeed: number = 12;
     public unison: number = 0;
     public unisonVoices: number = 1;
@@ -252,14 +257,17 @@ export class Instrument {
     public effects: number = 0;
     public chord: number = 1;
     public strumParts: number = 1;
+    public chordMuted: boolean = false;
     public volume: number = 0;
     public pan: number = Config.panCenter;
     public panDelay: number = 0;
+    public panMuted: boolean = false;
     public arpeggioSpeed: number = 12;
     public monoChordTone: number = 0;
     public fastTwoNoteArp: boolean = false;
     public legacyTieOver: boolean = false;
     public clicklessTransition: boolean = false;
+    public slideTicks: number = 0;
     public aliases: boolean = false;
     public pulseWidth: number = Config.pulseWidthRange;
     public decimalOffset: number = 0;
@@ -269,40 +277,45 @@ export class Instrument {
     public stringSustain: number = 10;
     public stringSustainType: SustainType = SustainType.acoustic;
     public distortion: number = 0;
+    public distortionMuted: boolean = false;
     public bitcrusherFreq: number = 0;
     public bitcrusherQuantization: number = 0;
+    public bitcrusherMuted: boolean = false;
     public ringModulation: number = Config.ringModRange >> 1;
     public ringModulationHz: number = Config.ringModHzRange >> 1;
     public ringModWaveformIndex: number = 0;
     public ringModPulseWidth: number = Config.pwmOperatorWaves.length >> 1;
     public ringModHzOffset: number = 200;
+    public ringModMuted: boolean = false;
     public granular: number = 4;
     public grainSize: number = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
     public grainAmounts: number = Config.grainAmountsMax;
     public grainRange: number = 40;
+    public granularMuted: boolean = false;
     public chorus: number = 0;
+    public chorusMuted: boolean = false;
     public reverb: number = 0;
     public reverbDelay: number = 0;
     public reverbShelfHz: number = 32;
     public reverbShelfGain: number = 6;
+    public reverbMuted: boolean = false;
     public echoSustain: number = 0;
     public echoDelay: number = 0;
-
+    public echoMuted: boolean = false;
     public phaserFreq: number = 0;
     public phaserMix: number = Config.phaserMixRange - 1;
     public phaserFeedback: number = 0;
     public phaserStages: number = 2;
-
+    public phaserMuted: boolean = false;
     public flangerDelay: number = 0;
     public flangerDepth: number = 0;
     public flangerRate: number = 0;
     public flangerFeedback: number = 0;
     public flangerMix: number = 0;
-
-    public slideTicks: number = 0;
-
+    public flangerMuted: boolean = false;
     public upperNoteLimit: number = Config.maxPitch;
     public lowerNoteLimit: number = 0;
+    public noteRangeMuted: boolean = false;
 
     public algorithm: number = 0;
     public feedbackType: number = 0;
@@ -399,12 +412,15 @@ export class Instrument {
         this.volume = 0;
         this.effects = 0;
         this.chorus = Config.chorusRange - 1;
+        this.chorusMuted = false;
         this.reverb = 0;
         this.reverbDelay = 0;
         this.reverbShelfHz = 32;
         this.reverbShelfGain = 6;
+        this.reverbMuted = false;
         this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
         this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
+        this.echoMuted = false;
         this.eqFilter.reset();
         this.eqFilterType = false;
         this.eqFilterSimpleCut = Config.filterSimpleCutRange - 1;
@@ -417,53 +433,61 @@ export class Instrument {
         this.noteFilterType = false;
         this.noteFilterSimpleCut = Config.filterSimpleCutRange - 1;
         this.noteFilterSimplePeak = 0;
+        this.noteFilterMuted = false;
         this.distortion = Math.floor((Config.distortionRange - 1) * 0.75);
         this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5)
         this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
+        this.bitcrusherMuted = false;
         this.ringModulation = Config.ringModRange >> 1;
         this.ringModulationHz = Config.ringModHzRange >> 1;
         this.ringModWaveformIndex = 0;
         this.ringModPulseWidth = Config.pwmOperatorWaves.length >> 1;
         this.ringModHzOffset = 200;
+        this.ringModMuted = false;
         this.granular = 4;
         this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
         this.grainAmounts = Config.grainAmountsMax;
         this.grainRange = 40;
-
+        this.granularMuted = false;
         this.phaserFreq	= 0;
         this.phaserFeedback = 0;
         this.phaserStages = 2;
         this.phaserMix = Config.phaserMixRange - 1;
-
+        this.phaserMuted = false;
         this.flangerDelay = 8;
         this.flangerDepth = 12;
         this.flangerRate = 3;
         this.flangerFeedback = 13;
         this.flangerMix = 26;
-
+        this.flangerMuted = false;
         this.slideTicks = 3;
         this.strumParts = 1;
-
         this.upperNoteLimit = Config.maxPitch;
         this.lowerNoteLimit = 0;
-
+        this.noteRangeMuted = false;
         this.pan = Config.panCenter;
         this.panDelay = 0;
+        this.panMuted = false
         this.pitchShift = Config.pitchShiftCenter;
+        this.pitchShiftMuted = false;
         this.detune = Config.detuneCenter;
+        this.detuneMuted = false;
         this.vibrato = 0;
+        this.vibratoMuted = false;
         this.unison = 0;
         this.stringSustain = 10;
         this.stringSustainType = Config.enableAcousticSustain ? SustainType.acoustic : SustainType.bright;
         this.clicklessTransition = false;
         this.arpeggioSpeed = 12;
         this.monoChordTone = 1;
+        this.chordMuted = false;
         this.envelopeSpeed = 12;
         this.legacyTieOver = false;
         this.aliases = false;
         this.fadeIn = 0;
         this.fadeOut = Config.fadeOutNeutral;
         this.transition = Config.transitions.dictionary["normal"].index;
+        this.transitionMuted = false;
         this.envelopeCount = 0;
         this.isNoiseInstrument = isNoiseChannel;
         switch (type) {
@@ -1859,8 +1883,8 @@ export class Instrument {
     }
 
     public getTransition(): Transition {
-        return effectsIncludeTransition(this.effects) ? Config.transitions[this.transition] :
-            (this.type == InstrumentType.mod ? Config.transitions.dictionary["interrupt"] : Config.transitions.dictionary["normal"]);
+        if (this.transitionMuted) return Config.transitions.dictionary["normal"];
+        return effectsIncludeTransition(this.effects) ? Config.transitions[this.transition] : this.type == InstrumentType.mod ? Config.transitions.dictionary["interrupt"] : Config.transitions.dictionary["normal"];
     }
 
     public getFadeInSeconds(): number {
@@ -1872,6 +1896,7 @@ export class Instrument {
     }
 
     public getChord(): Chord {
+        if (this.chordMuted) return Config.chords.dictionary["simultaneous"];
         return effectsIncludeChord(this.effects) ? Config.chords[this.chord] : Config.chords.dictionary["simultaneous"];
     }
 

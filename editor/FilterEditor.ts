@@ -20,8 +20,8 @@ export class FilterEditor {
     private _indicators: SVGTextElement[] = [];
     private _subFilters: FilterSettings[] = [];
     private _writingMods: boolean = false;
-    private readonly _controlPointPath: SVGPathElement = SVG.path({ fill: "currentColor", "pointer-events": "none" });
-    private readonly _dottedLinePath: SVGPathElement = SVG.path({ fill: "none", stroke: "currentColor", "stroke-width": 1, "stroke-dasharray": "3, 2", "pointer-events": "none" });
+    private readonly _controlPointPath: SVGPathElement = SVG.path({ class: "control-point-path", fill: "currentColor", "pointer-events": "none" });
+    private readonly _dottedLinePath: SVGPathElement = SVG.path({ class: "dotted-line-path", fill: "none", stroke: "currentColor", "stroke-width": 1, "stroke-dasharray": "3, 2", "pointer-events": "none" });
     private readonly _highlight: SVGCircleElement = SVG.circle({ fill: "white", stroke: "none", "pointer-events": "none", r: 4 });
     private readonly _svg: SVGSVGElement = SVG.svg({ style: `background-color: ${ColorConfig.editorBackground}; touch-action: none;`, width: "100%", height: "100%", viewBox: "0 0 " + this._editorWidth + " " + this._editorHeight, preserveAspectRatio: "none" },
         this._responsePath,
@@ -74,6 +74,8 @@ export class FilterEditor {
         this._larger = larger;
         this._forSong = forSong;
 
+        const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+
         if (this._larger) {
             this.container.addEventListener("keydown", this._whenKeyPressed)
             this._editorWidth = 1200;
@@ -112,7 +114,6 @@ export class FilterEditor {
 
             // Push initial state
             let filterSettings: FilterSettings;
-            const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             if (this._forSong) {
                 filterSettings = this._doc.song.eqFilter;
             } else {
@@ -150,6 +151,11 @@ export class FilterEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
+
+        if (useNoteFilter) {
+            this._controlPointPath.classList.toggle("muted", instrument.noteFilterMuted);
+            this._dottedLinePath.classList.toggle("muted", instrument.noteFilterMuted);
+        }
     }
 
     private _whenKeyPressed = (event: KeyboardEvent): void => {
@@ -178,9 +184,15 @@ export class FilterEditor {
 
     private _whenMouseOver = (event: MouseEvent): void => {
         this._mouseOver = true;
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 
         if (!this._larger)
-            this._controlPointPath.style.setProperty("fill", "currentColor");
+            if (this._useNoteFilter) {
+                this._controlPointPath.classList.toggle("muted", instrument.noteFilterMuted);
+            } else {
+                this._controlPointPath.style.setProperty("fill", "currentColor"); 
+            }
+
     }
 
     private _whenMouseOut = (event: MouseEvent): void => {
@@ -715,7 +727,11 @@ export class FilterEditor {
         if (displayMods)
             this._controlPointPath.style.setProperty("fill", `${ColorConfig.overwritingModSlider}`);
         else if (!this._larger)
-            this._controlPointPath.style.setProperty("fill", "currentColor");
+            if (this._useNoteFilter) {
+                this._controlPointPath.classList.toggle("muted", instrument.noteFilterMuted);
+            } else {
+                this._controlPointPath.style.setProperty("fill", "currentColor"); 
+            }
 
         if (this._useFilterSettings != filterSettings && !this._writingMods) {
             this._dragChange = null;
@@ -767,5 +783,14 @@ export class FilterEditor {
             this._octaves.setAttribute("x", String(x));
         }
         */
+        if (!this._larger && this._useNoteFilter) { // Might need to be double checked
+            this._controlPointPath.classList.toggle("muted", instrument.noteFilterMuted);
+        } else {
+            if (!this._useNoteFilter) this._controlPointPath.style.setProperty("fill", "currentColor"); // Not sure why I did it this way lol???
+            if (this._useNoteFilter) {
+                this._controlPointPath.classList.toggle("muted", instrument.noteFilterMuted);
+                this._dottedLinePath.classList.toggle("muted", instrument.noteFilterMuted);
+            }
+        }
     }
 }

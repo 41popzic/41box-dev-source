@@ -1839,6 +1839,15 @@ export class ChangeTransition extends Change {
     }
 }
 
+export class ChangeTransitionMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].transitionMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeToggleEffects extends Change {
     constructor(doc: SongDocument, toggleFlag: number, useInstrument: Instrument | null) {
         super();
@@ -2413,6 +2422,16 @@ export class ChangeVibratoDepth extends Change {
     }
 }
 
+export class ChangeVibratoMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].vibratoMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeEnvelopeSpeed extends Change {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super();
@@ -2527,6 +2546,16 @@ export class ChangeMonophonicTone extends Change {
     }
 }
 
+export class ChangeChordMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].chordMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeClicklessTransition extends Change {
     constructor(doc: SongDocument, newValue: boolean) {
         super();
@@ -2554,6 +2583,15 @@ export class ChangeAliasing extends Change {
             instrument.preset = instrument.type;
             this._didSomething();
         }
+    }
+}
+
+export class ChangeDistortionMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].distortionMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
     }
 }
 
@@ -2678,6 +2716,16 @@ export class ChangePitchShift extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangePitchShiftMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].pitchShiftMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeDetune extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -2687,6 +2735,16 @@ export class ChangeDetune extends ChangeInstrumentSlider {
         if (oldValue != newValue) this._didSomething();
     }
 }
+
+export class ChangeDetuneMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].detuneMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 
 export class ChangeRingMod extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
@@ -2729,6 +2787,16 @@ export class ChangeRingModPulseWidth extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeRingModMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].ringModMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeGranular extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -2769,6 +2837,16 @@ export class ChangeGrainRange extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeGranularMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].granularMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeDistortion extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -2799,47 +2877,14 @@ export class ChangeBitcrusherQuantization extends ChangeInstrumentSlider {
     }
 }
 
-/*export class ChangePhaserMix extends ChangeInstrumentSlider {
-    constructor(doc: SongDocument, oldValue: number, newValue: number) {
-        super(doc);
-        this._instrument.phaserMix = newValue;
-        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
+export class ChangeBitcrusherMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].bitcrusherMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
 }
-
-export class ChangePhaserFreq extends ChangeInstrumentSlider {
-    constructor(doc: SongDocument, oldValue: number, newValue: number) {
-        super(doc);
-        this._instrument.phaserFreq = newValue;
-        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
-        doc.notifier.changed();
-        if (oldValue != newValue) this._didSomething();
-    }
-}
-
-export class ChangePhaserFeedback extends ChangeInstrumentSlider {
-    constructor(doc: SongDocument, oldValue: number, newValue: number) {
-        super(doc);
-        this._instrument.phaserFeedback = newValue;
-        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
-        doc.notifier.changed();
-        if (oldValue != newValue) this._didSomething();
-    }
-}
-
-export class ChangePhaserStages extends ChangeInstrumentSlider {
-    constructor(doc: SongDocument, oldValue: number, newValue: number) {
-        super(doc);
-        this._instrument.phaserStages = newValue;
-        // doc.synth.unsetMod(Config.modulators.dictionary["..."].index, doc.channel, doc.getCurrentInstrument());
-        doc.notifier.changed();
-        if (oldValue != newValue) this._didSomething();
-    }
-}
-*/
-
 
 export class ChangeStringSustain extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
@@ -2909,6 +2954,16 @@ export class ChangeNoteFilterType extends Change {
     }
 }
 
+export class ChangeNoteFilterMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].noteFilterMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+
 export class ChangeEQFilterSimpleCut extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -2975,7 +3030,7 @@ this._filterSettings.controlPoints.splice(this._index, 0, this._point);
     }
 
     protected _doBackwards(): void {
-this._filterSettings.controlPoints.splice(this._index, 1);
+        this._filterSettings.controlPoints.splice(this._index, 1);
         this._filterSettings.controlPointCount--;
         this._filterSettings.controlPoints.length = this._filterSettings.controlPointCount;
         this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
@@ -3116,13 +3171,13 @@ export class ChangeSongFilterMovePoint extends UndoableChange {
         }
 
         protected _doForwards(): void {
- this._point.freq = this._newFreq;
+        this._point.freq = this._newFreq;
         this._point.gain = this._newGain;
         this._doc.notifier.changed();
     }
 
         protected _doBackwards(): void {
- this._point.freq = this._oldFreq;
+        this._point.freq = this._oldFreq;
         this._point.gain = this._oldGain;
         this._doc.notifier.changed();
     }
@@ -4913,6 +4968,15 @@ export class ChangeEchoSustain extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeEchoMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].echoMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeFlangerDelay extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -4963,6 +5027,15 @@ export class ChangeFlangerMix extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeFlangerMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].flangerMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangePhaserMix extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -5003,11 +5076,29 @@ export class ChangePhaserStages extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangePhaserMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].phaserMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeChorus extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.chorus = newValue;
         doc.synth.unsetMod(Config.modulators.dictionary["chorus"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeChorusMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].chorusMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
@@ -5048,6 +5139,15 @@ export class ChangeReverbShelfGain extends ChangeInstrumentSlider {
         super(doc);
         this._instrument.reverbShelfGain = newValue;
         //doc.synth.unsetMod(Config.modulators.dictionary["reverb delay"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeReverbMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].reverbMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
@@ -5700,6 +5800,15 @@ export class ChangePanDelay extends Change {
     }
 }
 
+export class ChangePanMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].panMuted = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeSizeBend extends UndoableChange {
     private _doc: SongDocument;
     private _note: Note;
@@ -5873,6 +5982,15 @@ export class ChangeLowerLimit extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.lowerNoteLimit = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeNoteRangeMuted extends Change {
+    constructor(doc: SongDocument, oldValue: boolean, newValue: boolean) {
+        super();
+        doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].noteRangeMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

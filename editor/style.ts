@@ -1172,6 +1172,9 @@ content: "";
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
+.beepboxEditor .selectContainer:not(.menu).muted::after {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
 .beepboxEditor .selectContainer.menu::after {
 	content: "";
 	flex-shrink: 0;
@@ -1190,6 +1193,7 @@ content: "";
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
+	
 .beepboxEditor select {
 	margin: 0;
 	padding: 0 4px;
@@ -1207,6 +1211,10 @@ content: "";
 	-webkit-appearance:none;
 	-moz-appearance: none;
 	appearance: none;
+}
+.beepboxEditor select.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	font-weight: bold;
 }
 .beepboxEditor select option:disabled {
 	color: ${ColorConfig.linkAccent};
@@ -1347,6 +1355,9 @@ content: "";
 	.beepboxEditor select { padding: 0 2px; }
 }
 */
+.beepboxEditor .dropdown.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
 .beepboxEditor button {
 	margin: 0;
 	position: relative;
@@ -1582,6 +1593,14 @@ content: "";
 	-webkit-mask-position: center;
 }
 
+.beepboxEditor .control-point-path.muted {
+	fill: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .dotted-line-path.muted {
+	stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
 .beepboxEditor .instrument-bar {
 	display: flex;
 	gap: 2px;
@@ -1657,6 +1676,18 @@ content: "";
 
 .beepboxEditor .instrument-bar .no-underline {
 	border-bottom: unset;
+}
+
+.beepboxEditor .instrument-bar .note-filter {
+	border-bottom: unset;
+}
+
+.beepboxEditor .instrument-bar .note-filter.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .note-filter-zoom.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
 }
 
 .beepboxEditor .instrument-bar .add-instrument::before {
@@ -1754,7 +1785,7 @@ content: "";
 	justify-content: space-between;
 }
 
-.beepboxEditor .effectContainer {
+.beepboxEditor .effect-container {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
 	border-radius: 2px;
@@ -1762,10 +1793,17 @@ content: "";
 	padding: 0.667em 0.5em !important
 }
 
-.beepboxEditor .effectTitle {
+.beepboxEditor .effect-title {
 	color: currentColor;
 	font-weight: 1000;
 	margin: -3px 0;
+	display: grid;
+	grid-template-columns: 0.5fr 2fr 0.5fr; // equal sections to compensate for mute button
+	align-items: center;
+}
+
+.beepboxEditor .effect-title.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
 }
 
 .beepboxEditor .knobContainer {
@@ -1801,8 +1839,27 @@ content: "";
 	pointer-events: none;
 }
 
-.beepboxEditor .markerHighlight {
-	stroke: currentColor;
+.beepboxEditor .knobMarkerHighlight {
+	stroke: currentColor; // is there a better color?
+}
+.beepboxEditor .knob.muted .knobIndicator {
+    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .knob.muted .knobMarkerHighlight {
+    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .knob.muted .knobValueArc {
+    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .knob.muted .knobModulationArc {
+    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
 }
 
 .beepboxEditor .knobValueArc {
@@ -1998,6 +2055,9 @@ content: "";
     z-index: 1;
 		pointer-events: none;
 }
+.beepboxEditor span.midTick.muted:after {
+    background:color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
 .beepboxEditor span.modSlider {
 	--mod-position: 20%;
 	--mod-color: ${ColorConfig.overwritingModSlider};
@@ -2027,6 +2087,11 @@ content: "";
 	-webkit-appearance: none;
 	margin-top: -10px;
 }
+
+.beepboxEditor input[type=range].muted::-webkit-slider-thumb {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
 .beepboxEditor input[type=range]:focus::-webkit-slider-runnable-track {
 	background: ${ColorConfig.uiWidgetFocus};
 }
@@ -2046,6 +2111,9 @@ content: "";
 	border: none;
 	background: currentColor;
 	cursor: pointer;
+}
+.beepboxEditor input[type=range].muted::-moz-range-thumb {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
 }
 .beepboxEditor input[type=range]::-ms-track {
 	width: 100%;

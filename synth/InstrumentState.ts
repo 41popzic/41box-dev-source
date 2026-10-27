@@ -405,6 +405,7 @@ export class InstrumentState {
     public usesRandomGrainLocation: boolean = true; //eventually I might use the granular code for sample pitch shifting, but we'll see
     public granularDelayLineDirty: boolean = false;
     public computeGrains: boolean = true;
+    public granularMuted: boolean = false;
 
     public ringModMix: number = 0;
     public ringModMixDelta: number = 0;
@@ -416,6 +417,7 @@ export class InstrumentState {
     public ringModHzOffset: number = 0.0;
     public ringModMixFade: number = 1.0;
     public ringModMixFadeDelta: number = 0;
+    public ringModMuted: boolean = false;
 
     public distortion: number = 0.0;
     public distortionDelta: number = 0.0;
@@ -426,6 +428,7 @@ export class InstrumentState {
     public distortionFractionalInput3: number = 0.0;
     public distortionPrevInput: number = 0.0;
     public distortionNextOutput: number = 0.0;
+    public distortionMuted: boolean = false;
 
     public bitcrusherPrevInput: number = 0.0;
     public bitcrusherCurrentOutput: number = 0.0;
@@ -436,6 +439,7 @@ export class InstrumentState {
     public bitcrusherScaleScale: number = 1.0;
     public bitcrusherFoldLevel: number = 1.0;
     public bitcrusherFoldLevelScale: number = 1.0;
+    public bitcrusherMuted: boolean = false;
 
     public readonly eqFilters: DynamicBiquadFilter[] = [];
     public eqFilterCount: number = 0;
@@ -462,6 +466,7 @@ export class InstrumentState {
     public chorusVoiceMultDelta: number = 0;
     public chorusCombinedMult: number = 0;
     public chorusCombinedMultDelta: number = 0;
+    public chorusMuted: boolean = false;
 
     public echoDelayLineL: Float32Array | null = null;
     public echoDelayLineR: Float32Array | null = null;
@@ -480,6 +485,7 @@ export class InstrumentState {
     public echoShelfSampleR: number = 0.0;
     public echoShelfPrevInputL: number = 0.0;
     public echoShelfPrevInputR: number = 0.0;
+    public echoMuted: boolean = false;
 
     public reverbDelayLine: Float32Array | null = null;
     public reverbDelayLineDirty: boolean = false;
@@ -501,6 +507,7 @@ export class InstrumentState {
     public reverbPreDelayLineL: Float32Array | null = null;
     public reverbPreDelayLineR: Float32Array | null = null;
     public reverbPreDelayPos: number = 0;
+    public reverbMuted: boolean = false;
 
     public phaserSamples: Float32Array | null = null;
     public phaserPrevInputs: Float32Array | null = null;
@@ -512,6 +519,7 @@ export class InstrumentState {
     public phaserBreakCoefDelta: number = 0.0;
     public phaserStages: number = 0;
     public phaserStagesDelta: number = 0;
+    public phaserMuted: boolean = false;
 
     public flangerDelayLineL: Float32Array | null = null;
     public flangerDelayLineR: Float32Array | null = null;
@@ -523,6 +531,7 @@ export class InstrumentState {
     public flangerFeedback: number = 1;
     public flangerMix: number = 0;
     public flangerMixDelta: number = 0;
+    public flangerMuted: boolean = false;
 
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
@@ -611,6 +620,7 @@ export class InstrumentState {
             if (this.granularMaximumGrains < this.granularGrainsLength) {
                 this.granularGrainsLength = Math.round(this.granularMaximumGrains);
             }
+            this.granularMuted = instrument.granularMuted;
         }
     }
 
@@ -883,6 +893,7 @@ export class InstrumentState {
             this.distortionDelta = (distortionEnd - distortionStart) / roundedSamplesPerTick;
             this.distortionDrive = distortionDriveStart;
             this.distortionDriveDelta = (distortionDriveEnd - distortionDriveStart) / roundedSamplesPerTick;
+            this.distortionMuted = instrument.distortionMuted;
         }
 
         if (usesBitcrusher) {
@@ -921,6 +932,7 @@ export class InstrumentState {
             const foldLevelEnd: number = 2.0 * Config.bitcrusherBaseVolume * Math.pow(1.5, Config.bitcrusherQuantizationRange - 1 - quantizationSettingEnd);
             this.bitcrusherFoldLevel = foldLevelStart;
             this.bitcrusherFoldLevelScale = Math.pow(foldLevelEnd / foldLevelStart, 1.0 / roundedSamplesPerTick);
+            this.bitcrusherMuted = instrument.bitcrusherMuted;
         }
 
         let eqFilterVolume: number = 1.0; //this.envelopeComputer.lowpassCutoffDecayVolumeCompensation;
@@ -1037,6 +1049,9 @@ export class InstrumentState {
         let delayInputMultEnd: number = 1.0;
 
         if (usesPanning) {
+            let panMuted: boolean;
+            panMuted = instrument.panMuted;
+
             const panEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
             const panEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
 
@@ -1080,6 +1095,18 @@ export class InstrumentState {
             this.panningOffsetR = this.panningDelayPos - delayStartR + synth.panningDelayBufferSize;
             this.panningOffsetDeltaL = (delayEndL - delayStartL) / roundedSamplesPerTick;
             this.panningOffsetDeltaR = (delayEndR - delayStartR) / roundedSamplesPerTick;
+
+            if (panMuted) {
+                this.panningVolumeL = 1;
+                this.panningVolumeR = 1;
+                this.panningVolumeDeltaL = 0;
+                this.panningVolumeDeltaR = 0;
+                this.panningOffsetL = this.panningDelayPos + synth.panningDelayBufferSize;
+                this.panningOffsetR = this.panningDelayPos + synth.panningDelayBufferSize;
+
+                this.panningOffsetDeltaL = 0;
+                this.panningOffsetDeltaR = 0;
+            } // Todo: fix this
         }
 
         if (usesChorus) {
@@ -1103,6 +1130,7 @@ export class InstrumentState {
             this.chorusVoiceMultDelta = (chorusEnd - chorusStart) / roundedSamplesPerTick;
             this.chorusCombinedMult = chorusCombinedMultStart;
             this.chorusCombinedMultDelta = (chorusCombinedMultEnd - chorusCombinedMultStart) / roundedSamplesPerTick;
+            this.chorusMuted = instrument.chorusMuted;
         }
       
         if (usesFlanger) {
@@ -1195,6 +1223,7 @@ export class InstrumentState {
             this.ringModWaveformIndex = instrument.ringModWaveformIndex;
             this.ringModPulseWidth = instrument.ringModPulseWidth;
 
+            this.ringModMuted = instrument.ringModMuted;
         }
 
         let maxEchoMult = 0.0;
@@ -1251,6 +1280,7 @@ export class InstrumentState {
             this.echoShelfA1 = Synth.tempFilterStartCoefficients.a[1];
             this.echoShelfB0 = Synth.tempFilterStartCoefficients.b[0];
             this.echoShelfB1 = Synth.tempFilterStartCoefficients.b[1];
+            this.echoMuted = instrument.echoMuted;
         }
 
         let maxReverbMult = 0.0;
@@ -1320,6 +1350,7 @@ export class InstrumentState {
 
             this.phaserStages = phaserStagesStart;
             this.phaserStagesDelta = (phaserStagesEnd - phaserStagesStart) / roundedSamplesPerTick;
+            this.phaserMuted = instrument.phaserMuted;
         }
             
         if (usesFlanger) {
@@ -1328,6 +1359,7 @@ export class InstrumentState {
             this.flangerRate = instrument.flangerRate    
             this.flangerFeedback = instrument.flangerFeedback
             //this.flangerMix = instrument.flangerMix / (Config.flangerMixRange - 1);
+            this.flangerMuted = instrument.flangerMuted;
         }
 
         if (usesReverb) {
@@ -1370,6 +1402,7 @@ export class InstrumentState {
             this.reverbShelfB0 = Synth.tempFilterStartCoefficients.b[0];
             this.reverbShelfB1 = Synth.tempFilterStartCoefficients.b[1];
             this.reverbDelay = instrument.reverbDelay;
+            this.reverbMuted = instrument.reverbMuted;
         }
 
         if (this.tonesAddedInThisTick) {

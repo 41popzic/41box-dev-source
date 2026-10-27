@@ -73,6 +73,11 @@ export class Slider {
             this._change = null;
         }
     };
+
+    public setMute(isMuted: boolean): void {
+        this.container.classList.toggle("muted", isMuted);
+        this.input.classList.toggle("muted", isMuted);
+    }
 }
 
 export class DoubleSlider {
@@ -218,6 +223,12 @@ export class DoubleSlider {
             // SVG.circle({ cx: ratio, cy: -9, r: 3, "fill": "currentColor" }),
             // SVG.rect({ x: ratio - 3, y: -9, width: 6, height: 18, "fill": "currentColor" }),
             // SVG.circle({ cx: ratio, cy: 9, r: 3, "fill": "currentColor" }),
+    }
+
+    public setMute(isMuted: boolean): void {
+        this.container.classList.toggle("muted", isMuted);
+        this.leftThumb.classList.toggle("muted", isMuted);
+        this.rightThumb.classList.toggle("muted", isMuted);
     }
 }
 

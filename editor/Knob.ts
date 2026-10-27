@@ -130,7 +130,7 @@ export class Knob {
             const innerRadius = this.outerRadius + 3;
             const outerRadius = this.outerRadius + 8;
 
-            const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: this._highlightMarkings[i] ? "knobMarker markerHighlight" : "knobMarker"});
+            const tick = line({ x1: (22 + Math.sin(radians) * innerRadius).toString(), y1: (22 - Math.cos(radians) * innerRadius).toString(), x2: (22 + Math.sin(radians) * outerRadius).toString(), y2: (22 - Math.cos(radians) * outerRadius).toString(), class: this._highlightMarkings[i] ? "knobMarkerHighlight" : "knobMarker"});
 
             this._svg.appendChild(tick);
         }
@@ -212,5 +212,10 @@ export class Knob {
         const largeArc = Math.abs(delta) > 180 ? 1 : 0;
 
         this._modulationArc.setAttribute( "d", `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} ${sweep} ${x2} ${y2}`);
+    }
+
+    public setMute(isMuted: boolean): void {
+        this.container.classList.toggle("muted", isMuted);
+        this._svg.classList.toggle("muted", isMuted);
     }
 }

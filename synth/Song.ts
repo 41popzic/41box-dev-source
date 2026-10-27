@@ -954,10 +954,12 @@ export class Song {
                             }
                         }
                     }
+                    buffer.push(base64IntToCharCode[instrument.noteFilterMuted ? 1 : 0]);
                 }
                 if (effectsIncludeTransition(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.transition]);
                     if (Config.transitions[instrument.transition].slides == true) buffer.push(base64IntToCharCode[instrument.slideTicks]);
+                    buffer.push(base64IntToCharCode[instrument.transitionMuted ? 1 : 0]);
                 }
                 if (effectsIncludeChord(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.chord]);
@@ -972,12 +974,15 @@ export class Song {
                     if (Config.chords[instrument.chord].strumParts > 0) {
                         buffer.push(base64IntToCharCode[instrument.strumParts]);
                     }
+                    buffer.push(base64IntToCharCode[instrument.chordMuted ? 1 : 0]);
                 }
                 if (effectsIncludePitchShift(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.pitchShift]);
+                    buffer.push(base64IntToCharCode[instrument.pitchShiftMuted ? 1 : 0]);
                 }
                 if (effectsIncludeDetune(instrument.effects)) {
                     buffer.push(base64IntToCharCode[(instrument.detune - Config.detuneMin) >> 6], base64IntToCharCode[(instrument.detune - Config.detuneMin) & 0x3F]);
+                    buffer.push(base64IntToCharCode[instrument.detuneMuted ? 1 : 0]);
                 }
                 if (effectsIncludeVibrato(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.vibrato]);
@@ -988,24 +993,30 @@ export class Song {
                         buffer.push(base64IntToCharCode[Math.round(instrument.vibratoDelay)]);
                         buffer.push(base64IntToCharCode[instrument.vibratoType]);
                     }
+                    buffer.push(base64IntToCharCode[instrument.vibratoMuted ? 1 : 0]);
                 }
                 if (effectsIncludeDistortion(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.distortion]);
                     // Aliasing is tied into distortion for now
                     buffer.push(base64IntToCharCode[+instrument.aliases]);
+                    buffer.push(base64IntToCharCode[instrument.distortionMuted ? 1 : 0]);
                 }
                 if (effectsIncludeBitcrusher(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.bitcrusherFreq], base64IntToCharCode[instrument.bitcrusherQuantization]);
+                    buffer.push(base64IntToCharCode[instrument.bitcrusherMuted ? 1 : 0]);
                 }
                 if (effectsIncludePanning(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.pan >> 6], base64IntToCharCode[instrument.pan & 0x3f]);
                     buffer.push(base64IntToCharCode[instrument.panDelay]);
+                    buffer.push(base64IntToCharCode[instrument.panMuted ? 1 : 0]);
                 }
                 if (effectsIncludeChorus(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.chorus]);
+                    buffer.push(base64IntToCharCode[instrument.chorusMuted ? 1 : 0]);
                 }
                 if (effectsIncludeEcho(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.echoSustain], base64IntToCharCode[instrument.echoDelay]);
+                    buffer.push(base64IntToCharCode[instrument.echoMuted ? 1 : 0]);
                 }
                 if (effectsIncludeFlanger(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.flangerDelay]);
@@ -1013,22 +1024,26 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.flangerRate]);
                     buffer.push(base64IntToCharCode[instrument.flangerFeedback]);
                     buffer.push(base64IntToCharCode[instrument.flangerMix]);   
+                    buffer.push(base64IntToCharCode[instrument.flangerMuted ? 1 : 0]);
                 }
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
                     buffer.push(base64IntToCharCode[instrument.reverbDelay]);
                     buffer.push(base64IntToCharCode[instrument.reverbShelfHz]);
                     buffer.push(base64IntToCharCode[instrument.reverbShelfGain]);
+                    buffer.push(base64IntToCharCode[instrument.reverbMuted ? 1 : 0]);
                 }
                 if (effectsIncludeNoteRange(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
                     buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
+                    buffer.push(base64IntToCharCode[instrument.noteRangeMuted ? 1 : 0]);
                 }
                 if (effectsIncludeGranular(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.granular]);
                     buffer.push(base64IntToCharCode[instrument.grainSize]);
                     buffer.push(base64IntToCharCode[instrument.grainAmounts]);
                     buffer.push(base64IntToCharCode[instrument.grainRange]);
+                    buffer.push(base64IntToCharCode[instrument.granularMuted ? 1 : 0]);
                 }
                 if (effectsIncludeRingModulation(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.ringModulation]);
@@ -1036,13 +1051,14 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.ringModWaveformIndex]);
                     buffer.push(base64IntToCharCode[(instrument.ringModPulseWidth)]);
                     buffer.push(base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) >> 6], base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) & 0x3F]);
+                    buffer.push(base64IntToCharCode[instrument.ringModMuted ? 1 : 0]);
                 }
-
                 if (effectsIncludePhaser(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.phaserFreq]);
                     buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
                     buffer.push(base64IntToCharCode[instrument.phaserStages]);
                     buffer.push(base64IntToCharCode[instrument.phaserMix]);
+                    buffer.push(base64IntToCharCode[instrument.phaserMuted ? 1 : 0]);
                 }
                 if (instrument.type != InstrumentType.drumset) {
                     buffer.push(SongTagCode.fadeInOut, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
@@ -2761,12 +2777,14 @@ export class Song {
                             instrument.noteFilterSimplePeak = clamp(0, Config.filterSimplePeakRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
 
                         }
+                        if (from41Box && !beforeFour) instrument.noteFilterMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeTransition(instrument.effects)) {
                         instrument.transition = clamp(0, Config.transitions.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         if ((fromUltraBox && !beforeSix)||(from41Box && !beforeFour)) {
                             if (Config.transitions[instrument.transition].slides == true) instrument.slideTicks = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         }
+                        if (from41Box && !beforeFour) instrument.transitionMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeChord(instrument.effects)) {
                         instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2781,9 +2799,11 @@ export class Song {
                         if (Config.chords[instrument.chord].strumParts > 0 && (from41Box && !beforeFour)) {
                             instrument.strumParts = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         }
+                        if (from41Box && !beforeFour) instrument.chordMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludePitchShift(instrument.effects)) {
                         instrument.pitchShift = clamp(0, Config.pitchShiftRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.pitchShiftMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeDetune(instrument.effects)) {
                         if (fromBeepBox) {
@@ -2792,6 +2812,7 @@ export class Song {
                             instrument.detune = Math.round((instrument.detune - 9) * (Math.abs(instrument.detune - 9) + 1) / 2 + Config.detuneCenter);
                         } else {
                             instrument.detune = clamp(Config.detuneMin, Config.detuneMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                            if (from41Box && !beforeFour) instrument.detuneMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                         }
                     }
                     if (effectsIncludeVibrato(instrument.effects)) {
@@ -2811,15 +2832,18 @@ export class Song {
                             instrument.vibratoDelay = Config.vibratos[instrument.vibrato].delayTicks / 2;
                             instrument.vibratoType = Config.vibratos[instrument.vibrato].type;
                         }
+                        if (from41Box && !beforeFour) instrument.vibratoMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeDistortion(instrument.effects)) {
                         instrument.distortion = clamp(0, Config.distortionRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         if ((fromJummBox && !beforeFive) || fromGoldBox || fromUltraBox || fromSlarmoosBox || from41Box)
                             instrument.aliases = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
+                        if (from41Box && !beforeFour) instrument.distortionMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeBitcrusher(instrument.effects)) {
                         instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.bitcrusherMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludePanning(instrument.effects)) {
                         if (fromBeepBox) {
@@ -2833,6 +2857,7 @@ export class Song {
                         // Now, pan delay follows on new versions of jummbox.
                         if ((fromJummBox && !beforeTwo) || fromGoldBox || fromUltraBox || fromSlarmoosBox || from41Box)
                             instrument.panDelay = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                            if (from41Box && !beforeFour) instrument.panMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeChorus(instrument.effects)) {
                         if (fromBeepBox) {
@@ -2840,11 +2865,13 @@ export class Song {
                             instrument.chorus = clamp(0, (Config.chorusRange / 2) + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) * 2;
                         } else {
                             instrument.chorus = clamp(0, Config.chorusRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                            if (from41Box && !beforeFour) instrument.chorusMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                         }
                     }
                     if (effectsIncludeEcho(instrument.effects)) {
                         instrument.echoSustain = clamp(0, Config.echoSustainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.echoDelay = clamp(0, Config.echoDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.echoMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeFlanger(instrument.effects)) {
                         instrument.flangerDelay = clamp(0, Config.flangerDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2852,6 +2879,7 @@ export class Song {
                         instrument.flangerRate = clamp(0, Config.flangerRateRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.flangerFeedback = clamp(0, Config.flangerFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.flangerMix = clamp(0, Config.flangerMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.flangerMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeReverb(instrument.effects)) {
                         if (fromBeepBox) {
@@ -2864,17 +2892,20 @@ export class Song {
                             if (!beforeFour && from41Box) instrument.reverbDelay = clamp(0, Config.reverbDelayRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                             if (!beforeFour && from41Box) instrument.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
                             if (!beforeFour && from41Box) instrument.reverbShelfGain = clamp(0, Config.reverbShelfGainRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])
+                            if (from41Box && !beforeFour) instrument.reverbMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                         }
                     }
                     if (effectsIncludeNoteRange(instrument.effects)) {
                         instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        if (from41Box && !beforeFour) instrument.noteRangeMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
                         instrument.granular = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.grainSize = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.grainAmounts = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.grainRange = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        if (from41Box && !beforeFour) instrument.granularMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeRingModulation(instrument.effects)) {
                         instrument.ringModulation = clamp(0, Config.ringModRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2882,12 +2913,14 @@ export class Song {
                         instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.ringModMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludePhaser(instrument.effects) && !beforeFour) {
                         instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]); 
                         instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (from41Box && !beforeFour) instrument.phaserMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
 
                 }

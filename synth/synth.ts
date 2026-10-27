@@ -2397,7 +2397,7 @@ if (playSong && !this.countInMetronome) {
                     }
 
                     let filteredPitches: number[] = note.pitches;
-                    if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                    if (effectsIncludeNoteRange(instrument.effects) && !instrument.noteRangeMuted) filteredPitches = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                     if (chord.singleTone && !(filteredPitches.length <= 0)) {
                         const atNoteStart: boolean = (Config.ticksPerPart * note.start == currentTick);
                         let tone: Tone;
@@ -2463,7 +2463,7 @@ if (playSong && !this.countInMetronome) {
                                     nextNoteForThisTone = noteForThisTone;
                                     noteForThisTone = prevNoteForThisTone;
                                     pitchesForThisTone = noteForThisTone.pitches;
-                                    if (effectsIncludeNoteRange(instrument.effects)) pitchesForThisTone = pitchesForThisTone.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                                    if (effectsIncludeNoteRange(instrument.effects) && !instrument.noteRangeMuted) pitchesForThisTone = pitchesForThisTone.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                                     prevNoteForThisTone = null;
                                     noteStartPart = noteForThisTone.start + strumOffsetParts;
                                     passedEndOfNote = true;
@@ -2897,7 +2897,7 @@ if (playSong && !this.countInMetronome) {
         }
 
         if (effectsIncludePitchShift(instrument.effects)) {
-            let pitchShift: number = Config.justIntonationSemitones[instrument.pitchShift] / intervalScale;
+            let pitchShift: number = !instrument.pitchShiftMuted ? Config.justIntonationSemitones[instrument.pitchShift] / intervalScale : 0;
             let pitchShiftScalarStart: number = 1.0;
             let pitchShiftScalarEnd: number = 1.0;
             if (this.isModActive(Config.modulators.dictionary["pitch shift"].index, channelIndex, tone.instrumentIndex)) {
@@ -2910,31 +2910,61 @@ if (playSong && !this.countInMetronome) {
             intervalStart += pitchShift * envelopeStart * pitchShiftScalarStart;
             intervalEnd += pitchShift * envelopeEnd * pitchShiftScalarEnd;
         }
-        if (effectsIncludeDetune(instrument.effects) || this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
-            const envelopeStart: number = envelopeStarts[EnvelopeComputeIndex.detune];
-            const envelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.detune];
-            let modDetuneStart: number = instrument.detune;
-            let modDetuneEnd: number = instrument.detune;
-            if (this.isModActive(Config.modulators.dictionary["detune"].index, channelIndex, tone.instrumentIndex)) {
+        const songDetuneActive = this.isModActive(
+            Config.modulators.dictionary["song detune"].index,
+            channelIndex,
+            tone.instrumentIndex
+        );
+
+        const detuneActive = this.isModActive(
+            Config.modulators.dictionary["detune"].index,
+            channelIndex,
+            tone.instrumentIndex
+        );
+
+        if (
+            (!instrument.detuneMuted && effectsIncludeDetune(instrument.effects)) ||
+            songDetuneActive
+        ) {
+            const envelopeStart = envelopeStarts[EnvelopeComputeIndex.detune];
+            const envelopeEnd = envelopeEnds[EnvelopeComputeIndex.detune];
+
+            let modDetuneStart = !instrument.detuneMuted ? instrument.detune : 0;
+            let modDetuneEnd = !instrument.detuneMuted ? instrument.detune : 0;
+
+            // Instrument detune modulation
+            if (!instrument.detuneMuted && detuneActive) {
                 modDetuneStart = this.getModValue(Config.modulators.dictionary["detune"].index, channelIndex, tone.instrumentIndex, false) + Config.detuneCenter;
                 modDetuneEnd = this.getModValue(Config.modulators.dictionary["detune"].index, channelIndex, tone.instrumentIndex, true) + Config.detuneCenter;
             }
-            if (this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
-                modDetuneStart += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
-                modDetuneEnd += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
+
+            // Apply instrument detune only when it isn't muted
+            if (!instrument.detuneMuted && effectsIncludeDetune(instrument.effects)) {
+                intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
+                intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
             }
-            intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
-            intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
-            // //envelopes should not affect song detune
-            // if (this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
-            //     modDetuneStart = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
-            //     modDetuneEnd = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
-            //     intervalStart += modDetuneStart * Config.pitchesPerOctave / (12.0 * 100.0);
-            //     intervalEnd += modDetuneEnd * Config.pitchesPerOctave / (12.0 * 100.0);
-            // }
+
+            // Song detune remains independent of instrument detunes and their envelope
+            if (songDetuneActive) {
+                const songDetuneStart = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
+
+                const songDetuneEnd = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
+
+                intervalStart += songDetuneStart * Config.pitchesPerOctave / (12.0 * 100.0);
+
+                intervalEnd += songDetuneEnd * Config.pitchesPerOctave / (12.0 * 100.0);
+
+                // //envelopes should not affect song detune
+                // if (this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
+                //     modDetuneStart = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
+                //     modDetuneEnd = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
+                //     intervalStart += modDetuneStart * Config.pitchesPerOctave / (12.0 * 100.0);
+                //     intervalEnd += modDetuneEnd * Config.pitchesPerOctave / (12.0 * 100.0);
+                // }
+            }
         }
 
-        if (effectsIncludeVibrato(instrument.effects)) {
+        if (effectsIncludeVibrato(instrument.effects) && instrument.vibratoMuted == false) {
             let delayTicks: number;
             let vibratoAmplitudeStart: number;
             let vibratoAmplitudeEnd: number;
@@ -3017,7 +3047,7 @@ if (playSong && !this.countInMetronome) {
         }
 
         let noteFilterExpression: number = envelopeComputer.lowpassCutoffDecayVolumeCompensation;
-        if (!effectsIncludeNoteFilter(instrument.effects)) {
+        if (!effectsIncludeNoteFilter(instrument.effects) || instrument.noteFilterMuted) {
             tone.noteFilterCount = 0;
         } else {
 
@@ -4563,17 +4593,17 @@ if (playSong && !this.countInMetronome) {
         // TODO: If automation is involved, don't assume sliders will stay at zero.
         // @jummbus - ^ Correct, removed the non-zero checks as modulation can change them.
 
-        const usesDistortion: boolean = effectsIncludeDistortion(instrumentState.effects);
-        const usesBitcrusher: boolean = effectsIncludeBitcrusher(instrumentState.effects);
+        const usesDistortion: boolean = effectsIncludeDistortion(instrumentState.effects) && !instrumentState.distortionMuted;
+        const usesBitcrusher: boolean = effectsIncludeBitcrusher(instrumentState.effects) && !instrumentState.bitcrusherMuted;
         const usesEqFilter: boolean = instrumentState.eqFilterCount > 0;
         const usesPanning: boolean = effectsIncludePanning(instrumentState.effects);
-        const usesChorus: boolean = effectsIncludeChorus(instrumentState.effects);
-        const usesEcho: boolean = effectsIncludeEcho(instrumentState.effects);
-        const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects);
-        const usesGranular: boolean = effectsIncludeGranular(instrumentState.effects);
-        const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects);
-        const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects);
-        const usesFlanger = effectsIncludeFlanger(instrumentState.effects);
+        const usesChorus: boolean = effectsIncludeChorus(instrumentState.effects) && !instrumentState.chorusMuted;
+        const usesEcho: boolean = effectsIncludeEcho(instrumentState.effects) && !instrumentState.echoMuted;
+        const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects) && !instrumentState.reverbMuted;
+        const usesGranular: boolean = effectsIncludeGranular(instrumentState.effects) && !instrumentState.granularMuted;
+        const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects) && !instrumentState.ringModMuted;
+        const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects) && !instrumentState.phaserMuted;
+        const usesFlanger = effectsIncludeFlanger(instrumentState.effects) && !instrumentState.flangerMuted;
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
         signature = signature << 1; if (usesEqFilter) signature = signature | 1;
