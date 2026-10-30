@@ -17576,6 +17576,7 @@ var beepbox = (function (exports) {
             this.panningOffsetR = 0.0;
             this.panningOffsetDeltaL = 0.0;
             this.panningOffsetDeltaR = 0.0;
+            this.panningMuted = false;
             this.chorusDelayLineL = null;
             this.chorusDelayLineR = null;
             this.chorusDelayLineDirty = false;
@@ -18073,8 +18074,6 @@ var beepbox = (function (exports) {
             let delayInputMultStart = 1.0;
             let delayInputMultEnd = 1.0;
             if (usesPanning) {
-                let panMuted;
-                panMuted = instrument.panMuted;
                 const panEnvelopeStart = envelopeStarts[41] * 2.0 - 1.0;
                 const panEnvelopeEnd = envelopeEnds[41] * 2.0 - 1.0;
                 let usePanStart = instrument.pan;
@@ -18110,16 +18109,7 @@ var beepbox = (function (exports) {
                 this.panningOffsetR = this.panningDelayPos - delayStartR + synth.panningDelayBufferSize;
                 this.panningOffsetDeltaL = (delayEndL - delayStartL) / roundedSamplesPerTick;
                 this.panningOffsetDeltaR = (delayEndR - delayStartR) / roundedSamplesPerTick;
-                if (panMuted) {
-                    this.panningVolumeL = 1;
-                    this.panningVolumeR = 1;
-                    this.panningVolumeDeltaL = 0;
-                    this.panningVolumeDeltaR = 0;
-                    this.panningOffsetL = this.panningDelayPos + synth.panningDelayBufferSize;
-                    this.panningOffsetR = this.panningDelayPos + synth.panningDelayBufferSize;
-                    this.panningOffsetDeltaL = 0;
-                    this.panningOffsetDeltaR = 0;
-                }
+                this.panningMuted = instrument.panMuted;
             }
             if (usesChorus) {
                 const chorusEnvelopeStart = envelopeStarts[45];
@@ -27434,10 +27424,10 @@ var beepbox = (function (exports) {
             pickedStringFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static effectsSynth(synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) {
+            const usesEqFilter = instrumentState.eqFilterCount > 0;
             const usesDistortion = effectsIncludeDistortion(instrumentState.effects) && !instrumentState.distortionMuted;
             const usesBitcrusher = effectsIncludeBitcrusher(instrumentState.effects) && !instrumentState.bitcrusherMuted;
-            const usesEqFilter = instrumentState.eqFilterCount > 0;
-            const usesPanning = effectsIncludePanning(instrumentState.effects);
+            const usesPanning = effectsIncludePanning(instrumentState.effects) && !instrumentState.panningMuted;
             const usesChorus = effectsIncludeChorus(instrumentState.effects) && !instrumentState.chorusMuted;
             const usesEcho = effectsIncludeEcho(instrumentState.effects) && !instrumentState.echoMuted;
             const usesReverb = effectsIncludeReverb(instrumentState.effects) && !instrumentState.reverbMuted;

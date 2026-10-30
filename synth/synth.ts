@@ -4593,10 +4593,12 @@ if (playSong && !this.countInMetronome) {
         // TODO: If automation is involved, don't assume sliders will stay at zero.
         // @jummbus - ^ Correct, removed the non-zero checks as modulation can change them.
 
+        const usesEqFilter: boolean = instrumentState.eqFilterCount > 0;
+
+        // Mutable effects
         const usesDistortion: boolean = effectsIncludeDistortion(instrumentState.effects) && !instrumentState.distortionMuted;
         const usesBitcrusher: boolean = effectsIncludeBitcrusher(instrumentState.effects) && !instrumentState.bitcrusherMuted;
-        const usesEqFilter: boolean = instrumentState.eqFilterCount > 0;
-        const usesPanning: boolean = effectsIncludePanning(instrumentState.effects);
+        const usesPanning: boolean = effectsIncludePanning(instrumentState.effects) && !instrumentState.panningMuted;
         const usesChorus: boolean = effectsIncludeChorus(instrumentState.effects) && !instrumentState.chorusMuted;
         const usesEcho: boolean = effectsIncludeEcho(instrumentState.effects) && !instrumentState.echoMuted;
         const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects) && !instrumentState.reverbMuted;
@@ -4604,6 +4606,7 @@ if (playSong && !this.countInMetronome) {
         const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects) && !instrumentState.ringModMuted;
         const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects) && !instrumentState.phaserMuted;
         const usesFlanger = effectsIncludeFlanger(instrumentState.effects) && !instrumentState.flangerMuted;
+        
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
         signature = signature << 1; if (usesEqFilter) signature = signature | 1;

@@ -456,6 +456,7 @@ export class InstrumentState {
     public panningOffsetR: number = 0.0;
     public panningOffsetDeltaL: number = 0.0;
     public panningOffsetDeltaR: number = 0.0;
+    public panningMuted: boolean = false;
 
     public chorusDelayLineL: Float32Array | null = null;
     public chorusDelayLineR: Float32Array | null = null;
@@ -1049,9 +1050,6 @@ export class InstrumentState {
         let delayInputMultEnd: number = 1.0;
 
         if (usesPanning) {
-            let panMuted: boolean;
-            panMuted = instrument.panMuted;
-
             const panEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
             const panEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
 
@@ -1096,17 +1094,7 @@ export class InstrumentState {
             this.panningOffsetDeltaL = (delayEndL - delayStartL) / roundedSamplesPerTick;
             this.panningOffsetDeltaR = (delayEndR - delayStartR) / roundedSamplesPerTick;
 
-            if (panMuted) {
-                this.panningVolumeL = 1;
-                this.panningVolumeR = 1;
-                this.panningVolumeDeltaL = 0;
-                this.panningVolumeDeltaR = 0;
-                this.panningOffsetL = this.panningDelayPos + synth.panningDelayBufferSize;
-                this.panningOffsetR = this.panningDelayPos + synth.panningDelayBufferSize;
-
-                this.panningOffsetDeltaL = 0;
-                this.panningOffsetDeltaR = 0;
-            } // Todo: fix this
+            this.panningMuted = instrument.panMuted;
         }
 
         if (usesChorus) {

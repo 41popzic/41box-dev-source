@@ -363,6 +363,21 @@ content: "";
 .beepboxEditor .tip:active {
 	color: ${ColorConfig.primaryText};
 }
+.beepboxEditor .tip.muted {
+	color:color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .tip.muted:hover {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
+
+.beepboxEditor .display {
+	color: ${ColorConfig.secondaryText};
+}
+
+.beepboxEditor .display.muted {
+	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+}
 
 .beepboxEditor .volume-speaker {
 	flex-shrink: 0;
@@ -923,7 +938,7 @@ content: "";
 	background: transparent;
 	border: none;
   padding-right: 0px;
-  padding-left: 0px;
+  padding-left: 4px;
   box-shadow: none;
 }
 
@@ -1273,7 +1288,7 @@ content: "";
 	display: block;
 	height: 2em;
 	border: none;
-	border-radius: 0.4em;
+	border-radius: 0;
 	background: ${ColorConfig.uiWidgetBackground};
 	color: inherit !important;
 	font-size: inherit;
@@ -1789,7 +1804,7 @@ content: "";
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
 	border-radius: 2px;
-	margin: 2px -6px;
+	margin: 2px -5px;
 	padding: 0.667em 0.5em !important
 }
 
