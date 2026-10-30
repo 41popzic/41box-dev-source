@@ -364,11 +364,11 @@ content: "";
 	color: ${ColorConfig.primaryText};
 }
 .beepboxEditor .tip.muted {
-	color:color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color:var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .tip.muted:hover {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color:var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .display {
@@ -376,7 +376,7 @@ content: "";
 }
 
 .beepboxEditor .display.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .volume-speaker {
@@ -1188,7 +1188,7 @@ content: "";
 	mask-position: center;
 }
 .beepboxEditor .selectContainer:not(.menu).muted::after {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	background: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 .beepboxEditor .selectContainer.menu::after {
 	content: "";
@@ -1228,7 +1228,7 @@ content: "";
 	appearance: none;
 }
 .beepboxEditor select.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 	font-weight: bold;
 }
 .beepboxEditor select option:disabled {
@@ -1371,7 +1371,7 @@ content: "";
 }
 */
 .beepboxEditor .dropdown.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 .beepboxEditor button {
 	margin: 0;
@@ -1609,11 +1609,11 @@ content: "";
 }
 
 .beepboxEditor .control-point-path.muted {
-	fill: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	fill: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .dotted-line-path.muted {
-	stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	stroke: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .instrument-bar {
@@ -1698,11 +1698,11 @@ content: "";
 }
 
 .beepboxEditor .instrument-bar .note-filter.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .note-filter-zoom.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .instrument-bar .add-instrument::before {
@@ -1802,7 +1802,6 @@ content: "";
 
 .beepboxEditor .effect-container {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
-	//border: 1px solid color-mix(in srgb, ${ColorConfig.blackPianoKey} 40%, transparent);
 	border-radius: 2px;
 	margin: 2px -5px;
 	padding: 0.667em 0.5em !important
@@ -1813,12 +1812,14 @@ content: "";
 	font-weight: 1000;
 	margin: -3px 0;
 	display: grid;
-	grid-template-columns: 0.5fr 2fr 0.5fr; // equal sections to compensate for mute button
+	grid-template-columns: 0.8fr 2.1fr 0.8fr; // equal sections to compensate for mute button
 	align-items: center;
+	/*justify-items: left;
+	padding-top: 2px*/
 }
 
 .beepboxEditor .effect-title.muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .knobContainer {
@@ -1858,23 +1859,23 @@ content: "";
 	stroke: currentColor; // is there a better color?
 }
 .beepboxEditor .knob.muted .knobIndicator {
-    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+    stroke: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .knob.muted .knobMarkerHighlight {
-    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+    stroke: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .knob.muted .knobValueArc {
-    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+    stroke: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .knob.muted .knobModulationArc {
-    stroke: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+    stroke: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .muted {
-	color: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	color: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor .knobValueArc {
@@ -2071,7 +2072,7 @@ content: "";
 		pointer-events: none;
 }
 .beepboxEditor span.midTick.muted:after {
-    background:color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+    background:var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 .beepboxEditor span.modSlider {
 	--mod-position: 20%;
@@ -2104,7 +2105,7 @@ content: "";
 }
 
 .beepboxEditor input[type=range].muted::-webkit-slider-thumb {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	background: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 
 .beepboxEditor input[type=range]:focus::-webkit-slider-runnable-track {
@@ -2128,7 +2129,7 @@ content: "";
 	cursor: pointer;
 }
 .beepboxEditor input[type=range].muted::-moz-range-thumb {
-	background: color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey});
+	background: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
 .beepboxEditor input[type=range]::-ms-track {
 	width: 100%;

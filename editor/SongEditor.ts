@@ -1185,7 +1185,7 @@ export class SongEditor {
     private readonly _bitcrusherFreqText = span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "freq");
     private readonly _bitcrusherFreqRow: HTMLDivElement = div({ class: "selectRow" }, span(this._bitcrusherFreqText), this._bitcrusherFreqSlider.container);
     private readonly _bitcrusherPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow);
-    private readonly _bitcrusherTitle: HTMLDivElement = div({ style: "cursor: pointer;", class: "effect-title" }, this._bitcrusherMuteButton, "bitcrush");
+    private readonly _bitcrusherTitle: HTMLDivElement = div({ style: "cursor: pointer;", class: "effect-title" }, this._bitcrusherMuteButton, "bitcrusher");
     private readonly _bitcrusherContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._bitcrusherTitle), this._bitcrusherPreContainer);
     
     private readonly _noteRangeMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });

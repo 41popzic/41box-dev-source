@@ -136,6 +136,7 @@ export class ColorConfig {
 					--mod-label-primary-text:   black;
 					--disabled-note-primary:    #999;
 					--disabled-note-secondary:  #666;
+					--effect-muted: 			#7a7979;
 				}
 			`,
         "dark competition": `
@@ -499,6 +500,7 @@ export class ColorConfig {
 					--mod-primary-note-lum-scale: 0;
 					--disabled-note-primary:    #536e5c;
 					--disabled-note-secondary:  #395440;
+					--effect-muted: 			#5c5151;
 				}
 			`,
         "canyon": `
@@ -614,6 +616,7 @@ export class ColorConfig {
 					--mod-primary-note-lum-scale: 0;
 					--disabled-note-primary:    #515164;
 					--disabled-note-secondary:  #2a2a3a;
+					--effect-muted: 			rgb(115, 114, 114);
 				}
 			`,
         "midnight": `
@@ -730,6 +733,7 @@ export class ColorConfig {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary:    #66a;
 			--disabled-note-secondary:  #447;
+			--effect-muted: 			#5c5151;
 		}
 	`,
         "jummbox light": `
@@ -976,6 +980,7 @@ export class ColorConfig {
 					--mod-primary-note-lum-scale: 0;
 					--disabled-note-primary: #91879f;
 					--disabled-note-secondary: #6a677a;
+					--effect-muted: 			#524c4c;
 				}
 
 			`,
@@ -1090,6 +1095,7 @@ export class ColorConfig {
   --mod-label-primary-text: white;
   --disabled-note-primary: #91879f;
   --disabled-note-secondary: #6a677a;
+  --effect-muted: 			#5c5151;
 
 
 			}
@@ -1207,6 +1213,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #c9c9c9;
 			--disabled-note-secondary: #616161;
+			--effect-muted: 			#5c5151;
 		}`,
         "moonlight": `
 			:root {
@@ -1321,6 +1328,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #828282;
 			--disabled-note-secondary: #4f4f4f;
+			--effect-muted: 		#5c5151;
 			}`,
         "autumn": `
 		:root {
@@ -1432,6 +1440,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
+			--effect-muted: 			#5c5151;
 		}`,
         "fruit": `
 		:root {
@@ -1544,6 +1553,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
+			--effect-muted: 			#5c5151;
 		}`,
         "sunset": `
 		:root {
@@ -1656,6 +1666,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
+			--effect-muted: 			#5c5151;
 		}`,
         "toxic": `
 		:root {
@@ -1768,6 +1779,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #5d5d5d;
 			--disabled-note-secondary: #292929;
+			--effect-muted: 			#5c5151;
 		}`,
         "violet verdant": `
 		:root {
@@ -1880,6 +1892,7 @@ export class ColorConfig {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #91879f;
 			--disabled-note-secondary: #6a677a;
+			--effect-muted: 			#4f5873;
 		}`,
         "portal": `
 		:root {
@@ -1981,6 +1994,7 @@ export class ColorConfig {
 			--mod-label-primary-text: #7bd4ff;
 			--disabled-note-primary: #072f4a;
 			--disabled-note-secondary: #6585a7;
+			--effect-muted: 			#5c5151;
 		}`,
         "fusion": `:root {
 			--page-margin: #0c0306;
@@ -2092,6 +2106,7 @@ export class ColorConfig {
 			--mod4-primary-note: #ffcc99;
 			--disabled-note-primary: #696969;
 			--disabled-note-secondary: #232323;
+			--effect-muted: 			#5c5151;
 		}`,
         "inverse": `:root {
 			--page-margin: #c4c8e3;
@@ -2206,6 +2221,7 @@ export class ColorConfig {
 			--mod-label-secondary-text: #707070;
 			--disabled-note-primary: #959595;
 			--disabled-note-secondary: #6e6e6e;
+			--effect-muted: 			#5c5151;
 			}`,
         "nebula": `
 		:root {
@@ -2316,6 +2332,7 @@ export class ColorConfig {
 			--mod-primary-note-lum: 85;
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #aaa;
+			--effect-muted: 			#4e4461;
 		}`,
         "roe light": `
 		:root {
@@ -2549,6 +2566,7 @@ export class ColorConfig {
 			--mod-label-primary-text: white;
 			--disabled-note-primary: #808080;
 			--disabled-note-secondary: #666666;
+			--effect-muted: 			#5c5151;
 		}`,
         "neapolitan": `:root {
 			--page-margin: #120807;
@@ -2665,6 +2683,7 @@ export class ColorConfig {
 			--mod-label-primary-text: #decdbf;
 			--disabled-note-primary: #bababa;
 			--disabled-note-secondary: #878787;
+			--effect-muted: 			#5c5151;
 		}`,
         "poly":
             `:root {
@@ -2777,6 +2796,7 @@ export class ColorConfig {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #c6c6c6;
 			--disabled-note-secondary: #8c8c8c;
+			--effect-muted: 			#5c5151;
 		}`,
 		"greyscale":
 			`:root {
@@ -2891,6 +2911,7 @@ export class ColorConfig {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #c6c6c6;
 			--disabled-note-secondary: #8c8c8c;
+			--effect-muted: 			#5c5151;
 		}`,
         "blutonium":
             `:root {
@@ -3005,6 +3026,7 @@ export class ColorConfig {
 			--mod-label-primary-text: #ffffffa6;
 			--disabled-note-primary: #c9c9c9;
 			--disabled-note-secondary: #616161;
+			--effect-muted: 			#3e364d;
 	}`,
 "slushie": `
 	:root {
@@ -3116,6 +3138,7 @@ export class ColorConfig {
 		--mod-label-primary: #37325e;
 		--mod-label-secondary-text: #6e8aa7;
 		--mod-label-primary-text: #c1ffff;
+		--effect-muted: 			#3e364d;
 }`,
 "ultrabox dark": `
 :root {
@@ -10978,6 +11001,7 @@ export class ColorConfig {
     public static readonly modLabelPrimaryText: string = "var(--mod-label-primary-text, black)";
     public static readonly disabledNotePrimary: string = "var(--disabled-note-primary, #999)";
     public static readonly disabledNoteSecondary: string = "var(--disabled-note-secondary, #666)";
+	public static readonly effectMuted: string = "var(--effect-muted)";
 
     public static c_pitchSecondaryChannelHue: number = 0;
     public static c_pitchSecondaryChannelHueScale: number = 0;

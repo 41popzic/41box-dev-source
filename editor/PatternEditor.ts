@@ -3447,10 +3447,6 @@ export class PatternEditor {
         this._patternBorderRight.setAttribute("visibility", visibility);
     }
 
-    /*public setBarOffset(offset: number): any {
-        this._barOffset = offset;
-    }*/ 
-    
     private _pitchToPixelHeight(pitch: number): number {
         return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);
     }

@@ -754,18 +754,22 @@ export class Instrument {
             instrumentObject["transition"] = Config.transitions[this.transition].name;
             instrumentObject["clicklessTransition"] = this.clicklessTransition;
             if (Config.transitions[this.transition].slides == true) instrumentObject["slideTicks"] = this.slideTicks;
+            instrumentObject["transitionMuted"] = this.transitionMuted;
         }
         if (effectsIncludeChord(this.effects)) {
-            instrumentObject["chord"] = this.getChord().name;
+            instrumentObject["chord"] = this.getChordSynth().name;
             instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
             instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
             if (Config.chords[this.chord].strumParts > 0) instrumentObject["strumParts"] = this.strumParts;
+            instrumentObject["chordMuted"] = this.chordMuted;
         }
         if (effectsIncludePitchShift(this.effects)) {
             instrumentObject["pitchShiftSemitones"] = this.pitchShift;
+            instrumentObject["pitchShiftMuted"] = this.pitchShiftMuted;
         }
         if (effectsIncludeDetune(this.effects)) {
             instrumentObject["detuneCents"] = detuneToCents(this.detune);
+            instrumentObject["detuneMuted"] = this.detuneMuted;
         }
         if (effectsIncludeVibrato(this.effects)) {
             if (this.vibrato == -1) {
@@ -780,6 +784,7 @@ export class Instrument {
             instrumentObject["vibratoDelay"] = this.vibratoDelay;
             instrumentObject["vibratoSpeed"] = this.vibratoSpeed;
             instrumentObject["vibratoType"] = this.vibratoType;
+            instrumentObject["vibratoMuted"] = this.vibratoMuted;
         }
         if (effectsIncludeNoteFilter(this.effects)) {
             instrumentObject["noteFilterType"] = this.noteFilterType;
@@ -791,12 +796,14 @@ export class Instrument {
                 if (this.noteSubFilters[i] != null)
                     instrumentObject["noteSubFilters" + i] = this.noteSubFilters[i]!.toJsonObject();
             }
+            instrumentObject["noteFilterMuted"] = this.noteFilterMuted;
         }
         if (effectsIncludeGranular(this.effects)) {
             instrumentObject["granular"] = this.granular;
             instrumentObject["grainSize"] = this.grainSize;
             instrumentObject["grainAmounts"] = this.grainAmounts;
             instrumentObject["grainRange"] = this.grainRange;
+            instrumentObject["granularMuted"] = this.granularMuted;
         }
         if (effectsIncludeRingModulation(this.effects)) {
             instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
@@ -804,31 +811,38 @@ export class Instrument {
             instrumentObject["ringModWaveformIndex"] = this.ringModWaveformIndex;
             instrumentObject["ringModPulseWidth"] = Math.round(100 * this.ringModPulseWidth / (Config.pulseWidthRange - 1));
             //instrumentObject["ringModHzOffset"] = Math.round(100 * this.ringModHzOffset / (Config.rmHzOffsetMax));
+            instrumentObject["ringModMuted"] = this.ringModMuted;
         }
         if (effectsIncludePhaser(this.effects)) {
             instrumentObject["phaserMix"] =  Math.round(100 *this.phaserMix/(Config.phaserMixRange - 1));
             instrumentObject["phaserFreq"] =  Math.round(100 *this.phaserFreq/(Config.phaserFreqRange - 1));
             instrumentObject["phaserFeedback"] =  Math.round(100 *this.phaserFeedback/(Config.phaserFeedbackRange - 1));
             instrumentObject["phaserStages"] =  Math.round(100 *this.phaserStages/(Config.phaserMaxStages - 1));
+            instrumentObject["phaserMuted"] = this.phaserMuted;
         }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
             instrumentObject["aliases"] = this.aliases;
+            instrumentObject["distortionMuted"] = this.distortionMuted;
         }
         if (effectsIncludeBitcrusher(this.effects)) {
             instrumentObject["bitcrusherOctave"] = (Config.bitcrusherFreqRange - 1 - this.bitcrusherFreq) * Config.bitcrusherOctaveStep;
             instrumentObject["bitcrusherQuantization"] = Math.round(100 * this.bitcrusherQuantization / (Config.bitcrusherQuantizationRange - 1));
+            instrumentObject["bitcrusherMuted"] = this.bitcrusherMuted;
         }
         if (effectsIncludePanning(this.effects)) {
             instrumentObject["pan"] = Math.round(100 * (this.pan - Config.panCenter) / Config.panCenter);
             instrumentObject["panDelay"] = this.panDelay;
+            instrumentObject["panMuted"] = this.panMuted;
         }
         if (effectsIncludeChorus(this.effects)) {
             instrumentObject["chorus"] = Math.round(100 * this.chorus / (Config.chorusRange - 1));
+            instrumentObject["chorusMuted"] = this.chorusMuted;
         }
         if (effectsIncludeEcho(this.effects)) {
             instrumentObject["echoSustain"] = Math.round(100 * this.echoSustain / (Config.echoSustainRange - 1));
             instrumentObject["echoDelayBeats"] = Math.round(1000 * (this.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat)) / 1000;
+            instrumentObject["echoMuted"] = this.echoMuted;
         }
         if (effectsIncludeFlanger(this.effects)) {
             instrumentObject["flangerDelay"] = this.flangerDelay;
@@ -836,16 +850,19 @@ export class Instrument {
             instrumentObject["flangerRate"] = this.flangerRate;
             instrumentObject["flangerFeedback"] = this.flangerFeedback;
             instrumentObject["flangerMix"] = Math.round(100 * this.flangerMix / (Config.flangerMixRange - 1));
+            instrumentObject["flangerMuted"] = this.flangerMuted;
         }
         if (effectsIncludeReverb(this.effects)) {
             instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
             instrumentObject["reverbDelay"] = this.reverbDelay;
             instrumentObject["reverbShelfHz"] = this.reverbShelfHz;
             instrumentObject["reverbShelfGain"] = this.reverbShelfGain;
+            instrumentObject["reverbMuted"] = this.reverbMuted;
         }
         if (effectsIncludeNoteRange(this.effects)) {
             instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
             instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
+            instrumentObject["noteRangeMuted"] = this.noteRangeMuted;
         }
         if (this.type != InstrumentType.drumset) {
             instrumentObject["fadeInSeconds"] = Math.round(10000 * fadeInSettingToSeconds(this.fadeIn)) / 10000;
@@ -1075,6 +1092,9 @@ export class Instrument {
                 this.effects = (this.effects | (1 << EffectType.transition));
             }
         }
+        if (instrumentObject["transitionMuted"] != undefined) {
+            this.transitionMuted = instrumentObject["transitionMuted"];
+        }  
         if (instrumentObject["slideTicks"] != undefined) {
             this.slideTicks = instrumentObject["slideTicks"];
         }  
@@ -1136,10 +1156,19 @@ export class Instrument {
             // Enable chord if it was used.
             this.effects = (this.effects | (1 << EffectType.chord));
         }
+        if (instrumentObject["chorusMuted"] != undefined) {
+            this.chorusMuted = instrumentObject["chorusMuted"];
+        }
+        if (instrumentObject["chordMuted"] != undefined) {
+            this.chordMuted = instrumentObject["chordMuted"];
+        }  
 
         if (instrumentObject["pitchShiftSemitones"] != undefined) {
             this.pitchShift = clamp(0, Config.pitchShiftRange, Math.round(+instrumentObject["pitchShiftSemitones"]));
         }
+        if (instrumentObject["pitchShiftMuted"] != undefined) {
+            this.pitchShiftMuted = instrumentObject["pitchShiftMuted"];
+        }  
         // modbox pitch shift, known in that mod as "octave offset"
         if (instrumentObject["octoff"] != undefined) {
             let potentialPitchShift: string = instrumentObject["octoff"];
@@ -1160,6 +1189,9 @@ export class Instrument {
         if (instrumentObject["detuneCents"] != undefined) {
             this.detune = clamp(Config.detuneMin, Config.detuneMax + 1, Math.round(centsToDetune(+instrumentObject["detuneCents"])));
         }
+        if (instrumentObject["detuneMuted"] != undefined) {
+            this.detuneMuted = instrumentObject["detuneMuted"];
+        }  
 
         this.vibrato = Config.vibratos.dictionary["none"].index; // default value.
         const vibratoProperty: any = instrumentObject["vibrato"] || instrumentObject["effect"]; // The vibrato property was previously called "effect", not to be confused with the current "effects".
@@ -1184,6 +1216,9 @@ export class Instrument {
                 this.vibratoSpeed = 10; // default;
                 this.vibratoType = Config.vibratos[this.vibrato].type;
             }
+            if (instrumentObject["vibratoMuted"] != undefined) {
+                this.vibratoMuted = instrumentObject["vibratoMuted"];
+            }  
 
             // Old songs may have a vibrato effect without explicitly enabling it.
             if (vibrato != Config.vibratos.dictionary["none"]) {
@@ -1209,6 +1244,9 @@ export class Instrument {
             this.panDelay = (instrumentObject["panDelay"] | 0);
         } else {
             this.panDelay = 0;
+        }
+        if (instrumentObject["panMuted"] != undefined) {
+            this.panMuted = instrumentObject["panMuted"];
         }
 
         if (instrumentObject["detune"] != undefined) {
@@ -1242,6 +1280,9 @@ export class Instrument {
         if (instrumentObject["rmHzOffset"] != undefined) {
             this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["rmHzOffset"] | 0) / 100));
         }
+        if (instrumentObject["ringModMuted"] != undefined) {
+            this.ringModMuted = instrumentObject["ringModMuted"];
+        }  
 
         if (instrumentObject["granular"] != undefined) {
             this.granular = instrumentObject["granular"];
@@ -1255,6 +1296,9 @@ export class Instrument {
         if (instrumentObject["grainRange"] != undefined) {
             this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
         }
+        if (instrumentObject["granularMuted"] != undefined) {
+            this.granularMuted = instrumentObject["granularMuted"];
+        }  
 
         if (instrumentObject["phaserMix"] != undefined) {
             this.phaserMix = clamp(0, Config.phaserMixRange, Math.round((Config.phaserMixRange - 1) * (instrumentObject["phaserMix"] | 0) / 100));
@@ -1268,10 +1312,16 @@ export class Instrument {
         if (instrumentObject["phaserStages"] != undefined) {
             this.phaserStages = clamp(0, Config.phaserMaxStages, Math.round((Config.phaserMaxStages - 1) * (instrumentObject["phaserStages"] | 0) / 100));
         }
+        if (instrumentObject["phaserMuted"] != undefined) {
+            this.phaserMuted = instrumentObject["phaserMuted"];
+        }  
 
         if (instrumentObject["distortion"] != undefined) {
             this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
         }
+        if (instrumentObject["distortionMuted"] != undefined) {
+            this.distortionMuted = instrumentObject["distortionMuted"];
+        }  
 
         if (instrumentObject["bitcrusherOctave"] != undefined) {
             this.bitcrusherFreq = Config.bitcrusherFreqRange - 1 - (+instrumentObject["bitcrusherOctave"]) / Config.bitcrusherOctaveStep;
@@ -1279,6 +1329,9 @@ export class Instrument {
         if (instrumentObject["bitcrusherQuantization"] != undefined) {
             this.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, Math.round((Config.bitcrusherQuantizationRange - 1) * (instrumentObject["bitcrusherQuantization"] | 0) / 100));
         }
+        if (instrumentObject["bitcrusherMuted"] != undefined) {
+            this.bitcrusherMuted = instrumentObject["bitcrusherMuted"];
+        }  
 
         if (instrumentObject["echoSustain"] != undefined) {
             this.echoSustain = clamp(0, Config.echoSustainRange, Math.round((Config.echoSustainRange - 1) * (instrumentObject["echoSustain"] | 0) / 100));
@@ -1286,6 +1339,10 @@ export class Instrument {
         if (instrumentObject["echoDelayBeats"] != undefined) {
             this.echoDelay = clamp(0, Config.echoDelayRange, Math.round((+instrumentObject["echoDelayBeats"]) * (Config.ticksPerPart * Config.partsPerBeat) / Config.echoDelayStepTicks - 1.0));
         }
+        if (instrumentObject["echoMuted"] != undefined) {
+            this.echoMuted = instrumentObject["echoMuted"];
+        }  
+
         if (instrumentObject["flangerDelay"] != undefined) {
             this.flangerDelay = clamp(0, Config.flangerDelayRange,instrumentObject["flangerDelay"] | 0);
         }
@@ -1301,13 +1358,17 @@ export class Instrument {
         if (instrumentObject["flangerMix"] != undefined) {
             this.flangerMix = clamp(0, Config.flangerMixRange,Math.round((Config.flangerMixRange - 1) * (instrumentObject["flangerMix"] | 0) / 100));
         }
+        if (instrumentObject["flangerMuted"] != undefined) {
+            this.flangerMuted = instrumentObject["flangerMuted"];
+        }
+
         if (!isNaN(instrumentObject["chorus"])) {
             this.chorus = clamp(0, Config.chorusRange, Math.round((Config.chorusRange - 1) * (instrumentObject["chorus"] | 0) / 100));
         }
 
         if (instrumentObject["reverb"] != undefined) {
             this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
-            this.reverbDelay = clamp(0, Config.reverbDelayRange - 1, Math.round((Config.reverbDelayRange - 1) * (instrumentObject["reverbDelay"] | 0) / 100));
+            this.reverbDelay = clamp(0, Config.reverbDelayRange, instrumentObject["reverbDelay"] ?? 5); // Icl I forgot what the fallback was -41popzic
             this.reverbShelfHz = clamp(0, Config.reverbShelfHzRange, instrumentObject["reverbShelfHz"] ?? 32);
             this.reverbShelfGain = clamp(0, Config.reverbShelfGainRange, instrumentObject["reverbShelfGain"] ?? 6);
         } else {
@@ -1316,12 +1377,19 @@ export class Instrument {
             this.reverbShelfHz = 32;
             this.reverbShelfGain = 6;
         }
+        if (instrumentObject["reverbMuted"] != undefined) {
+            this.reverbMuted = instrumentObject["reverbMuted"];
+        }  
         if (instrumentObject["upperNoteLimit"] != undefined) {
             this.upperNoteLimit = instrumentObject["upperNoteLimit"]
         }
         if (instrumentObject["lowerNoteLimit"] != undefined) {
             this.lowerNoteLimit = instrumentObject["lowerNoteLimit"]
         }
+        if (instrumentObject["noteRangeMuted"] != undefined) {
+            this.noteRangeMuted = instrumentObject["noteRangeMuted"];
+        }  
+
         if (instrumentObject["pulseWidth"] != undefined) {
             this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
         } else {
@@ -1658,6 +1726,9 @@ export class Instrument {
                     this.noteSubFilters[i]!.fromJsonObject(instrumentObject["noteSubFilters" + i]);
                 }
             }
+            if (instrumentObject["noteFilterMuted"] != undefined) {
+                this.noteFilterMuted = instrumentObject["noteFilterMuted"];
+            }  
             if (instrumentObject["eqFilterType"] != undefined) {
                 this.eqFilterType = instrumentObject["eqFilterType"];
             }
@@ -1896,7 +1967,12 @@ export class Instrument {
     }
 
     public getChord(): Chord {
-        if (this.chordMuted) return Config.chords.dictionary["simultaneous"];
+        const synthChordMuted = this.chordMuted;
+        if (synthChordMuted) return Config.chords.dictionary["simultaneous"];
+        return effectsIncludeChord(this.effects) ? Config.chords[this.chord] : Config.chords.dictionary["simultaneous"];
+    }
+
+    public getChordSynth(): Chord {
         return effectsIncludeChord(this.effects) ? Config.chords[this.chord] : Config.chords.dictionary["simultaneous"];
     }
 
