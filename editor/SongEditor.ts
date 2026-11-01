@@ -1,9 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, effectsIncludeFlanger, flangerRateValues,/*effectsIncludePhaser*/ 
-effectsIncludePhaser,
-effectsIncludeNoteRange} from "../synth/SynthConfig";
+import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, effectsIncludeFlanger, flangerRateValues,/*effectsIncludePhaser*/ effectsIncludePhaser, effectsIncludeNoteRange} from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -52,7 +50,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, ChangeReverbDelay, ChangeReverbShelfHz, ChangeReverbShelfGain, ChangeSlideSpeed, ChangeStrumSpeed, ChangePhaserMix, ChangePhaserFeedback, ChangePhaserFreq, ChangePhaserStages, ChangeUpperLimit, ChangeLowerLimit, ChangePanMuted, ChangeReverbMuted, ChangeChorusMuted, ChangeTransitionMuted, ChangeChordMuted, ChangePitchShiftMuted, ChangeDetuneMuted, ChangeVibratoMuted, ChangeDistortionMuted, ChangeNoteFilterMuted, ChangeGranularMuted, ChangeBitcrusherMuted, ChangeEchoMuted, ChangeRingModMuted, ChangeFlangerMuted, ChangePhaserMuted, ChangeNoteRangeMuted, } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, ChangeReverbDelay, ChangeReverbShelfHz, ChangeReverbShelfGain, ChangeSlideSpeed, ChangeStrumSpeed, ChangePhaserMix, ChangePhaserFeedback, ChangePhaserFreq, ChangePhaserStages, ChangeUpperLimit, ChangeLowerLimit, ChangePanMuted, ChangeReverbMuted, ChangeChorusMuted, ChangeTransitionMuted, ChangeChordMuted, ChangePitchShiftMuted, ChangeDetuneMuted, ChangeVibratoMuted, ChangeDistortionMuted, ChangeNoteFilterMuted, ChangeGranularMuted, ChangeBitcrusherMuted, ChangeEchoMuted, ChangeRingModMuted, ChangeFlangerMuted, ChangePhaserMuted, ChangeNoteRangeMuted, ChangeEffectOrder, } from "./changes";
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
@@ -66,6 +64,7 @@ import { PreferencesPrompt } from "./PreferencesPrompt";
 //import { ContextMenu } from "./Context";
 import { SongDetailsPrompt } from "./SongDetailsPrompt";
 import { clamp } from "../synth/utils";
+import { EffectArrows } from "./EffectArrows";
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -866,6 +865,10 @@ export class SongEditor {
 
     //private readonly _panSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.panMax, value: Config.panCenter, step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), true);
     private readonly _panMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _panArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.panning, -1), 
+        () => this._moveEffect(EffectType.panning, 1)
+    );
     private readonly _panKnob: Knob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), [0, 50, 100])
     private readonly _panDropdown: HTMLButtonElement = button({ class: "dropdown", style: "margin-top: 0em; margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Pan) }, "▼");
     private readonly _panKnobInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
@@ -883,14 +886,18 @@ export class SongEditor {
     private readonly _panDelayRow: HTMLElement = div({ style: "margin-top: 1.667em", class: "selectRow dropFader" }, span(this._panDelayText), this._panDelaySlider.container);
     private readonly _panDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._panDelayRow);
     private readonly _panPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._panKnobRow, this._panDropdownGroup);
-    private readonly _panTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._panMuteButton, "panning");
+    private readonly _panTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._panMuteButton, "panning", this._panArrows.container);
     private readonly _panContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em; padding: 2em;"}, this._panTitle, this._panPreContainer)
 
     private readonly _chorusMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _chorusArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.chorus, -1), 
+        () => this._moveEffect(EffectType.chorus, 1)
+    );
     private readonly _chorusSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeChorus(this.doc, oldValue, newValue), false);
     private readonly _chorusText = span({ class: "tip", onclick: () => this._openPrompt("chorusMix") }, "mix");
     private readonly _chorusRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._chorusText), this._chorusSlider.container);
-    private readonly _chorusTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title"}, this._chorusMuteButton, "chorus");
+    private readonly _chorusTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title"}, this._chorusMuteButton, "chorus", this._chorusArrows.container);
     private readonly _chorusPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._chorusRow);
     private readonly _chorusContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._chorusTitle), this._chorusPreContainer)
 
@@ -898,6 +905,10 @@ export class SongEditor {
     public readonly reverbShelfHzNum: HTMLParagraphElement = div({ style: "font-size: 80%; ", id: "reverbShelfHzNum" });
     public readonly reverbShelfGainNum: HTMLParagraphElement = div({ style: "font-size: 80%; ", id: "reverbShelfGainnum" });
     private readonly _reverbMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _reverbArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.reverb, -1), 
+        () => this._moveEffect(EffectType.reverb, 1)
+    );
     private readonly _reverbMixSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange + 0, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeReverb(this.doc, oldValue, newValue), false);
     private readonly _reverbMixText = span({ class: "tip", onclick: () => this._openPrompt("reverbMix") }, "mix");
     private readonly _reverbMixRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._reverbMixText), this._reverbMixSlider.container);
@@ -919,11 +930,15 @@ export class SongEditor {
         span(this._reverbShelfGainText),
         div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.reverbShelfGainNum),
     ), this._reverbShelfGainSlider.container);
-    private readonly _reverbTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._reverbMuteButton, "reverb");
+    private readonly _reverbTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._reverbMuteButton, "reverb", this._reverbArrows.container);
     private readonly _reverbPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column"}, this._reverbMixRow, this._reverbDelayRow, this._reverbShelfHzRow, this._reverbShelfGainRow)
     private readonly _reverbContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._reverbTitle), this._reverbPreContainer)
 
     private readonly _ringModMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _ringModArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.ringModulation, -1), 
+        () => this._moveEffect(EffectType.ringModulation, 1)
+    );
     private readonly _ringModWaveSelect: HTMLSelectElement = buildOptions(select({}), Config.operatorWaves.map(wave => wave.name));
     private readonly _ringModPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "pulse width" }), this.doc, (oldValue: number, newValue: number) => new ChangeRingModPulseWidth(this.doc, oldValue, newValue), true);
     private readonly _ringModSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeRingMod(this.doc, oldValue, newValue), false);
@@ -945,10 +960,14 @@ export class SongEditor {
         this._ringModWaveSelectRow
     );
     private readonly _ringModPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._ringModContainerRow);
-    private readonly _ringModTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._ringModMuteButton, "ring modulation");
+    private readonly _ringModTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._ringModMuteButton, "ring mod", this._ringModArrows.container);
     private readonly _ringModContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._ringModTitle), this._ringModPreContainer);
 
     private readonly _granularMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _granularArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.granular, -1), 
+        () => this._moveEffect(EffectType.granular, 1)
+    );
     private readonly _granularSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeGranular(this.doc, oldValue, newValue), false);
     private readonly _granularText = span({ class: "tip", onclick: () => this._openPrompt("granularMix") }, "mix ");
     private readonly _granularRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._granularText), this._granularSlider.container);
@@ -975,12 +994,16 @@ export class SongEditor {
         this._grainSizeSliderRow,
         this._grainRangeSliderRow
     );
-    private readonly _granularTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._granularMuteButton, "granular");
+    private readonly _granularTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._granularMuteButton, "granular", this._granularArrows.container);
     private readonly _granularPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._granularContainerRow);
     private readonly _granularContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._granularTitle), this._granularPreContainer);
 
     public readonly echoDelayNum: HTMLParagraphElement = div({ class: "display", style: "font-size: 80%; ", id: "echoDelayNum" });
     private readonly _echoMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _echoArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.echo, -1),
+        () => this._moveEffect(EffectType.echo, 1)
+    );
     private readonly _echoSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
     private readonly _echoSustainText = span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "sustain");
     private readonly _echoSustainRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._echoSustainText), this._echoSustainSlider.container);
@@ -991,13 +1014,17 @@ export class SongEditor {
         div(this.echoDelayNum),
     ), this._echoDelaySlider.container);
     private readonly _echoPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._echoSustainRow, this._echoDelayRow);
-    private readonly _echoTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title"}, this._echoMuteButton, "echo");
+    private readonly _echoTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title"}, this._echoMuteButton, "echo", this._echoArrows.container);
     private readonly _echoContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._echoTitle), this._echoPreContainer);
 
     public readonly flangerRateNum: HTMLParagraphElement = div({ class: "display", style: "font-size: 80%;", id: "flangerRateNum" });
     public readonly flangerDelayNum: HTMLParagraphElement = div({ class: "display", style: "font-size: 80%;", id: "flangerDelayNum" });
     public readonly flangerDepthNum: HTMLParagraphElement = div({ class: "display", style: "font-size: 80%;", id: "flangerDepthNum" });    
     private readonly _flangerMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _flangerArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.flanger, -1), 
+        () => this._moveEffect(EffectType.flanger, 1)
+    );
     private readonly _flangerMixSlider: Slider = new Slider( input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerMixRange - 1, value: 0, step: "1"}), this.doc, (oldValue: number, newValue: number) => new ChangeFlangerMix(this.doc, oldValue, newValue), true);
     private readonly _flangerMixText = span({ style: "text-align: left", class: "tip", onclick: () => this._openPrompt("flangerMix"),}, span("mix"));
     private readonly _flangerMixRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._flangerMixText), this._flangerMixSlider.container );
@@ -1014,10 +1041,14 @@ export class SongEditor {
     private readonly _flangerFeedbackText = span({ style: "text-align: left", class: "tip", onclick: () => this._openPrompt("flangerFeedback"),}, span("feedback"));
     private readonly _flangerFeedbackRow: HTMLDivElement = div({ class: "selectRow" }, span(this._flangerFeedbackText), this._flangerFeedbackSlider.container );    
     private readonly _flangerPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._flangerMixRow, this._flangerDelayRow, this._flangerDepthRow, this._flangerRateRow, this._flangerFeedbackRow);
-    private readonly _flangerTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._flangerMuteButton, "flanger");
+    private readonly _flangerTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._flangerMuteButton, "flanger", this._flangerArrows.container);
     private readonly _flangerContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._flangerTitle), this._flangerPreContainer);
    
     private readonly _phaserMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _phaserArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.phaser, -1), 
+        () => this._moveEffect(EffectType.phaser, 1)
+    );
     private readonly _phaserMixSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePhaserMix(this.doc, oldValue, newValue), false);
     private readonly _phaserMixText = span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("mix"));
     private readonly _phaserMixRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._phaserMixText), this._phaserMixSlider.container);
@@ -1031,7 +1062,7 @@ export class SongEditor {
     private readonly _phaserStagesText = span({ class: "tip", onclick: () => this._openPrompt("phaserStages") }, span(" stages"));
     private readonly _phaserStagesRow: HTMLDivElement = div({ class: "selectRow" }, span(this._phaserStagesText), this._phaserStagesSlider.container);
     private readonly _phaserPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._phaserMixRow, this._phaserFreqRow, this._phaserFeedbackRow, this._phaserStagesRow);
-    private readonly _phaserTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._phaserMuteButton, "phaser");
+    private readonly _phaserTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._phaserMuteButton, "phaser", this._phaserArrows.container);
     private readonly _phaserContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._phaserTitle), this._phaserPreContainer);
 
     private readonly _pitchedPresetSelect: HTMLSelectElement = buildPresetOptions(false, "pitchPresetSelect");
@@ -1076,6 +1107,10 @@ export class SongEditor {
     private readonly _fadeInOutRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("fadeInOut") }, "fade"), this._fadeInOutEditor.container);
     
     private readonly _transitionMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _transitionArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.transition, -1), 
+        () => this._moveEffect(EffectType.transition, 1)
+    );
     private readonly _transitionSelect: HTMLSelectElement = buildOptions(select(), Config.transitions.map(transition => transition.name));
     private readonly _transitionDropdown: HTMLButtonElement = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Transition) }, "▼");
     private readonly _transitionText = span({ class: "tip", onclick: () => this._openPrompt("transition") }, "transition")
@@ -1089,7 +1124,7 @@ export class SongEditor {
     private readonly _slideSpeedRow: HTMLDivElement = div({ class: "selectRow" }, span(this._slideSpeedText), this._slideSpeedDisplay, this._slideSpeedSlider.container);
     private readonly _transitionDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._slideSpeedRow, this._clicklessTransitionRow);
     private readonly _transitionPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column;" }, this._transitionRow, this._transitionDropdownGroup);
-    private readonly _transitionTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._transitionMuteButton, "transition");
+    private readonly _transitionTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._transitionMuteButton, "transition", this._transitionArrows.container);
     private readonly _transitionContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._transitionTitle), this._transitionPreContainer);
 
     private readonly _effectsSelect: HTMLSelectElement = select(option({ selected: true, disabled: true, hidden: false })); // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
@@ -1105,6 +1140,10 @@ export class SongEditor {
     private _eqFilterSimplePeakRow: HTMLDivElement = div({ class: "selectRow", title: "low-pass filter eak resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "filt. peak"), this._eqFilterSimplePeakSlider.container);
 
     private readonly _noteFilterMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _noteFilterArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.noteFilter, -1), 
+        () => this._moveEffect(EffectType.noteFilter, 1)
+    );
     private readonly _noteFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "note-filter", onclick: () => this._switchNoteFilterType(true) }, "noob");
     private readonly _noteFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button note-filter", onclick: () => this._switchNoteFilterType(false) }, "pro");
     private readonly _noteFilterTypeText = span({ style: "", class: "tip", onclick: () => this._openPrompt("filterType") }, "filter type");
@@ -1120,7 +1159,7 @@ export class SongEditor {
     private readonly _noteFilterSimplePeakText = span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "filter peak");
     private _noteFilterSimplePeakRow: HTMLDivElement = div({ class: "selectRow", title: "low-pass filter peak resonance" }, span(this._noteFilterSimplePeakText), this._noteFilterSimplePeakSlider.container);
     private readonly _noteFilterPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow);
-    private readonly _noteFilterTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._noteFilterMuteButton, "note filter");
+    private readonly _noteFilterTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._noteFilterMuteButton, "note filter", this._noteFilterArrows.container);
     private readonly _noteFilterContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em;"}, span(this._noteFilterTitle), this._noteFilterPreContainer);
 
     private readonly _supersawDynamismSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawDynamismMax, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeSupersawDynamism(this.doc, oldValue, newValue), false);
@@ -1143,6 +1182,10 @@ export class SongEditor {
     private readonly _pulseWidthDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._decimalOffsetRow);
 
     private readonly _pitchShiftMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _pitchShiftArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.pitchShift, -1), 
+        () => this._moveEffect(EffectType.pitchShift, 1)
+    );
     //private readonly _pitchShiftSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePitchShift(this.doc, oldValue, newValue), true);
     private readonly _pitchShiftKnob: Knob = new Knob(0, Config.pitchShiftRange - 1, 1, 0, true, this.doc, (oldValue: number, newValue: number) => new ChangePitchShift(this.doc, oldValue, newValue), [0, 7, 12, 19, 24], [false, true, false, true]);
     //private readonly _pitchShiftTonicMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
@@ -1151,10 +1194,14 @@ export class SongEditor {
     private readonly _pitchShiftText = span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose");
     private readonly _pitchShiftRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._pitchShiftText), this._pitchShiftKnob.container);
     private readonly _pitchShiftPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._pitchShiftRow);
-    private readonly _pitchShiftTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._pitchShiftMuteButton, "pitch shift");
+    private readonly _pitchShiftTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._pitchShiftMuteButton, "pitch shift", this._pitchShiftArrows.container);
     private readonly _pitchShiftContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._pitchShiftTitle), this._pitchShiftPreContainer);
     
     private readonly _detuneMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _detuneArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.detune, -1), 
+        () => this._moveEffect(EffectType.detune, 1)
+    );
     private readonly _detuneSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue: number, newValue: number) => new ChangeDetune(this.doc, oldValue, newValue), true);
     private readonly _detuneSliderInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
     private readonly _detuneSliderText = span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("detune") }, "cents ");
@@ -1163,21 +1210,29 @@ export class SongEditor {
         div({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._detuneSliderInputBox),
     ), this._detuneSlider.container);
     private readonly _detunePreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._detuneSliderRow);
-    private readonly _detuneTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._detuneMuteButton, "detune");
+    private readonly _detuneTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._detuneMuteButton, "detune", this._detuneArrows.container);
     private readonly _detuneContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._detuneTitle), this._detunePreContainer);
 
     private readonly _distortionMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _distortionArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.distortion, -1), 
+        () => this._moveEffect(EffectType.distortion, 1)
+    );
     private readonly _distortionSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeDistortion(this.doc, oldValue, newValue), false);
     private readonly _distortionText = span({ class: "tip", onclick: () => this._openPrompt("distortionMix") }, "mix");
     private readonly _distortionRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._distortionText), this._distortionSlider.container);    
     private readonly _aliasingBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _aliasingText = span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("aliases") }, "aliasing");
     private readonly _aliasingRow: HTMLElement = div({ class: "selectRow" }, span(this._aliasingText), this._aliasingBox);
-    private readonly _distortionTitle: HTMLDivElement= div({ style: "cursor: pointer", class: "effect-title" }, this._distortionMuteButton, "distortion");
+    private readonly _distortionTitle: HTMLDivElement= div({ style: "cursor: pointer", class: "effect-title" }, this._distortionMuteButton, "distortion", this._distortionArrows.container);
     private readonly _distortionPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._distortionRow, this._aliasingRow);
     private readonly _distortionContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._distortionTitle), this._distortionPreContainer);
 
     private readonly _bitcrusherMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _bitcrusherArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.bitcrusher, -1), 
+        () => this._moveEffect(EffectType.bitcrusher, 1)
+    );
     private readonly _bitcrusherQuantizationSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeBitcrusherQuantization(this.doc, oldValue, newValue), false);
     private readonly _bitcrusherQuantizationText = span({ class: "tip", onclick: () => this._openPrompt("bitcrusherQuantization") }, "crush");
     private readonly _bitcrusherQuantizationRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._bitcrusherQuantizationText), this._bitcrusherQuantizationSlider.container);
@@ -1185,10 +1240,14 @@ export class SongEditor {
     private readonly _bitcrusherFreqText = span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "freq");
     private readonly _bitcrusherFreqRow: HTMLDivElement = div({ class: "selectRow" }, span(this._bitcrusherFreqText), this._bitcrusherFreqSlider.container);
     private readonly _bitcrusherPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow);
-    private readonly _bitcrusherTitle: HTMLDivElement = div({ style: "cursor: pointer;", class: "effect-title" }, this._bitcrusherMuteButton, "bitcrusher");
+    private readonly _bitcrusherTitle: HTMLDivElement = div({ style: "cursor: pointer;", class: "effect-title" }, this._bitcrusherMuteButton, "bitcrusher", this._bitcrusherArrows.container);
     private readonly _bitcrusherContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._bitcrusherTitle), this._bitcrusherPreContainer);
     
     private readonly _noteRangeMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _noteRangeArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.noteRange, -1),
+        () => this._moveEffect(EffectType.noteRange, 1)
+    );
     private readonly _upperNoteLimitInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 3em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
     //private readonly _upperNoteLimitRow: HTMLElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "upper note limit"), this._upperNoteLimitInputBox);
     private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 3em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
@@ -1201,7 +1260,7 @@ export class SongEditor {
     private readonly _noteRangeDoubSliderContainer: HTMLDivElement = div({ style: "max-width: 9em" }, this._noteRangeDoubSlider.container) // Thanks slarmoooo -41popzic
     private readonly _noteRangeDoubRow: HTMLDivElement = div({ style: "margin-top: 0.667em;", class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteRange") }, ""), this._lowerNoteLimitBoxWrapper, this._noteRangeDoubSliderContainer, this._upperNoteLimitBoxWrapper);    
     private readonly _noteRangePreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._noteRangeDoubRow);
-    private readonly _noteRangeTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._noteRangeMuteButton, "note range");
+    private readonly _noteRangeTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._noteRangeMuteButton, "note range", this._noteRangeArrows.container);
     private readonly _noteRangeContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._noteRangeTitle), this._noteRangePreContainer);
 
     private readonly _stringSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeStringSustain(this.doc, oldValue, newValue), false);
@@ -1243,6 +1302,10 @@ export class SongEditor {
     private readonly _unisonDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
    
     private readonly _chordMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _chordArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.chord, -1), 
+        () => this._moveEffect(EffectType.chord, 1)
+    );
     private readonly _chordSelect: HTMLSelectElement = buildOptions(select({ style: "flex-shrink: 100"}), Config.chords.map(chord => chord.name));
     private readonly _chordDropdown: HTMLButtonElement = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Chord) }, "▼");
     private readonly _monophonicNoteInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 2.35em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1.0 });
@@ -1262,10 +1325,14 @@ export class SongEditor {
     private readonly _strumSpeedRow: HTMLElement = div({ class: "selectRow dropFader" }, div({ style:"display: flex; flex-direction: column" }, span(this._strumSpeedText), this._strumSpeedDisplay), this._strumSpeedSlider.container);
     private readonly _chordDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._strumSpeedRow, this._arpeggioSpeedRow, this._twoNoteArpRow);
     private readonly _chordPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._chordSelectRow, this._chordDropdownGroup);
-    private readonly _chordTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._chordMuteButton, "chord type");
+    private readonly _chordTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._chordMuteButton, "chord type", this._chordArrows.container);
     private readonly _chordContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._chordTitle), this._chordPreContainer);
 
     private readonly _vibratoMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
+    private readonly _vibratoArrows: EffectArrows = new EffectArrows(
+        () => this._moveEffect(EffectType.vibrato, -1), 
+        () => this._moveEffect(EffectType.vibrato, 1)
+    );
     private readonly _vibratoSelect: HTMLSelectElement = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
     private readonly _vibratoDropdown: HTMLButtonElement = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Vibrato) }, "▼");
     private readonly _vibratoText = span({ class: "tip", onclick: () => this._openPrompt("vibrato") }, "vibrato ");
@@ -1285,9 +1352,29 @@ export class SongEditor {
     private readonly _vibratoTypeSelectRow: HTMLElement = div({ class: "selectRow dropFader" }, span(this._vibratoTypeText), div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
     private readonly _vibratoDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: `display: none;` }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
     private readonly _vibratoPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._vibratoSelectRow, this._vibratoDropdownGroup);
-    private readonly _vibratoTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._vibratoMuteButton, "vibrato");
+    private readonly _vibratoTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._vibratoMuteButton, "vibrato", this._vibratoArrows.container);
     private readonly _vibratoContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._vibratoTitle), this._vibratoPreContainer);
     
+    private readonly _effectElements: Map<EffectType, HTMLElement> = new Map([
+        [EffectType.reverb, this._reverbContainer],
+        [EffectType.chorus, this._chorusContainer],
+        [EffectType.panning, this._panContainer],
+        [EffectType.distortion, this._distortionContainer],
+        [EffectType.bitcrusher, this._bitcrusherContainer],
+        [EffectType.noteFilter, this._noteFilterContainer],
+        [EffectType.echo, this._echoContainer],
+        [EffectType.pitchShift, this._pitchShiftContainer],
+        [EffectType.detune, this._detuneContainer],
+        [EffectType.vibrato, this._vibratoContainer],
+        [EffectType.transition, this._transitionContainer],
+        [EffectType.chord, this._chordContainer],
+        [EffectType.noteRange, this._noteRangeContainer],
+        [EffectType.ringModulation, this._ringModContainer],
+        [EffectType.granular, this._granularContainer],
+        [EffectType.flanger, this._flangerContainer],
+        [EffectType.phaser, this._phaserContainer],
+    ]);
+
     private readonly _phaseModGroup: HTMLElement = div({ class: "editor-controls-alt" });
     private readonly _feedbackTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
     readonly envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this.doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu), (name: string) => this._openPrompt(name));
@@ -1389,6 +1476,27 @@ export class SongEditor {
     */
 
     private readonly _addEnvelopeButton: HTMLButtonElement = button({ type: "button", class: "add-envelope" });
+    
+    private readonly _effectsContainer: HTMLDivElement = div({ class: "effects-container" },
+        this._panContainer,
+        this._transitionContainer,
+        this._chordContainer,
+        this._pitchShiftContainer,
+        this._detuneContainer,
+        this._vibratoContainer,
+        this._noteFilterContainer,
+        this._granularContainer,
+        this._distortionContainer,
+        this._bitcrusherContainer,
+        this._chorusContainer,
+        this._echoContainer,
+        this._reverbContainer,
+        this._ringModContainer,
+        this._flangerContainer,
+        this._phaserContainer,
+        this._noteRangeContainer,
+    );
+
     private readonly _customInstrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
         this._eqFilterTypeRow,
         this._eqFilterRow,
@@ -1426,56 +1534,7 @@ export class SongEditor {
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "effects")),
             div({ class: "effects-menu" }, this._effectsSelect),
         ),
-        //this._panSliderRow,
-        //this._panDropdownGroup,
-        this._panContainer,
-        //this._transitionRow,
-        //this._transitionDropdownGroup,
-        this._transitionContainer,
-        //this._chordSelectRow,
-        //this._chordDropdownGroup,
-        this._chordContainer,
-        //this._pitchShiftRow,
-        this._pitchShiftContainer,
-        //this._detuneSliderRow,
-        this._detuneContainer,
-        //this._vibratoSelectRow,
-        //this._vibratoDropdownGroup,
-        this._vibratoContainer,
-        //this._noteFilterTypeRow,
-        //this._noteFilterRow,
-        //this._noteFilterSimpleCutRow,
-        //this._noteFilterSimplePeakRow,
-        this._noteFilterContainer,
-        //this._granularContainerRow,
-        this._granularContainer,
-        //this._distortionRow,
-        //this._aliasingRow,
-        this._distortionContainer,
-        //this._bitcrusherQuantizationRow,
-        //this._bitcrusherFreqRow,
-        this._bitcrusherContainer,
-        //this._chorusRow,
-        this._chorusContainer,
-        //this._echoSustainRow,
-        //this._echoDelayRow,
-        this._echoContainer,
-        //this._reverbRow,
-        this._reverbContainer,
-        //this._ringModContainerRow,
-        this._ringModContainer,
-        //this._phaserMixRow,
-        //this._phaserFreqRow,
-        //this._phaserFeedbackRow,    
-        //this._phaserStagesRow,
-        //this._flangerMixRow,
-        //this._flangerDepthRow,
-        //this._flangerDelayRow,
-        //this._flangerRateRow,
-        //this._flangerFeedbackRow,
-        this._flangerContainer,
-        this._phaserContainer,
-        this._noteRangeContainer,
+        this._effectsContainer,
         div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "envelopes")),
             this._envelopeDropdown,
@@ -2049,6 +2108,9 @@ export class SongEditor {
         this._zoomOutButton.addEventListener("click", this._zoomOut);
         this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
         this._trackArea.addEventListener("mousedown", this.refocusStage);
+
+        // Effect order
+        this._renderEffectOrder();
 
         // Pan
         this._panKnobInputBox.addEventListener("input", () => { this.doc.record(new ChangePan(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panKnobInputBox.value))))) });
@@ -3364,6 +3426,9 @@ export class SongEditor {
             document.getElementById('text-content')!.style.display = this.doc.prefs.showDescription ? "" : "none";
 
         const instrumentEffects = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+
+        // Effect order
+        this._renderEffectOrder();
 
         // Pan
         this._panMuteButton.classList.toggle("muted", instrumentEffects.panMuted);
@@ -7176,5 +7241,49 @@ export class SongEditor {
             console.warn("Effect not collapsible!");
         }
         return;
+    }
+
+    private _moveEffect(effect: EffectType, direction: -1 | 1): void {
+        const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+
+        const oldOrder = [...instrument.effectOrder];
+        const newOrder = [...oldOrder];
+
+        const index = newOrder.indexOf(effect);
+        let newIndex = index + direction;
+
+        if (index === -1) return;
+        
+        while (newIndex >= 0 && newIndex < newOrder.length) {
+            const candidate = newOrder[newIndex];
+
+            if (instrument.effects & (1 << candidate)) {
+                break;
+            }
+
+            newIndex += direction;
+        }
+
+        if (newIndex < 0 || newIndex >= newOrder.length) return;
+
+        [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]];
+
+        const change = new ChangeEffectOrder(this.doc, oldOrder, newOrder);
+        this.doc.setProspectiveChange(change);
+        this.doc.record(change);
+
+        this._renderEffectOrder();
+    }
+
+    public _renderEffectOrder(): void {
+        const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+
+        for (const effect of instrument.effectOrder) {
+            const element = this._effectElements.get(effect);
+
+            if (element) {
+                this._effectsContainer.appendChild(element);
+            }
+        }
     }
 }

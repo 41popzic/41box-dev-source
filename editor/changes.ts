@@ -5163,6 +5163,34 @@ export class ChangeSongReverb extends Change {
     }
 }
 
+export class ChangeEffectOrder extends UndoableChange {
+    private _instrument: Instrument;
+    private _oldOrder: EffectType[];
+    private _newOrder: EffectType[];
+
+    constructor(private _doc: SongDocument, oldOrder: EffectType[], newOrder: EffectType[]) {
+        super(false);
+
+        this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+
+        this._oldOrder = [...oldOrder];
+        this._newOrder = [...newOrder];
+
+        this._doForwards();
+        this._doc.notifier.changed();
+        this._didSomething();
+    }
+
+    protected _doForwards(): void {
+        this._instrument.effectOrder = [...this._newOrder];
+    }
+
+    protected _doBackwards(): void {
+        this._instrument.effectOrder = [...this._oldOrder];
+    }
+}
+
+
 export class ChangeNoteAdded extends UndoableChange {
     private _doc: SongDocument;
     private _pattern: Pattern;

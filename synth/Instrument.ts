@@ -317,6 +317,26 @@ export class Instrument {
     public lowerNoteLimit: number = 0;
     public noteRangeMuted: boolean = false;
 
+    public effectOrder: number[] = [
+            EffectType.reverb,
+            EffectType.chorus,
+            EffectType.panning,
+            EffectType.distortion,
+            EffectType.bitcrusher,
+            EffectType.noteFilter,
+            EffectType.echo,
+            EffectType.pitchShift,
+            EffectType.detune,
+            EffectType.vibrato,
+            EffectType.transition,
+            EffectType.chord,
+            EffectType.noteRange,
+            EffectType.ringModulation,
+            EffectType.granular,
+            EffectType.flanger,
+            EffectType.phaser,
+    ];
+
     public algorithm: number = 0;
     public feedbackType: number = 0;
     public algorithm6Op: number = 1;
@@ -489,6 +509,25 @@ export class Instrument {
         this.transition = Config.transitions.dictionary["normal"].index;
         this.transitionMuted = false;
         this.envelopeCount = 0;
+        this.effectOrder = [
+            EffectType.reverb,
+            EffectType.chorus,
+            EffectType.panning,
+            EffectType.distortion,
+            EffectType.bitcrusher,
+            EffectType.noteFilter,
+            EffectType.echo,
+            EffectType.pitchShift,
+            EffectType.detune,
+            EffectType.vibrato,
+            EffectType.transition,
+            EffectType.chord,
+            EffectType.noteRange,
+            EffectType.ringModulation,
+            EffectType.granular,
+            EffectType.flanger,
+            EffectType.phaser,
+        ];
         this.isNoiseInstrument = isNoiseChannel;
         switch (type) {
             case InstrumentType.chip:

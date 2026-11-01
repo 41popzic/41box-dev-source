@@ -1060,6 +1060,10 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.phaserMix]);
                     buffer.push(base64IntToCharCode[instrument.phaserMuted ? 1 : 0]);
                 }
+                for (const effect of instrument.effectOrder) {
+                    buffer.push(base64IntToCharCode[effect]);
+                }
+
                 if (instrument.type != InstrumentType.drumset) {
                     buffer.push(SongTagCode.fadeInOut, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
                     // Transition info follows transition song tag
@@ -2922,7 +2926,13 @@ export class Song {
                         instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         if (from41Box && !beforeFour) instrument.phaserMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
+                    const effectOrder: EffectType[] = [];
 
+                    for (let i = 0; i < EffectType.length; i++) {
+                        effectOrder.push(base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
+
+                    instrument.effectOrder = effectOrder;
                 }
                 // Clamp the range.
                 instrument.effects &= (1 << EffectType.length) - 1;

@@ -4,7 +4,7 @@ import { SpectrumWave, HarmonicsWave, Instrument } from "./Instrument";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
 import { Tone, Synth } from "./synth";
-import { SustainType, InstrumentType, calculateRingModHertz, EnvelopeComputeIndex, FilterType, Unison, Chord, Config, getDrumWave, drawNoiseSpectrum, performIntegralOld, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, GranularEnvelopeType, effectsIncludePhaser } from "./SynthConfig";
+import { SustainType, InstrumentType, calculateRingModHertz, EnvelopeComputeIndex, FilterType, Unison, Chord, Config, getDrumWave, drawNoiseSpectrum, performIntegralOld, effectsIncludeBitcrusher, effectsIncludeChorus, effectsIncludeDistortion, effectsIncludeEcho, effectsIncludeFlanger, effectsIncludeGranular, effectsIncludePanning, effectsIncludeReverb, effectsIncludeRingModulation, GranularEnvelopeType, effectsIncludePhaser, EffectType } from "./SynthConfig";
 import {  } from "./utils";
 import { DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { EnvelopeComputer } from "./EnvelopeComputer";
@@ -387,6 +387,8 @@ export class InstrumentState {
     public nextVibratoTime: number = 0;
     public envelopeTime: number[] = [];
 
+    public effectOrder: EffectType[] = [];
+
     public eqFilterVolume: number = 1.0;
     public eqFilterVolumeDelta: number = 0.0;
     public mixVolume: number = 1.0;
@@ -555,6 +557,7 @@ export class InstrumentState {
     public readonly envelopeComputer: EnvelopeComputer = new EnvelopeComputer();
 
     public allocateNecessaryBuffers(synth: Synth, instrument: Instrument, samplesPerTick: number): void {
+        this.effectOrder = instrument.effectOrder;
         if (effectsIncludePanning(instrument.effects)) {
             if (this.panningDelayLine == null || this.panningDelayLine.length < synth.panningDelayBufferSize) {
                 this.panningDelayLine = new Float32Array(synth.panningDelayBufferSize);

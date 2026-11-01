@@ -1806,16 +1806,29 @@ content: "";
 	margin: 2px -5px;
 	padding: 0.667em 0.5em !important
 }
+.beepboxEditor .arrow-button {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
+	padding: 0px; 
+	width: 1.25em; 
+	height: 1.25em; 
+	font-size: 1.1em;
+	margin: 0 -2px;
+}
+
+.beepboxEditor .arrow-button:focus {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
+}
 
 .beepboxEditor .effect-title {
+	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	color: currentColor;
 	font-weight: 1000;
 	margin: -3px 0;
 	display: grid;
 	grid-template-columns: 0.8fr 2.1fr 0.8fr; // equal sections to compensate for mute button
 	align-items: center;
-	/*justify-items: left;
-	padding-top: 2px*/
+	justify-items: left;
+	padding-top: 2px
 }
 
 .beepboxEditor .effect-title.muted {
