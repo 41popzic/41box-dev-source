@@ -4626,7 +4626,8 @@ if (playSong && !this.countInMetronome) {
         signature = signature << 1; if (usesFlanger) signature = signature | 1;
 
         let granularSample = `
-            let granularOutput = 0;
+            let granularOutputL = 0;
+            let granularOutputR = 0;
             for (let grainIndex = 0; grainIndex < granularGrainCount; grainIndex++) {
                 const grain = granularGrains[grainIndex];
                 if (computeGrains) {
@@ -4637,9 +4638,9 @@ if (playSong && !this.countInMetronome) {
                         const grainDelayLinePositionInt = grainDelayLinePosition | 0;
                         let grainAgeInSamples = grain.ageInSamples;
                         const grainMaxAgeInSamples = grain.maxAgeInSamples;
-                        let grainSample = granularDelayLine[
-                            ((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt)) & granularDelayLineMask)
-                        ];
+                        const grainDelayIndex = (granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt)) & granularDelayLineMask;
+                        let grainSampleL = granularDelayLineL[grainDelayIndex];
+                        let grainSampleR = granularDelayLineR[grainDelayIndex];
         `;
 
         if (Config.granularEnvelopeType == GranularEnvelopeType.parabolic) {
@@ -4653,8 +4654,10 @@ if (playSong && !this.countInMetronome) {
         }
 
         granularSample += `
-            grainSample *= grainEnvelope;
-            granularOutput += grainSample;
+            grainSampleL *= grainEnvelope;
+            grainSampleR *= grainEnvelope;
+            granularOutputL += grainSampleL;
+            granularOutputR += grainSampleR;
             if (grainAgeInSamples > grainMaxAgeInSamples) {
                 if (granularGrainCount > 0) {
                     // Faster equivalent of .pop, ignoring the order in the array.
@@ -4693,10 +4696,13 @@ if (playSong && !this.countInMetronome) {
         }
         granularWet += granularMixDelta;
         granularDry -= granularMixDelta;
-        granularOutput *= Config.granularOutputLoudnessCompensation;
-        granularDelayLine[granularDelayLineIndex] = sample;
+        granularOutputL *= Config.granularOutputLoudnessCompensation;
+        granularOutputR *= Config.granularOutputLoudnessCompensation;
+        granularDelayLineL[granularDelayLineIndex] = sampleL;
+        granularDelayLineR[granularDelayLineIndex] = sampleR;
         granularDelayLineIndex = (granularDelayLineIndex + 1) & granularDelayLineMask;
-        sample = sample * granularDry + granularOutput * granularWet;
+        sampleL = sampleL * granularDry + granularOutputL * granularWet;
+        sampleR = sampleR * granularDry + granularOutputR * granularWet;
         tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;
         `;
 
@@ -4746,10 +4752,11 @@ if (playSong && !this.countInMetronome) {
                     let granularWet = instrumentState.granularMix / 2; // Gralunar is *2 as fast on 41Box for some reason???
                     const granularMixDelta = instrumentState.granularMixDelta;
                     let granularDry = 1.0 - (granularWet * 2); 
-                    const granularDelayLine = instrumentState.granularDelayLine;
+                    const granularDelayLineL = instrumentState.granularDelayLineL;
+                    const granularDelayLineR = instrumentState.granularDelayLineR;
                     const granularGrains = instrumentState.granularGrains;
                     let granularGrainCount = instrumentState.granularGrainsLength;
-                    const granularDelayLineLength = granularDelayLine.length;
+                    const granularDelayLineLength = granularDelayLineL.length;
                     const granularDelayLineMask = granularDelayLineLength - 1;
                     let granularDelayLineIndex = instrumentState.granularDelayLineIndex;
                     const usesRandomGrainLocation = instrumentState.usesRandomGrainLocation;
@@ -4785,51 +4792,93 @@ if (playSong && !this.countInMetronome) {
                     const distortionPrevOutputWeight2 = 1.0 - distortionNextOutputWeight2;
                     const distortionPrevOutputWeight3 = 1.0 - distortionNextOutputWeight3;
                     
-                    let distortionFractionalInput1 = +instrumentState.distortionFractionalInput1;
-                    let distortionFractionalInput2 = +instrumentState.distortionFractionalInput2;
-                    let distortionFractionalInput3 = +instrumentState.distortionFractionalInput3;
-                    let distortionPrevInput = +instrumentState.distortionPrevInput;
-                    let distortionNextOutput = +instrumentState.distortionNextOutput;
+
+                    let distortionFractionalInput1L = +instrumentState.distortionFractionalInput1L;
+                    let distortionFractionalInput1R = +instrumentState.distortionFractionalInput1R;
+
+                    let distortionFractionalInput2L = +instrumentState.distortionFractionalInput2L;
+                    let distortionFractionalInput2R = +instrumentState.distortionFractionalInput2R;
+
+                    let distortionFractionalInput3L = +instrumentState.distortionFractionalInput3L;
+                    let distortionFractionalInput3R = +instrumentState.distortionFractionalInput3R;
+
+                    let distortionPrevInputL = +instrumentState.distortionPrevInputL;
+                    let distortionPrevInputR = +instrumentState.distortionPrevInputR;
+
+                    let distortionNextOutputL = +instrumentState.distortionNextOutputL;
+                    let distortionNextOutputR = +instrumentState.distortionNextOutputR;
                 `,
                 sampleStage: `
-					const distortionReverse = 1.0 - distortion;
-					const distortionNextInput = sample * distortionDrive;
-					sample = distortionNextOutput;
-					distortionNextOutput = distortionNextInput / (distortionReverse * Math.abs(distortionNextInput) + distortion);
-					distortionFractionalInput1 = distortionFractionalDelayG1 * distortionNextInput + distortionPrevInput - distortionFractionalDelayG1 * distortionFractionalInput1;
-					distortionFractionalInput2 = distortionFractionalDelayG2 * distortionNextInput + distortionPrevInput - distortionFractionalDelayG2 * distortionFractionalInput2;
-					distortionFractionalInput3 = distortionFractionalDelayG3 * distortionNextInput + distortionPrevInput - distortionFractionalDelayG3 * distortionFractionalInput3;
-					const distortionOutput1 = distortionFractionalInput1 / (distortionReverse * Math.abs(distortionFractionalInput1) + distortion);
-					const distortionOutput2 = distortionFractionalInput2 / (distortionReverse * Math.abs(distortionFractionalInput2) + distortion);
-					const distortionOutput3 = distortionFractionalInput3 / (distortionReverse * Math.abs(distortionFractionalInput3) + distortion);
-					distortionNextOutput += distortionOutput1 * distortionNextOutputWeight1 + distortionOutput2 * distortionNextOutputWeight2 + distortionOutput3 * distortionNextOutputWeight3;
-					sample += distortionOutput1 * distortionPrevOutputWeight1 + distortionOutput2 * distortionPrevOutputWeight2 + distortionOutput3 * distortionPrevOutputWeight3;
-					sample *= distortionOversampleCompensation;
-					distortionPrevInput = distortionNextInput;
-					distortion += distortionDelta;
-					distortionDrive += distortionDriveDelta;
+                    const distortionReverse = 1.0 - distortion;
+
+                    const distortionNextInputL = sampleL * distortionDrive;
+                    const distortionNextInputR = sampleR * distortionDrive;
+
+                    sampleL = distortionNextOutputL;
+                    sampleR = distortionNextOutputR;
+
+                    distortionNextOutputL = distortionNextInputL / (distortionReverse * Math.abs(distortionNextInputL) + distortion);
+                    distortionNextOutputR = distortionNextInputR / (distortionReverse * Math.abs(distortionNextInputR) + distortion);
+
+                    distortionFractionalInput1L = distortionFractionalDelayG1 * distortionNextInputL + distortionPrevInputL - distortionFractionalDelayG1 * distortionFractionalInput1L;
+                    distortionFractionalInput1R = distortionFractionalDelayG1 * distortionNextInputR + distortionPrevInputR - distortionFractionalDelayG1 * distortionFractionalInput1R;
+
+                    distortionFractionalInput2L = distortionFractionalDelayG2 * distortionNextInputL + distortionPrevInputL - distortionFractionalDelayG2 * distortionFractionalInput2L;
+                    distortionFractionalInput2R = distortionFractionalDelayG2 * distortionNextInputR + distortionPrevInputR - distortionFractionalDelayG2 * distortionFractionalInput2R;
+
+                    distortionFractionalInput3L = distortionFractionalDelayG3 * distortionNextInputL + distortionPrevInputL - distortionFractionalDelayG3 * distortionFractionalInput3L;
+                    distortionFractionalInput3R = distortionFractionalDelayG3 * distortionNextInputR + distortionPrevInputR - distortionFractionalDelayG3 * distortionFractionalInput3R;
+
+                    const distortionOutput1L = distortionFractionalInput1L / (distortionReverse * Math.abs(distortionFractionalInput1L) + distortion);
+                    const distortionOutput1R = distortionFractionalInput1R / (distortionReverse * Math.abs(distortionFractionalInput1R) + distortion);
+
+                    const distortionOutput2L = distortionFractionalInput2L / (distortionReverse * Math.abs(distortionFractionalInput2L) + distortion);
+                    const distortionOutput2R = distortionFractionalInput2R / (distortionReverse * Math.abs(distortionFractionalInput2R) + distortion);
+
+                    const distortionOutput3L = distortionFractionalInput3L / (distortionReverse * Math.abs(distortionFractionalInput3L) + distortion);
+                    const distortionOutput3R = distortionFractionalInput3R / (distortionReverse * Math.abs(distortionFractionalInput3R) + distortion);
+
+                    distortionNextOutputL += distortionOutput1L * distortionNextOutputWeight1 + distortionOutput2L * distortionNextOutputWeight2 + distortionOutput3L * distortionNextOutputWeight3;
+                    distortionNextOutputR += distortionOutput1R * distortionNextOutputWeight1 + distortionOutput2R * distortionNextOutputWeight2 + distortionOutput3R * distortionNextOutputWeight3;
+
+                    sampleL += distortionOutput1L * distortionPrevOutputWeight1 + distortionOutput2L * distortionPrevOutputWeight2 + distortionOutput3L * distortionPrevOutputWeight3;
+                    sampleR += distortionOutput1R * distortionPrevOutputWeight1 + distortionOutput2R * distortionPrevOutputWeight2 + distortionOutput3R * distortionPrevOutputWeight3;
+
+                    sampleL *= distortionOversampleCompensation;
+                    sampleR *= distortionOversampleCompensation;
+
+                    distortionPrevInputL = distortionNextInputL;
+                    distortionPrevInputR = distortionNextInputR;
+
+                    distortion += distortionDelta;
+                    distortionDrive += distortionDriveDelta;
                 `,
                 saveStage: `
                     instrumentState.distortion = distortion;
                     instrumentState.distortionDrive = distortionDrive;
-                    
-                    if (!Number.isFinite(distortionFractionalInput1) || Math.abs(distortionFractionalInput1) < epsilon) distortionFractionalInput1 = 0.0;
-                    if (!Number.isFinite(distortionFractionalInput2) || Math.abs(distortionFractionalInput2) < epsilon) distortionFractionalInput2 = 0.0;
-                    if (!Number.isFinite(distortionFractionalInput3) || Math.abs(distortionFractionalInput3) < epsilon) distortionFractionalInput3 = 0.0;
-                    if (!Number.isFinite(distortionPrevInput) || Math.abs(distortionPrevInput) < epsilon) distortionPrevInput = 0.0;
-                    if (!Number.isFinite(distortionNextOutput) || Math.abs(distortionNextOutput) < epsilon) distortionNextOutput = 0.0;
-                    
-                    instrumentState.distortionFractionalInput1 = distortionFractionalInput1;
-                    instrumentState.distortionFractionalInput2 = distortionFractionalInput2;
-                    instrumentState.distortionFractionalInput3 = distortionFractionalInput3;
-                    instrumentState.distortionPrevInput = distortionPrevInput;
-                    instrumentState.distortionNextOutput = distortionNextOutput;
+
+                    instrumentState.distortionFractionalInput1L = Number.isFinite(distortionFractionalInput1L) ? distortionFractionalInput1L : 0;
+                    instrumentState.distortionFractionalInput1R = Number.isFinite(distortionFractionalInput1R) ? distortionFractionalInput1R : 0;
+
+                    instrumentState.distortionFractionalInput2L = Number.isFinite(distortionFractionalInput2L) ? distortionFractionalInput2L : 0;
+                    instrumentState.distortionFractionalInput2R = Number.isFinite(distortionFractionalInput2R) ? distortionFractionalInput2R : 0;
+
+                    instrumentState.distortionFractionalInput3L = Number.isFinite(distortionFractionalInput3L) ? distortionFractionalInput3L : 0;
+                    instrumentState.distortionFractionalInput3R = Number.isFinite(distortionFractionalInput3R) ? distortionFractionalInput3R : 0;
+
+                    instrumentState.distortionPrevInputL = Number.isFinite(distortionPrevInputL) ? distortionPrevInputL : 0;
+                    instrumentState.distortionPrevInputR = Number.isFinite(distortionPrevInputR) ? distortionPrevInputR : 0;
+
+                    instrumentState.distortionNextOutputL = Number.isFinite(distortionNextOutputL) ? distortionNextOutputL : 0;
+                    instrumentState.distortionNextOutputR = Number.isFinite(distortionNextOutputR) ? distortionNextOutputR : 0;
                 `,
             },
             [EffectType.bitcrusher]: {
                 loadStage: `
-                    let bitcrusherPrevInput = +instrumentState.bitcrusherPrevInput;
-                    let bitcrusherCurrentOutput = +instrumentState.bitcrusherCurrentOutput;
+                    let bitcrusherPrevInputL = +instrumentState.bitcrusherPrevInputL;
+                    let bitcrusherPrevInputR = +instrumentState.bitcrusherPrevInputR;
+                    let bitcrusherCurrentOutputL = +instrumentState.bitcrusherCurrentOutputL;
+                    let bitcrusherCurrentOutputR = +instrumentState.bitcrusherCurrentOutputR;
                     let bitcrusherPhase = +instrumentState.bitcrusherPhase;
                     let bitcrusherPhaseDelta = +instrumentState.bitcrusherPhaseDelta;
                     const bitcrusherPhaseDeltaScale = +instrumentState.bitcrusherPhaseDeltaScale;
@@ -4841,34 +4890,56 @@ if (playSong && !this.countInMetronome) {
                 sampleStage: `
 					bitcrusherPhase += bitcrusherPhaseDelta;
 					if (bitcrusherPhase < 1.0) {
-						bitcrusherPrevInput = sample;
-						sample = bitcrusherCurrentOutput;
-					} else {
-						bitcrusherPhase -= (bitcrusherPhase | 0);
-						const bitcrusherRatio = bitcrusherPhase / bitcrusherPhaseDelta;
-						
-						const lerpedInput = sample + (bitcrusherPrevInput - sample) * bitcrusherRatio;
-						bitcrusherPrevInput = sample;
-						
-						const bitcrusherWrapLevel = bitcrusherFoldLevel * 4.0;
-						const wrappedSample = (((lerpedInput + bitcrusherFoldLevel) % bitcrusherWrapLevel) + bitcrusherWrapLevel) % bitcrusherWrapLevel;
-						const foldedSample = bitcrusherFoldLevel - Math.abs(bitcrusherFoldLevel * 2.0 - wrappedSample);
-						const scaledSample = foldedSample / bitcrusherScale;
-						const oldValue = bitcrusherCurrentOutput;
-						const newValue = (((scaledSample > 0 ? scaledSample + 1 : scaledSample)|0)-.5) * bitcrusherScale;
-						
-						sample = oldValue + (newValue - oldValue) * bitcrusherRatio;
-						bitcrusherCurrentOutput = newValue;
-					}
+						bitcrusherPrevInputL = sampleL;
+                        bitcrusherPrevInputR = sampleR;
+
+						sampleL = bitcrusherCurrentOutputL;
+                        sampleR = bitcrusherCurrentOutputR;
+                    } else {
+                        bitcrusherPhase -= (bitcrusherPhase | 0);
+                        const bitcrusherRatio = bitcrusherPhase / bitcrusherPhaseDelta;
+
+                        const bitcrusherWrapLevel = bitcrusherFoldLevel * 4.0;
+
+                        // Left 
+                        const lerpedInputL = sampleL + (bitcrusherPrevInputL - sampleL) * bitcrusherRatio;
+                        bitcrusherPrevInputL = sampleL;
+
+                        const wrappedSampleL = (((lerpedInputL + bitcrusherFoldLevel) % bitcrusherWrapLevel) + bitcrusherWrapLevel) % bitcrusherWrapLevel;
+                        const foldedSampleL = bitcrusherFoldLevel - Math.abs(bitcrusherFoldLevel * 2.0 - wrappedSampleL);
+                        const scaledSampleL = foldedSampleL / bitcrusherScale;
+                        const oldValueL = bitcrusherCurrentOutputL;
+                        const newValueL = (((scaledSampleL > 0 ? scaledSampleL + 1 : scaledSampleL) | 0) - 0.5) * bitcrusherScale;
+
+                        sampleL = oldValueL + (newValueL - oldValueL) * bitcrusherRatio;
+                        bitcrusherCurrentOutputL = newValueL;
+
+                        // Right
+                        const lerpedInputR = sampleR + (bitcrusherPrevInputR - sampleR) * bitcrusherRatio;
+                        bitcrusherPrevInputR = sampleR;
+
+                        const wrappedSampleR = (((lerpedInputR + bitcrusherFoldLevel) % bitcrusherWrapLevel) + bitcrusherWrapLevel) % bitcrusherWrapLevel;
+                        const foldedSampleR = bitcrusherFoldLevel - Math.abs(bitcrusherFoldLevel * 2.0 - wrappedSampleR);
+                        const scaledSampleR = foldedSampleR / bitcrusherScale;
+                        const oldValueR = bitcrusherCurrentOutputR;
+                        const newValueR = (((scaledSampleR > 0 ? scaledSampleR + 1 : scaledSampleR) | 0) - 0.5) * bitcrusherScale;
+
+                        sampleR = oldValueR + (newValueR - oldValueR) * bitcrusherRatio;
+                        bitcrusherCurrentOutputR = newValueR;
+                    }
 					bitcrusherPhaseDelta *= bitcrusherPhaseDeltaScale;
 					bitcrusherScale *= bitcrusherScaleScale;
 					bitcrusherFoldLevel *= bitcrusherFoldLevelScale;
                 `,
                 saveStage: `
-                    if (Math.abs(bitcrusherPrevInput) < epsilon) bitcrusherPrevInput = 0.0;
-                    if (Math.abs(bitcrusherCurrentOutput) < epsilon) bitcrusherCurrentOutput = 0.0;
-                    instrumentState.bitcrusherPrevInput = bitcrusherPrevInput;
-                    instrumentState.bitcrusherCurrentOutput = bitcrusherCurrentOutput;
+                    if (Math.abs(bitcrusherPrevInputL) < epsilon) bitcrusherPrevInputL = 0.0;
+                    if (Math.abs(bitcrusherPrevInputR) < epsilon) bitcrusherPrevInputR = 0.0;
+                    if (Math.abs(bitcrusherCurrentOutputL) < epsilon) bitcrusherCurrentOutputL = 0.0;
+                    if (Math.abs(bitcrusherCurrentOutputR) < epsilon) bitcrusherCurrentOutputR = 0.0;
+                    instrumentState.bitcrusherPrevInputL = bitcrusherPrevInputL;
+                    instrumentState.bitcrusherPrevInputR = bitcrusherPrevInputR;
+                    instrumentState.bitcrusherCurrentOutputL = bitcrusherCurrentOutputL;
+                    instrumentState.bitcrusherCurrentOutputR = bitcrusherCurrentOutputR;
                     instrumentState.bitcrusherPhase = bitcrusherPhase;
                     instrumentState.bitcrusherPhaseDelta = bitcrusherPhaseDelta;
                     instrumentState.bitcrusherScale = bitcrusherScale;
@@ -4895,9 +4966,14 @@ if (playSong && !this.countInMetronome) {
                     const ringModWaveformLength = ringModWaveform.length - 1;
                 `,
                 sampleStage: `
-                    const ringModOutput = sample * ringModWaveform[(ringModPhase*ringModWaveformLength)|0];
+                    const ringModWave = ringModWaveform[(ringModPhase * ringModWaveformLength) | 0];
                     const ringModMixF = Math.max(0, ringModMix * ringModMixFade);
-                    sample = sample * (1 - ringModMixF) + ringModOutput * ringModMixF;
+
+                    const ringModOutputL = sampleL * ringModWave;
+                    const ringModOutputR = sampleR * ringModWave;
+
+                    sampleL = sampleL * (1 - ringModMixF) + ringModOutputL * ringModMixF;
+                    sampleR = sampleR * (1 - ringModMixF) + ringModOutputR * ringModMixF;
 
                     ringModMix += ringModMixDelta;
                     ringModPhase += ringModPhaseDelta;
@@ -4918,8 +4994,10 @@ if (playSong && !this.countInMetronome) {
             },
             [EffectType.phaser]: {
                 loadStage: `
-                    const phaserSamples = instrumentState.phaserSamples;
-                    const phaserPrevInputs = instrumentState.phaserPrevInputs;
+                    const phaserSamplesL = instrumentState.phaserSamplesL;
+                    const phaserSamplesR = instrumentState.phaserSamplesR;
+                    const phaserPrevInputsL = instrumentState.phaserPrevInputsL;
+                    const phaserPrevInputsR = instrumentState.phaserPrevInputsR;
                     let phaserStages = instrumentState.phaserStages;
                     let phaserStagesInt = Math.floor(phaserStages);
                     const phaserStagesDelta = instrumentState.phaserStagesDelta;
@@ -4931,17 +5009,33 @@ if (playSong && !this.countInMetronome) {
                     let phaserBreakCoef = +instrumentState.phaserBreakCoef;
                 `,
                 sampleStage: `
-                    const phaserFeedback = phaserSamples[Math.max(0,phaserStagesInt - 1)] * phaserFeedbackMult;
+                    const phaserLastStage = Math.max(0, phaserStagesInt - 1);
+                    const phaserFeedbackL = phaserSamplesL[phaserLastStage] * phaserFeedbackMult;
+                    const phaserFeedbackR = phaserSamplesR[phaserLastStage] * phaserFeedbackMult;
                     for (let stage = 0; stage < phaserStagesInt; stage++) {
-                        const phaserInput = stage === 0 ? sample + phaserFeedback : phaserSamples[stage - 1];
-                        const phaserPrevInput = phaserPrevInputs[stage];
-                        const phaserSample = phaserSamples[stage];
-                        const phaserNextOutput = phaserBreakCoef * phaserInput + phaserPrevInput - phaserBreakCoef * phaserSample;
-                        phaserPrevInputs[stage] = phaserInput;
-                        phaserSamples[stage] = phaserNextOutput;
+                        // Left
+                        const phaserInputL = stage === 0 ? sampleL + phaserFeedbackL : phaserSamplesL[stage - 1];
+                        const phaserPrevInputL = phaserPrevInputsL[stage];
+                        const phaserSampleL = phaserSamplesL[stage];
+                        const phaserNextOutputL = phaserBreakCoef * phaserInputL + phaserPrevInputL - phaserBreakCoef * phaserSampleL;
+                        phaserPrevInputsL[stage] = phaserInputL;
+                        phaserSamplesL[stage] = phaserNextOutputL;
+
+                        // Right
+                        const phaserInputR = stage === 0 ? sampleR + phaserFeedbackR : phaserSamplesR[stage - 1];
+                        const phaserPrevInputR = phaserPrevInputsR[stage];
+                        const phaserSampleR = phaserSamplesR[stage];
+                        const phaserNextOutputR = phaserBreakCoef * phaserInputR + phaserPrevInputR - phaserBreakCoef * phaserSampleR;
+                        phaserPrevInputsR[stage] = phaserInputR;
+                        phaserSamplesR[stage] = phaserNextOutputR;
                     }
-                    const phaserOutput = phaserSamples[Math.max(0,phaserStagesInt - 1)];
-                    sample = sample + phaserOutput * phaserMix;
+
+                    const phaserOutputL = phaserSamplesL[phaserLastStage];
+                    const phaserOutputR = phaserSamplesR[phaserLastStage];
+
+                    sampleL += phaserOutputL * phaserMix;
+                    sampleR += phaserOutputR * phaserMix;
+
                     phaserFeedbackMult += phaserFeedbackMultDelta;
                     phaserBreakCoef += phaserBreakCoefDelta;
                     phaserMix += phaserMixDelta;
@@ -4951,8 +5045,10 @@ if (playSong && !this.countInMetronome) {
                 saveStage: `
 
                     for (let stage = 0; stage < phaserStages; stage++) {
-                        if (!Number.isFinite(phaserPrevInputs[stage]) || Math.abs(phaserPrevInputs[stage]) < epsilon) phaserPrevInputs[stage] = 0.0;
-                        if (!Number.isFinite(phaserSamples[stage]) || Math.abs(phaserSamples[stage]) < epsilon) phaserSamples[stage] = 0.0;
+                        if (!Number.isFinite(phaserPrevInputsL[stage]) || Math.abs(phaserPrevInputsL[stage]) < epsilon) phaserPrevInputsL[stage] = 0.0;
+                        if (!Number.isFinite(phaserSamplesL[stage]) || Math.abs(phaserSamplesL[stage]) < epsilon) phaserSamplesL[stage] = 0.0;
+                        if (!Number.isFinite(phaserPrevInputsR[stage]) || Math.abs(phaserPrevInputsR[stage]) < epsilon) phaserPrevInputsR[stage] = 0.0;
+                        if (!Number.isFinite(phaserSamplesR[stage]) || Math.abs(phaserSamplesR[stage]) < epsilon) phaserSamplesR[stage] = 0.0;
                     }
                     
                     instrumentState.phaserMix = phaserMix;
@@ -4963,7 +5059,8 @@ if (playSong && !this.countInMetronome) {
             [EffectType.panning]: {
                 loadStage: `
                     const panningMask = synth.panningDelayBufferMask >>> 0;
-                    const panningDelayLine = instrumentState.panningDelayLine;
+                    const panningDelayLineL = instrumentState.panningDelayLineL;
+                    const panningDelayLineR = instrumentState.panningDelayLineR;
                     let panningDelayPos = instrumentState.panningDelayPos & panningMask;
                     let   panningVolumeL      = +instrumentState.panningVolumeL;
                     let   panningVolumeR      = +instrumentState.panningVolumeR;
@@ -4975,25 +5072,28 @@ if (playSong && !this.countInMetronome) {
                     const panningOffsetDeltaR = 1.0 - instrumentState.panningOffsetDeltaR;
                 `,
                 sampleStage: `
-					panningDelayLine[panningDelayPos] = sample;
-					const panningRatioL  = panningOffsetL - (panningOffsetL | 0);
-					const panningRatioR  = panningOffsetR - (panningOffsetR | 0);
-					const panningTapLA   = panningDelayLine[(panningOffsetL) & panningMask];
-					const panningTapLB   = panningDelayLine[(panningOffsetL + 1) & panningMask];
-					const panningTapRA   = panningDelayLine[(panningOffsetR) & panningMask];
-					const panningTapRB   = panningDelayLine[(panningOffsetR + 1) & panningMask];
-					const panningTapL    = panningTapLA + (panningTapLB - panningTapLA) * panningRatioL;
-					const panningTapR    = panningTapRA + (panningTapRB - panningTapRA) * panningRatioR;
-					sampleL = panningTapL * panningVolumeL;
-					sampleR = panningTapR * panningVolumeR;
-					panningDelayPos = (panningDelayPos + 1) & panningMask;
-					panningVolumeL += panningVolumeDeltaL;
-					panningVolumeR += panningVolumeDeltaR;
-					panningOffsetL += panningOffsetDeltaL;
-					panningOffsetR += panningOffsetDeltaR;
+                    panningDelayLineL[panningDelayPos] = sampleL;
+                    panningDelayLineR[panningDelayPos] = sampleR;
+                    const panningRatioL = panningOffsetL - (panningOffsetL | 0);
+                    const panningRatioR = panningOffsetR - (panningOffsetR | 0);
+                    const panningTapLA = panningDelayLineL[(panningOffsetL) & panningMask];
+                    const panningTapLB = panningDelayLineL[(panningOffsetL + 1) & panningMask];
+                    const panningTapRA = panningDelayLineR[(panningOffsetR) & panningMask];
+                    const panningTapRB = panningDelayLineR[(panningOffsetR + 1) & panningMask];
+                    const panningTapL = panningTapLA + (panningTapLB - panningTapLA) * panningRatioL;
+                    const panningTapR = panningTapRA + (panningTapRB - panningTapRA) * panningRatioR;
+
+                    sampleL = panningTapL * panningVolumeL;
+                    sampleR = panningTapR * panningVolumeR;
+
+                    panningDelayPos = (panningDelayPos + 1) & panningMask;
+                    panningVolumeL += panningVolumeDeltaL;
+                    panningVolumeR += panningVolumeDeltaR;
+                    panningOffsetL += panningOffsetDeltaL;
+                    panningOffsetR += panningOffsetDeltaR;
                 `,
                 saveStage: `
-                    Synth.sanitizeDelayLine(panningDelayLine, panningDelayPos, panningMask);
+                    Synth.sanitizeDelayLine(panningDelayLineL, panningDelayLineR, panningDelayPos, panningMask);
                     instrumentState.panningDelayPos = panningDelayPos;
                     instrumentState.panningVolumeL = panningVolumeL;
                     instrumentState.panningVolumeR = panningVolumeR;
@@ -5235,8 +5335,10 @@ if (playSong && !this.countInMetronome) {
             [EffectType.reverb]: {
                 loadStage: `
                     const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.
-                    const reverbDelayLine = instrumentState.reverbDelayLine;
-                    instrumentState.reverbDelayLineDirty = true;
+                    const reverbDelayLineL = instrumentState.reverbDelayLineL;
+                    const reverbDelayLineR = instrumentState.reverbDelayLineR;
+                    instrumentState.reverbDelayLineDirtyL = true;
+                    instrumentState.reverbDelayLineDirtyR = true;
                     let reverbDelayPos = instrumentState.reverbDelayPos & reverbMask;
 
                     const reverbPreDelayLineL = instrumentState.reverbPreDelayLineL;
@@ -5255,14 +5357,23 @@ if (playSong && !this.countInMetronome) {
                     const reverbShelfA1 = +instrumentState.reverbShelfA1;
                     const reverbShelfB0 = +instrumentState.reverbShelfB0;
                     const reverbShelfB1 = +instrumentState.reverbShelfB1;
-                    let reverbShelfSample0 = +instrumentState.reverbShelfSample0;
-                    let reverbShelfSample1 = +instrumentState.reverbShelfSample1;
-                    let reverbShelfSample2 = +instrumentState.reverbShelfSample2;
-                    let reverbShelfSample3 = +instrumentState.reverbShelfSample3;
-                    let reverbShelfPrevInput0 = +instrumentState.reverbShelfPrevInput0;
-                    let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
-                    let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
-                    let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;
+                    let reverbShelfSample0L = +instrumentState.reverbShelfSample0L;
+                    let reverbShelfSample1L = +instrumentState.reverbShelfSample1L;
+                    let reverbShelfSample2L = +instrumentState.reverbShelfSample2L;
+                    let reverbShelfSample3L = +instrumentState.reverbShelfSample3L;
+                    let reverbShelfSample0R = +instrumentState.reverbShelfSample0R;
+                    let reverbShelfSample1R = +instrumentState.reverbShelfSample1R;
+                    let reverbShelfSample2R = +instrumentState.reverbShelfSample2R;
+                    let reverbShelfSample3R = +instrumentState.reverbShelfSample3R;
+
+                    let reverbShelfPrevInput0L = +instrumentState.reverbShelfPrevInput0L;
+                    let reverbShelfPrevInput1L = +instrumentState.reverbShelfPrevInput1L;
+                    let reverbShelfPrevInput2L = +instrumentState.reverbShelfPrevInput2L;
+                    let reverbShelfPrevInput3L = +instrumentState.reverbShelfPrevInput3L;
+                    let reverbShelfPrevInput0R = +instrumentState.reverbShelfPrevInput0R;
+                    let reverbShelfPrevInput1R = +instrumentState.reverbShelfPrevInput1R;
+                    let reverbShelfPrevInput2R = +instrumentState.reverbShelfPrevInput2R;
+                    let reverbShelfPrevInput3R = +instrumentState.reverbShelfPrevInput3R;
                 `,
                 sampleStage: `
 					// Reverb, implemented using a feedback delay network with a Hadamard matrix and lowpass filters.
@@ -5272,10 +5383,14 @@ if (playSong && !this.countInMetronome) {
 					const reverbDelayPos1 = (reverbDelayPos +  3041) & reverbMask;
                     const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
                     const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
-                    const reverbSample0 = reverbDelayLine[reverbDelayPos];
-                    const reverbSample1 = reverbDelayLine[reverbDelayPos1];
-                    const reverbSample2 = reverbDelayLine[reverbDelayPos2];
-                    const reverbSample3 = reverbDelayLine[reverbDelayPos3];
+                    const reverbSample0L = reverbDelayLineL[reverbDelayPos];
+                    const reverbSample1L = reverbDelayLineL[reverbDelayPos1];
+                    const reverbSample2L = reverbDelayLineL[reverbDelayPos2];
+                    const reverbSample3L = reverbDelayLineL[reverbDelayPos3];
+                    const reverbSample0R = reverbDelayLineR[reverbDelayPos];
+                    const reverbSample1R = reverbDelayLineR[reverbDelayPos1];
+                    const reverbSample2R = reverbDelayLineR[reverbDelayPos2];
+                    const reverbSample3R = reverbDelayLineR[reverbDelayPos3];
 
                     reverbPreDelayLineL[reverbPreDelayPos] = sampleL;
                     reverbPreDelayLineR[reverbPreDelayPos] = sampleR;
@@ -5286,36 +5401,60 @@ if (playSong && !this.countInMetronome) {
 
                     reverbPreDelayPos = (reverbPreDelayPos + 1) & preDelayMask;
 
-                    const reverbTemp0 = -(reverbSample0 + delayedSampleL) + reverbSample1;
-                    const reverbTemp1 = -(reverbSample0 + delayedSampleR) - reverbSample1;
-                    const reverbTemp2 = -reverbSample2 + reverbSample3;
-                    const reverbTemp3 = -reverbSample2 - reverbSample3;
-					const reverbShelfInput0 = (reverbTemp0 + reverbTemp2) * reverb;
-					const reverbShelfInput1 = (reverbTemp1 + reverbTemp3) * reverb;
-					const reverbShelfInput2 = (reverbTemp0 - reverbTemp2) * reverb;
-					const reverbShelfInput3 = (reverbTemp1 - reverbTemp3) * reverb;
-					reverbShelfSample0 = reverbShelfB0 * reverbShelfInput0 + reverbShelfB1 * reverbShelfPrevInput0 - reverbShelfA1 * reverbShelfSample0;
-					reverbShelfSample1 = reverbShelfB0 * reverbShelfInput1 + reverbShelfB1 * reverbShelfPrevInput1 - reverbShelfA1 * reverbShelfSample1;
-					reverbShelfSample2 = reverbShelfB0 * reverbShelfInput2 + reverbShelfB1 * reverbShelfPrevInput2 - reverbShelfA1 * reverbShelfSample2;
-					reverbShelfSample3 = reverbShelfB0 * reverbShelfInput3 + reverbShelfB1 * reverbShelfPrevInput3 - reverbShelfA1 * reverbShelfSample3;
-					reverbShelfPrevInput0 = reverbShelfInput0;
-					reverbShelfPrevInput1 = reverbShelfInput1;
-					reverbShelfPrevInput2 = reverbShelfInput2;
-					reverbShelfPrevInput3 = reverbShelfInput3;
-					reverbDelayLine[reverbDelayPos1] = reverbShelfSample0 * delayInputMult;
-					reverbDelayLine[reverbDelayPos2] = reverbShelfSample1 * delayInputMult;
-					reverbDelayLine[reverbDelayPos3] = reverbShelfSample2 * delayInputMult;
-					reverbDelayLine[reverbDelayPos ] = reverbShelfSample3 * delayInputMult;
+                    const reverbTemp0L = -(reverbSample0L + delayedSampleL) + reverbSample1L;
+                    const reverbTemp1L = -(reverbSample0L + delayedSampleL) - reverbSample1L;
+                    const reverbTemp2L = -reverbSample2L + reverbSample3L;
+                    const reverbTemp3L = -reverbSample2L - reverbSample3L;
+                    const reverbTemp0R = -(reverbSample0R + delayedSampleR) + reverbSample1R;
+                    const reverbTemp1R = -(reverbSample0R + delayedSampleR) - reverbSample1R;
+                    const reverbTemp2R = -reverbSample2R + reverbSample3R;
+                    const reverbTemp3R = -reverbSample2R - reverbSample3R;
+					const reverbShelfInput0L = (reverbTemp0L + reverbTemp2L) * reverb;
+                    const reverbShelfInput1L = (reverbTemp1L + reverbTemp3L) * reverb;
+                    const reverbShelfInput2L = (reverbTemp0L - reverbTemp2L) * reverb;
+                    const reverbShelfInput3L = (reverbTemp1L - reverbTemp3L) * reverb;
+                    const reverbShelfInput0R = (reverbTemp0R + reverbTemp2R) * reverb;
+                    const reverbShelfInput1R = (reverbTemp1R + reverbTemp3R) * reverb;
+                    const reverbShelfInput2R = (reverbTemp0R - reverbTemp2R) * reverb;
+                    const reverbShelfInput3R = (reverbTemp1R - reverbTemp3R) * reverb;
+                    reverbShelfSample0L = reverbShelfB0 * reverbShelfInput0L + reverbShelfB1 * reverbShelfPrevInput0L - reverbShelfA1 * reverbShelfSample0L;
+                    reverbShelfSample1L = reverbShelfB0 * reverbShelfInput1L + reverbShelfB1 * reverbShelfPrevInput1L - reverbShelfA1 * reverbShelfSample1L;
+                    reverbShelfSample2L = reverbShelfB0 * reverbShelfInput2L + reverbShelfB1 * reverbShelfPrevInput2L - reverbShelfA1 * reverbShelfSample2L;
+                    reverbShelfSample3L = reverbShelfB0 * reverbShelfInput3L + reverbShelfB1 * reverbShelfPrevInput3L - reverbShelfA1 * reverbShelfSample3L;
+                    reverbShelfSample0R = reverbShelfB0 * reverbShelfInput0R + reverbShelfB1 * reverbShelfPrevInput0R - reverbShelfA1 * reverbShelfSample0R;
+                    reverbShelfSample1R = reverbShelfB0 * reverbShelfInput1R + reverbShelfB1 * reverbShelfPrevInput1R - reverbShelfA1 * reverbShelfSample1R;
+                    reverbShelfSample2R = reverbShelfB0 * reverbShelfInput2R + reverbShelfB1 * reverbShelfPrevInput2R - reverbShelfA1 * reverbShelfSample2R;
+                    reverbShelfSample3R = reverbShelfB0 * reverbShelfInput3R + reverbShelfB1 * reverbShelfPrevInput3R - reverbShelfA1 * reverbShelfSample3R;
+                    reverbShelfPrevInput0L = reverbShelfInput0L;
+					reverbShelfPrevInput1L = reverbShelfInput1L;
+					reverbShelfPrevInput2L = reverbShelfInput2L;
+					reverbShelfPrevInput3L = reverbShelfInput3L;
+                    reverbShelfPrevInput0R = reverbShelfInput0R;
+					reverbShelfPrevInput1R = reverbShelfInput1R;
+					reverbShelfPrevInput2R = reverbShelfInput2R;
+					reverbShelfPrevInput3R = reverbShelfInput3R;
+					reverbDelayLineL[reverbDelayPos1] = reverbShelfSample0L * delayInputMult;
+					reverbDelayLineL[reverbDelayPos2] = reverbShelfSample1L * delayInputMult;
+					reverbDelayLineL[reverbDelayPos3] = reverbShelfSample2L * delayInputMult;
+					reverbDelayLineL[reverbDelayPos ] = reverbShelfSample3L * delayInputMult;
+					reverbDelayLineR[reverbDelayPos1] = reverbShelfSample0R * delayInputMult;
+					reverbDelayLineR[reverbDelayPos2] = reverbShelfSample1R * delayInputMult;
+					reverbDelayLineR[reverbDelayPos3] = reverbShelfSample2R * delayInputMult;
+					reverbDelayLineR[reverbDelayPos ] = reverbShelfSample3R * delayInputMult;
 					reverbDelayPos = (reverbDelayPos + 1) & reverbMask;
-					sampleL += (reverbSample1 + reverbSample2 + reverbSample3) * 1;
-					sampleR += (reverbSample0 + reverbSample2 - reverbSample3) * 1;
+					sampleL += (reverbSample1L + reverbSample2L + reverbSample3L);
+					sampleR += (reverbSample0R + reverbSample2R - reverbSample3R);
 					reverb += reverbDelta;
                 `,
                 saveStage: `
-                    Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
-                    Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
-                    Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
-                    Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineL, reverbDelayPos,         reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineL, reverbDelayPos +  3041, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineL, reverbDelayPos +  6426, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineL, reverbDelayPos + 10907, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineR, reverbDelayPos,         reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineR, reverbDelayPos +  3041, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineR, reverbDelayPos +  6426, reverbMask);
+                    Synth.sanitizeDelayLine(reverbDelayLineR, reverbDelayPos + 10907, reverbMask);
 
                     Synth.sanitizeDelayLine(reverbPreDelayLineL, reverbPreDelayPos, preDelayMask);
                     Synth.sanitizeDelayLine(reverbPreDelayLineR, reverbPreDelayPos, preDelayMask);
@@ -5323,59 +5462,112 @@ if (playSong && !this.countInMetronome) {
                     instrumentState.reverbDelayPos = reverbDelayPos;
                     instrumentState.reverbPreDelayPos = reverbPreDelayPos;
                     instrumentState.reverbMult = reverb;
-                    
-                    if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
-                    if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
-                    if (!Number.isFinite(reverbShelfSample2) || Math.abs(reverbShelfSample2) < epsilon) reverbShelfSample2 = 0.0;
-                    if (!Number.isFinite(reverbShelfSample3) || Math.abs(reverbShelfSample3) < epsilon) reverbShelfSample3 = 0.0;
-                    if (!Number.isFinite(reverbShelfPrevInput0) || Math.abs(reverbShelfPrevInput0) < epsilon) reverbShelfPrevInput0 = 0.0;
-                    if (!Number.isFinite(reverbShelfPrevInput1) || Math.abs(reverbShelfPrevInput1) < epsilon) reverbShelfPrevInput1 = 0.0;
-                    if (!Number.isFinite(reverbShelfPrevInput2) || Math.abs(reverbShelfPrevInput2) < epsilon) reverbShelfPrevInput2 = 0.0;
-                    if (!Number.isFinite(reverbShelfPrevInput3) || Math.abs(reverbShelfPrevInput3) < epsilon) reverbShelfPrevInput3 = 0.0;
-                    instrumentState.reverbShelfSample0 = reverbShelfSample0;
-                    instrumentState.reverbShelfSample1 = reverbShelfSample1;
-                    instrumentState.reverbShelfSample2 = reverbShelfSample2;
-                    instrumentState.reverbShelfSample3 = reverbShelfSample3;
-                    instrumentState.reverbShelfPrevInput0 = reverbShelfPrevInput0;
-                    instrumentState.reverbShelfPrevInput1 = reverbShelfPrevInput1;
-                    instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
-                    instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;
+
+                    if (!Number.isFinite(reverbShelfSample0L) || Math.abs(reverbShelfSample0L) < epsilon) reverbShelfSample0L = 0.0;
+                    if (!Number.isFinite(reverbShelfSample1L) || Math.abs(reverbShelfSample1L) < epsilon) reverbShelfSample1L = 0.0;
+                    if (!Number.isFinite(reverbShelfSample2L) || Math.abs(reverbShelfSample2L) < epsilon) reverbShelfSample2L = 0.0;
+                    if (!Number.isFinite(reverbShelfSample3L) || Math.abs(reverbShelfSample3L) < epsilon) reverbShelfSample3L = 0.0;
+
+                    if (!Number.isFinite(reverbShelfPrevInput0L) || Math.abs(reverbShelfPrevInput0L) < epsilon) reverbShelfPrevInput0L = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput1L) || Math.abs(reverbShelfPrevInput1L) < epsilon) reverbShelfPrevInput1L = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput2L) || Math.abs(reverbShelfPrevInput2L) < epsilon) reverbShelfPrevInput2L = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput3L) || Math.abs(reverbShelfPrevInput3L) < epsilon) reverbShelfPrevInput3L = 0.0;
+
+                    if (!Number.isFinite(reverbShelfSample0R) || Math.abs(reverbShelfSample0R) < epsilon) reverbShelfSample0R = 0.0;
+                    if (!Number.isFinite(reverbShelfSample1R) || Math.abs(reverbShelfSample1R) < epsilon) reverbShelfSample1R = 0.0;
+                    if (!Number.isFinite(reverbShelfSample2R) || Math.abs(reverbShelfSample2R) < epsilon) reverbShelfSample2R = 0.0;
+                    if (!Number.isFinite(reverbShelfSample3R) || Math.abs(reverbShelfSample3R) < epsilon) reverbShelfSample3R = 0.0;
+
+                    if (!Number.isFinite(reverbShelfPrevInput0R) || Math.abs(reverbShelfPrevInput0R) < epsilon) reverbShelfPrevInput0R = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput1R) || Math.abs(reverbShelfPrevInput1R) < epsilon) reverbShelfPrevInput1R = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput2R) || Math.abs(reverbShelfPrevInput2R) < epsilon) reverbShelfPrevInput2R = 0.0;
+                    if (!Number.isFinite(reverbShelfPrevInput3R) || Math.abs(reverbShelfPrevInput3R) < epsilon) reverbShelfPrevInput3R = 0.0;
+
+                    instrumentState.reverbShelfSample0L = reverbShelfSample0L;
+                    instrumentState.reverbShelfSample1L = reverbShelfSample1L;
+                    instrumentState.reverbShelfSample2L = reverbShelfSample2L;
+                    instrumentState.reverbShelfSample3L = reverbShelfSample3L;
+                    instrumentState.reverbShelfPrevInput0L = reverbShelfPrevInput0L;
+                    instrumentState.reverbShelfPrevInput1L = reverbShelfPrevInput1L;
+                    instrumentState.reverbShelfPrevInput2L = reverbShelfPrevInput2L;
+                    instrumentState.reverbShelfPrevInput3L = reverbShelfPrevInput3L;
+
+                    instrumentState.reverbShelfSample0R = reverbShelfSample0R;
+                    instrumentState.reverbShelfSample1R = reverbShelfSample1R;
+                    instrumentState.reverbShelfSample2R = reverbShelfSample2R;
+                    instrumentState.reverbShelfSample3R = reverbShelfSample3R;
+                    instrumentState.reverbShelfPrevInput0R = reverbShelfPrevInput0R;
+                    instrumentState.reverbShelfPrevInput1R = reverbShelfPrevInput1R;
+                    instrumentState.reverbShelfPrevInput2R = reverbShelfPrevInput2R;
+                    instrumentState.reverbShelfPrevInput3R = reverbShelfPrevInput3R;
                 `,
             },
         }
 
         const eqFilter = { // EQ is not movable.
             loadStage: `
-				let filters = instrumentState.eqFilters;
-				const filterCount = instrumentState.eqFilterCount|0;
-				let initialFilterInput1 = +instrumentState.initialEqFilterInput1;
-				let initialFilterInput2 = +instrumentState.initialEqFilterInput2;
-				const applyFilters = Synth.applyFilters;
+                let filtersL = instrumentState.eqFiltersL;
+                let filtersR = instrumentState.eqFiltersR;
+
+                const filterCount = instrumentState.eqFilterCount | 0;
+
+                let initialFilterInput1L = +instrumentState.initialEqFilterInput1L;
+                let initialFilterInput2L = +instrumentState.initialEqFilterInput2L;
+                let initialFilterInput1R = +instrumentState.initialEqFilterInput1R;
+                let initialFilterInput2R = +instrumentState.initialEqFilterInput2R;
+
+                const applyFilters = Synth.applyFilters;
             `,
             sampleStage: `
-                const inputSample = sample;
-                sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
-                initialFilterInput2 = initialFilterInput1;
-                initialFilterInput1 = inputSample;
+                const inputSampleL = sampleL;
+                const inputSampleR = sampleR;
+
+                sampleL = applyFilters(inputSampleL, initialFilterInput1L, initialFilterInput2L, filterCount, filtersL);
+                sampleR = applyFilters(inputSampleR, initialFilterInput1R, initialFilterInput2R, filterCount, filtersR);
+
+                initialFilterInput2L = initialFilterInput1L;
+                initialFilterInput1L = inputSampleL;
+
+                initialFilterInput2R = initialFilterInput1R;
+                initialFilterInput1R = inputSampleR;
             `,
             saveStage: `
-				synth.sanitizeFilters(filters);
-				// The filter input here is downstream from another filter so we
-				// better make sure it's safe too.
-				if (!(initialFilterInput1 < 100) || !(initialFilterInput2 < 100)) {
-					initialFilterInput1 = 0.0;
-					initialFilterInput2 = 0.0;
-				}
-				if (Math.abs(initialFilterInput1) < epsilon) initialFilterInput1 = 0.0;
-				if (Math.abs(initialFilterInput2) < epsilon) initialFilterInput2 = 0.0;
-				instrumentState.initialEqFilterInput1 = initialFilterInput1;
-				instrumentState.initialEqFilterInput2 = initialFilterInput2;
+                synth.sanitizeFilters(filtersL);
+                synth.sanitizeFilters(filtersR);
+
+                if (!(initialFilterInput1L < 100) || !(initialFilterInput1L > -100)) initialFilterInput1L = 0.0;
+                if (!(initialFilterInput2L < 100) || !(initialFilterInput2L > -100)) initialFilterInput2L = 0.0;
+                if (!(initialFilterInput1R < 100) || !(initialFilterInput1R > -100)) initialFilterInput1R = 0.0;
+                if (!(initialFilterInput2R < 100) || !(initialFilterInput2R > -100)) initialFilterInput2R = 0.0;
+
+                if (Math.abs(initialFilterInput1L) < epsilon) initialFilterInput1L = 0.0;
+                if (Math.abs(initialFilterInput2L) < epsilon) initialFilterInput2L = 0.0;
+                if (Math.abs(initialFilterInput1R) < epsilon) initialFilterInput1R = 0.0;
+                if (Math.abs(initialFilterInput2R) < epsilon) initialFilterInput2R = 0.0;
+
+                instrumentState.initialEqFilterInput1L = initialFilterInput1L;
+                instrumentState.initialEqFilterInput2L = initialFilterInput2L;
+                instrumentState.initialEqFilterInput1R = initialFilterInput1R;
+                instrumentState.initialEqFilterInput2R = initialFilterInput2R;
             `,
         };
 
         const cacheKey = `${signature}:${instrumentState.effectOrder.join(",")}`;
 
         let effectsFunction: Function = Synth.effectsFunctionCache[cacheKey];
+
+        const effectIsActive: Partial<Record<EffectType, boolean>> = {
+            [EffectType.granular]: usesGranular,
+            [EffectType.distortion]: usesDistortion,
+            [EffectType.bitcrusher]: usesBitcrusher,
+            [EffectType.ringModulation]: usesRingModulation,
+            [EffectType.phaser]: usesPhaser,
+            [EffectType.panning]: usesPanning,
+            [EffectType.chorus]: usesChorus,
+            [EffectType.flanger]: usesFlanger,
+            [EffectType.echo]: usesEcho,
+            [EffectType.reverb]: usesReverb,
+        };
 
         if (effectsFunction == undefined) {
             let effectsSource: string = "return (synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) => {";
@@ -5384,20 +5576,13 @@ if (playSong && !this.countInMetronome) {
             let effectSampleStage = "";
             let effectSaveStage = "";
 
-            const effectIsActive: Partial<Record<EffectType, boolean>> = {
-                [EffectType.granular]: usesGranular,
-                [EffectType.distortion]: usesDistortion,
-                [EffectType.bitcrusher]: usesBitcrusher,
-                [EffectType.ringModulation]: usesRingModulation,
-                [EffectType.phaser]: usesPhaser,
-                [EffectType.panning]: usesPanning,
-                [EffectType.chorus]: usesChorus,
-                [EffectType.flanger]: usesFlanger,
-                [EffectType.echo]: usesEcho,
-                [EffectType.reverb]: usesReverb,
-            };
+            for (let i = 0; i < instrumentState.effectOrder.length; i++) {
+                if (i === 3 && usesEqFilter) { // eq was originally at index 4?? Oh well it sounds fine like this when importing old songs
+                    effectSampleStage += eqFilter.sampleStage;
+                }
 
-            for (const effectType of instrumentState.effectOrder) {
+                const effectType = instrumentState.effectOrder[i];
+
                 if (!effectIsActive[effectType]) continue;
 
                 const stages = effects[effectType];
@@ -5423,7 +5608,12 @@ if (playSong && !this.countInMetronome) {
             effectsSource += `
                 tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;
             `;
-            if (usesEqFilter) effectsSource += eqFilter.sampleStage;
+
+            effectsSource += `
+                sampleL *= eqFilterVolume;
+                sampleR *= eqFilterVolume;
+                eqFilterVolume += eqFilterVolumeDelta;
+            `
 
             effectsSource += effectSampleStage;
 

@@ -398,14 +398,15 @@ export class InstrumentState {
 
     public granularMix: number = 1.0;
     public granularMixDelta: number = 0.0;
-    public granularDelayLine: Float32Array | null = null;
+    public granularDelayLineL: Float32Array | null = null;
+    public granularDelayLineR: Float32Array | null = null;
     public granularDelayLineIndex: number = 0;
     public granularMaximumDelayTimeInSeconds: number = 1;
     public granularGrains: Grain[];
     public granularGrainsLength: number;
     public granularMaximumGrains: number;
     public usesRandomGrainLocation: boolean = true; //eventually I might use the granular code for sample pitch shifting, but we'll see
-    public granularDelayLineDirty: boolean = false;
+    public granularDelayLineDirty: boolean = false; // dirty for both delay lines???
     public computeGrains: boolean = true;
     public granularMuted: boolean = false;
 
@@ -425,15 +426,22 @@ export class InstrumentState {
     public distortionDelta: number = 0.0;
     public distortionDrive: number = 0.0;
     public distortionDriveDelta: number = 0.0;
-    public distortionFractionalInput1: number = 0.0;
-    public distortionFractionalInput2: number = 0.0;
-    public distortionFractionalInput3: number = 0.0;
-    public distortionPrevInput: number = 0.0;
-    public distortionNextOutput: number = 0.0;
+    public distortionFractionalInput1L: number = 0.0;
+    public distortionFractionalInput1R: number = 0.0;
+    public distortionFractionalInput2L: number = 0.0;
+    public distortionFractionalInput2R: number = 0.0;
+    public distortionFractionalInput3L: number = 0.0;
+    public distortionFractionalInput3R: number = 0.0;
+    public distortionPrevInputL: number = 0.0;
+    public distortionPrevInputR: number = 0.0;
+    public distortionNextOutputL: number = 0.0;
+    public distortionNextOutputR: number = 0.0;
     public distortionMuted: boolean = false;
 
-    public bitcrusherPrevInput: number = 0.0;
-    public bitcrusherCurrentOutput: number = 0.0;
+    public bitcrusherPrevInputL: number = 0.0;
+    public bitcrusherPrevInputR: number = 0.0;
+    public bitcrusherCurrentOutputL: number = 0.0;
+    public bitcrusherCurrentOutputR: number = 0.0;
     public bitcrusherPhase: number = 1.0;
     public bitcrusherPhaseDelta: number = 0.0;
     public bitcrusherPhaseDeltaScale: number = 1.0;
@@ -443,12 +451,16 @@ export class InstrumentState {
     public bitcrusherFoldLevelScale: number = 1.0;
     public bitcrusherMuted: boolean = false;
 
-    public readonly eqFilters: DynamicBiquadFilter[] = [];
+    public readonly eqFiltersL: DynamicBiquadFilter[] = [];
+    public readonly eqFiltersR: DynamicBiquadFilter[] = [];
     public eqFilterCount: number = 0;
-    public initialEqFilterInput1: number = 0.0;
-    public initialEqFilterInput2: number = 0.0;
+    public initialEqFilterInput1L: number = 0.0;
+    public initialEqFilterInput2L: number = 0.0;
+    public initialEqFilterInput1R: number = 0.0;
+    public initialEqFilterInput2R: number = 0.0;
 
-    public panningDelayLine: Float32Array | null = null;
+    public panningDelayLineL: Float32Array | null = null;
+    public panningDelayLineR: Float32Array | null = null;
     public panningDelayPos: number = 0;
     public panningVolumeL: number = 0.0;
     public panningVolumeR: number = 0.0;
@@ -490,30 +502,42 @@ export class InstrumentState {
     public echoShelfPrevInputR: number = 0.0;
     public echoMuted: boolean = false;
 
-    public reverbDelayLine: Float32Array | null = null;
-    public reverbDelayLineDirty: boolean = false;
+    public reverbDelayLineL: Float32Array | null = null;    
+    public reverbDelayLineR: Float32Array | null = null;
+    public reverbDelayLineDirtyL: boolean = false;
+    public reverbDelayLineDirtyR: boolean = false;
     public reverbDelayPos: number = 0;
     public reverbMult: number = 0.0;
     public reverbMultDelta: number = 0.0;
     public reverbShelfA1: number = 0.0;
     public reverbShelfB0: number = 0.0;
     public reverbShelfB1: number = 0.0;
-    public reverbShelfSample0: number = 0.0;
-    public reverbShelfSample1: number = 0.0;
-    public reverbShelfSample2: number = 0.0;
-    public reverbShelfSample3: number = 0.0;
-    public reverbShelfPrevInput0: number = 0.0;
-    public reverbShelfPrevInput1: number = 0.0;
-    public reverbShelfPrevInput2: number = 0.0;
-    public reverbShelfPrevInput3: number = 0.0;
+    public reverbShelfSample0L: number = 0.0;
+    public reverbShelfSample1L: number = 0.0;
+    public reverbShelfSample2L: number = 0.0;
+    public reverbShelfSample3L: number = 0.0;
+    public reverbShelfSample0R: number = 0.0;
+    public reverbShelfSample1R: number = 0.0;
+    public reverbShelfSample2R: number = 0.0;
+    public reverbShelfSample3R: number = 0.0;
+    public reverbShelfPrevInput0L: number = 0.0;
+    public reverbShelfPrevInput1L: number = 0.0;
+    public reverbShelfPrevInput2L: number = 0.0;
+    public reverbShelfPrevInput3L: number = 0.0;
+    public reverbShelfPrevInput0R: number = 0.0;
+    public reverbShelfPrevInput1R: number = 0.0;
+    public reverbShelfPrevInput2R: number = 0.0;
+    public reverbShelfPrevInput3R: number = 0.0;
     public reverbDelay: number = 0.0;
     public reverbPreDelayLineL: Float32Array | null = null;
     public reverbPreDelayLineR: Float32Array | null = null;
     public reverbPreDelayPos: number = 0;
     public reverbMuted: boolean = false;
 
-    public phaserSamples: Float32Array | null = null;
-    public phaserPrevInputs: Float32Array | null = null;
+    public phaserSamplesL: Float32Array | null = null;
+    public phaserSamplesR: Float32Array | null = null;
+    public phaserPrevInputsL: Float32Array | null = null;
+    public phaserPrevInputsR: Float32Array | null = null;
     public phaserFeedbackMult: number = 0.0;
     public phaserFeedbackMultDelta: number = 0.0;
     public phaserMix: number = 0.0;
@@ -559,8 +583,11 @@ export class InstrumentState {
     public allocateNecessaryBuffers(synth: Synth, instrument: Instrument, samplesPerTick: number): void {
         this.effectOrder = instrument.effectOrder;
         if (effectsIncludePanning(instrument.effects)) {
-            if (this.panningDelayLine == null || this.panningDelayLine.length < synth.panningDelayBufferSize) {
-                this.panningDelayLine = new Float32Array(synth.panningDelayBufferSize);
+            if (this.panningDelayLineL == null || this.panningDelayLineL.length < synth.panningDelayBufferSize) {
+                this.panningDelayLineL = new Float32Array(synth.panningDelayBufferSize);
+            }
+            if (this.panningDelayLineR == null || this.panningDelayLineR.length < synth.panningDelayBufferSize) {
+                this.panningDelayLineR = new Float32Array(synth.panningDelayBufferSize);
             }
         }
         if (effectsIncludeChorus(instrument.effects)) {
@@ -588,8 +615,11 @@ export class InstrumentState {
         }
         if (effectsIncludeReverb(instrument.effects)) {
             // TODO: Make reverb delay line sample rate agnostic. Maybe just double buffer size for 96KHz? Adjust attenuation and shelf cutoff appropriately?
-            if (this.reverbDelayLine == null) {
-                this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
+            if (this.reverbDelayLineL == null) {
+                this.reverbDelayLineL = new Float32Array(Config.reverbDelayBufferSize);
+            }
+            if (this.reverbDelayLineR == null) {
+                this.reverbDelayLineR = new Float32Array(Config.reverbDelayBufferSize);
             }
 
             if (this.reverbPreDelayLineL == null) {
@@ -601,9 +631,13 @@ export class InstrumentState {
             }
         }
         if (effectsIncludePhaser(instrument.effects)) {
-            if (this.phaserSamples == null) {
-                this.phaserSamples = new Float32Array(Config.phaserMaxStages);
-                this.phaserPrevInputs = new Float32Array(Config.phaserMaxStages);
+            if (this.phaserSamplesL == null) {
+                this.phaserSamplesL = new Float32Array(Config.phaserMaxStages);
+                this.phaserPrevInputsL = new Float32Array(Config.phaserMaxStages);
+            }
+            if (this.phaserSamplesR == null) {
+                this.phaserSamplesR = new Float32Array(Config.phaserMaxStages);
+                this.phaserPrevInputsR = new Float32Array(Config.phaserMaxStages);
             }
         }
         if (effectsIncludeGranular(instrument.effects)) {
@@ -611,9 +645,18 @@ export class InstrumentState {
             const granularDelayLineSizeInSeconds: number = granularDelayLineSizeInMilliseconds / 1000; // Maximum possible delay time
             this.granularMaximumDelayTimeInSeconds = granularDelayLineSizeInSeconds;
             const granularDelayLineSizeInSamples: number = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * (synth.samplesPerSecond)));
-            if (this.granularDelayLine == null || this.granularDelayLine.length != granularDelayLineSizeInSamples) {
-                this.granularDelayLine = new Float32Array(granularDelayLineSizeInSamples);
+            let granularDelayLineChanged = false;
+            if (this.granularDelayLineL == null || this.granularDelayLineL.length != granularDelayLineSizeInSamples) {
+                this.granularDelayLineL = new Float32Array(granularDelayLineSizeInSamples);
+                granularDelayLineChanged = true;
+            }
+            if (this.granularDelayLineR == null || this.granularDelayLineR.length != granularDelayLineSizeInSamples) {
+                this.granularDelayLineR = new Float32Array(granularDelayLineSizeInSamples);
+                granularDelayLineChanged = true;
+            }
+            if (granularDelayLineChanged) {
                 this.granularDelayLineIndex = 0;
+                this.granularDelayLineDirty = false;
             }
             const oldGrainsLength: number = this.granularGrains.length;
             if (this.granularMaximumGrains > oldGrainsLength) { //increase grain amount if it changes
@@ -657,38 +700,59 @@ export class InstrumentState {
     }
 
     public deactivate(): void {
-        this.bitcrusherPrevInput = 0.0;
-        this.bitcrusherCurrentOutput = 0.0;
+        this.bitcrusherPrevInputL = 0.0;
+        this.bitcrusherPrevInputR = 0.0;
+        this.bitcrusherCurrentOutputL = 0.0;
+        this.bitcrusherCurrentOutputR = 0.0;
         this.bitcrusherPhase = 1.0;
         for (let i: number = 0; i < this.eqFilterCount; i++) {
-            this.eqFilters[i].resetOutput();
+            this.eqFiltersL[i].resetOutput();
+            this.eqFiltersR[i].resetOutput();
         }
         this.eqFilterCount = 0;
-        this.initialEqFilterInput1 = 0.0;
-        this.initialEqFilterInput2 = 0.0;
-        this.distortionFractionalInput1 = 0.0;
-        this.distortionFractionalInput2 = 0.0;
-        this.distortionFractionalInput3 = 0.0;
-        this.distortionPrevInput = 0.0;
-        this.distortionNextOutput = 0.0;
+        this.initialEqFilterInput1L = 0.0;
+        this.initialEqFilterInput2L = 0.0;
+        this.initialEqFilterInput1R = 0.0;
+        this.initialEqFilterInput2R = 0.0;
+        this.distortionFractionalInput1L = 0.0;
+        this.distortionFractionalInput1R = 0.0;
+        this.distortionFractionalInput2L = 0.0;
+        this.distortionFractionalInput2R = 0.0;
+        this.distortionFractionalInput3L = 0.0;
+        this.distortionFractionalInput3R = 0.0;
+        this.distortionPrevInputL = 0.0;
+        this.distortionPrevInputR = 0.0;
+        this.distortionNextOutputL = 0.0;
+        this.distortionNextOutputR = 0.0;
         this.panningDelayPos = 0;
-        if (this.panningDelayLine != null) for (let i: number = 0; i < this.panningDelayLine.length; i++) this.panningDelayLine[i] = 0.0;
+        if (this.panningDelayLineL != null) for (let i: number = 0; i < this.panningDelayLineL.length; i++) this.panningDelayLineL[i] = 0.0;
+        if (this.panningDelayLineR != null) for (let i: number = 0; i < this.panningDelayLineR.length; i++) this.panningDelayLineR[i] = 0.0;
         this.echoDelayOffsetEnd = null;
         this.echoShelfSampleL = 0.0;
         this.echoShelfSampleR = 0.0;
         this.echoShelfPrevInputL = 0.0;
         this.echoShelfPrevInputR = 0.0;
-        this.reverbShelfSample0 = 0.0;
-        this.reverbShelfSample1 = 0.0;
-        this.reverbShelfSample2 = 0.0;
-        this.reverbShelfSample3 = 0.0;
-        this.reverbShelfPrevInput0 = 0.0;
-        this.reverbShelfPrevInput1 = 0.0;
-        this.reverbShelfPrevInput2 = 0.0;
-        this.reverbShelfPrevInput3 = 0.0;
+        this.reverbShelfSample0L = 0.0;
+        this.reverbShelfSample1L = 0.0;
+        this.reverbShelfSample2L = 0.0;
+        this.reverbShelfSample3L = 0.0;
+        this.reverbShelfPrevInput0L = 0.0;
+        this.reverbShelfPrevInput1L = 0.0;
+        this.reverbShelfPrevInput2L = 0.0;
+        this.reverbShelfPrevInput3L = 0.0;
+        this.reverbShelfSample0R = 0.0;
+        this.reverbShelfSample1R = 0.0;
+        this.reverbShelfSample2R = 0.0;
+        this.reverbShelfSample3R = 0.0;
+        this.reverbShelfPrevInput0R = 0.0;
+        this.reverbShelfPrevInput1R = 0.0;
+        this.reverbShelfPrevInput2R = 0.0;
+        this.reverbShelfPrevInput3R = 0.0;
         this.reverbDelay = 0.0;        
-        if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
-        if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
+        if (this.phaserSamplesL != null) for (let i: number = 0; i < this.phaserSamplesL.length; i++) this.phaserSamplesL[i] = 0.0;
+        if (this.phaserPrevInputsL != null) for (let i: number = 0; i < this.phaserPrevInputsL.length; i++) this.phaserPrevInputsL[i] = 0.0;
+        if (this.phaserSamplesR != null) for (let i: number = 0; i < this.phaserSamplesR.length; i++) this.phaserSamplesR[i] = 0.0;
+        if (this.phaserPrevInputsR != null) for (let i: number = 0; i < this.phaserPrevInputsR.length; i++) this.phaserPrevInputsR[i] = 0.0;
         
         this.flangerDelayPos = 0;
         this.flangerPhase = 0;
@@ -728,13 +792,17 @@ export class InstrumentState {
             for (let i: number = 0; i < this.echoDelayLineL!.length; i++) this.echoDelayLineL![i] = 0.0;
             for (let i: number = 0; i < this.echoDelayLineR!.length; i++) this.echoDelayLineR![i] = 0.0;
         }
-        if (this.reverbDelayLineDirty) {
-            this.reverbDelayLine!.fill(0.0);
+        if (this.reverbDelayLineDirtyL) {
+            this.reverbDelayLineL!.fill(0.0);
             this.reverbPreDelayLineL!.fill(0.0);
+        }
+        if (this.reverbDelayLineDirtyR) {
+            this.reverbDelayLineR!.fill(0.0);
             this.reverbPreDelayLineR!.fill(0.0);
         }
         if (this.granularDelayLineDirty) {
-            for (let i: number = 0; i < this.granularDelayLine!.length; i++) this.granularDelayLine![i] = 0.0;
+            for (let i: number = 0; i < this.granularDelayLineL!.length; i++) this.granularDelayLineL![i] = 0.0;
+            for (let i: number = 0; i < this.granularDelayLineR!.length; i++) this.granularDelayLineR![i] = 0.0;
         }
 
         this.chorusPhase = 0.0;
@@ -852,7 +920,7 @@ export class InstrumentState {
                     const granularGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                     const granularGrainSizeInSeconds: number = granularGrainSizeInMilliseconds / 1000.0;
                     const granularGrainSizeInSamples: number = Math.floor(granularGrainSizeInSeconds * samplesPerSecond);
-                    const granularDelayLineLength: number = this.granularDelayLine!.length;
+                    const granularDelayLineLength: number = this.granularDelayLineL!.length;
                     const grainIndex: number = this.granularGrainsLength;
 
                     this.granularGrainsLength++;
@@ -978,8 +1046,10 @@ export class InstrumentState {
                 startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
                 endPoint.toCoefficients(Synth.tempFilterEndCoefficients, samplesPerSecond, 1.0, 1.0);
 
-                if (this.eqFilters.length < 1) this.eqFilters[0] = new DynamicBiquadFilter();
-                this.eqFilters[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersL.length < 1) this.eqFiltersL[0] = new DynamicBiquadFilter();
+                this.eqFiltersL[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersR.length < 1) this.eqFiltersR[0] = new DynamicBiquadFilter();
+                this.eqFiltersR[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
 
             } else {
                 eqFilterSettingsStart.convertLegacySettingsForSynth(startSimpleFreq, startSimpleGain, true);
@@ -988,8 +1058,10 @@ export class InstrumentState {
 
                 startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
 
-                if (this.eqFilters.length < 1) this.eqFilters[0] = new DynamicBiquadFilter();
-                this.eqFilters[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersL.length < 1) this.eqFiltersL[0] = new DynamicBiquadFilter();
+                this.eqFiltersL[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersR.length < 1) this.eqFiltersR[0] = new DynamicBiquadFilter();
+                this.eqFiltersR[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
 
             }
 
@@ -1017,8 +1089,10 @@ export class InstrumentState {
 
                 startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, /*eqAllFreqsEnvelopeStart * eqFreqEnvelopeStart*/ 1.0, /*eqPeakEnvelopeStart*/ 1.0);
                 endPoint.toCoefficients(Synth.tempFilterEndCoefficients, samplesPerSecond, /*eqAllFreqsEnvelopeEnd   * eqFreqEnvelopeEnd*/   1.0, /*eqPeakEnvelopeEnd*/   1.0);
-                if (this.eqFilters.length <= i) this.eqFilters[i] = new DynamicBiquadFilter();
-                this.eqFilters[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersL.length <= i) this.eqFiltersL[i] = new DynamicBiquadFilter();
+                this.eqFiltersL[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
+                if (this.eqFiltersR.length <= i) this.eqFiltersR[i] = new DynamicBiquadFilter();
+                this.eqFiltersR[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == FilterType.lowPass);
                 eqFilterVolume *= startPoint.getVolumeCompensationMult();
 
             }

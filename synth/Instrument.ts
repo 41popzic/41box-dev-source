@@ -318,23 +318,23 @@ export class Instrument {
     public noteRangeMuted: boolean = false;
 
     public effectOrder: number[] = [
-            EffectType.reverb,
-            EffectType.chorus,
-            EffectType.panning,
-            EffectType.distortion,
-            EffectType.bitcrusher,
-            EffectType.noteFilter,
-            EffectType.echo,
-            EffectType.pitchShift,
-            EffectType.detune,
-            EffectType.vibrato,
-            EffectType.transition,
-            EffectType.chord,
-            EffectType.noteRange,
-            EffectType.ringModulation,
-            EffectType.granular,
-            EffectType.flanger,
-            EffectType.phaser,
+        EffectType.distortion,
+        EffectType.bitcrusher,
+        EffectType.panning,
+        EffectType.chorus,
+        EffectType.flanger,
+        EffectType.echo,
+        EffectType.reverb,
+        EffectType.granular,
+        EffectType.ringModulation,
+        EffectType.phaser,
+        EffectType.noteFilter,
+        EffectType.pitchShift,
+        EffectType.detune,
+        EffectType.vibrato,
+        EffectType.transition,
+        EffectType.chord,
+        EffectType.noteRange,
     ];
 
     public algorithm: number = 0;
@@ -510,23 +510,23 @@ export class Instrument {
         this.transitionMuted = false;
         this.envelopeCount = 0;
         this.effectOrder = [
-            EffectType.reverb,
-            EffectType.chorus,
-            EffectType.panning,
             EffectType.distortion,
             EffectType.bitcrusher,
-            EffectType.noteFilter,
+            EffectType.panning,
+            EffectType.chorus,
+            EffectType.flanger,
             EffectType.echo,
+            EffectType.reverb,
+            EffectType.granular,
+            EffectType.ringModulation,
+            EffectType.phaser,
+            EffectType.noteFilter,
             EffectType.pitchShift,
             EffectType.detune,
             EffectType.vibrato,
             EffectType.transition,
             EffectType.chord,
             EffectType.noteRange,
-            EffectType.ringModulation,
-            EffectType.granular,
-            EffectType.flanger,
-            EffectType.phaser,
         ];
         this.isNoiseInstrument = isNoiseChannel;
         switch (type) {

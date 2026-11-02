@@ -2926,13 +2926,15 @@ export class Song {
                         instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         if (from41Box && !beforeFour) instrument.phaserMuted = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
-                    const effectOrder: EffectType[] = [];
+                    if (from41Box && !beforeFour) {
+                        const effectOrder: EffectType[] = [];
 
-                    for (let i = 0; i < EffectType.length; i++) {
-                        effectOrder.push(base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        for (let i = 0; i < EffectType.length; i++) {
+                            effectOrder.push(base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        }
+
+                        instrument.effectOrder = effectOrder;
                     }
-
-                    instrument.effectOrder = effectOrder;
                 }
                 // Clamp the range.
                 instrument.effects &= (1 << EffectType.length) - 1;
