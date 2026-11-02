@@ -15916,16 +15916,25 @@ content: "";
 .beepboxEditor .effect-container {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	border-radius: 2px;
-	margin: 2px -5px;
+	margin: 2px 0px;
 	padding: 0.667em 0.5em !important
 }
+
+.effect-container.effect-drop-before {
+    box-shadow: 0 -2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
+.effect-container.effect-drop-after {
+    box-shadow: 0 2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
 .beepboxEditor .arrow-button {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	padding: 0px; 
 	width: 1.25em; 
 	height: 1.25em; 
 	font-size: 1.1em;
-	margin: 0 -2px;
+	margin: 0;
 }
 
 .beepboxEditor .arrow-button:focus {
@@ -15938,10 +15947,10 @@ content: "";
 	font-weight: 1000;
 	margin: -3px 0;
 	display: grid;
-	grid-template-columns: 0.8fr 2.1fr 0.8fr; // equal sections to compensate for mute button
+	grid-template-columns: 0.8fr 2.4fr 0.5fr; // equal sections to compensate for mute button
 	align-items: center;
 	justify-items: left;
-	padding-top: 2px
+	padding-top: 2px;
 }
 
 .beepboxEditor .effect-title.muted {
@@ -56756,26 +56765,12 @@ You should be redirected to the song at:<br /><br />
 
     const { div: div$1, button: button$1 } = HTML;
     class EffectArrows {
-        constructor(onMoveUp, onMoveDown) {
+        constructor() {
             this._downArrow = button$1({ class: "arrow-button", type: "button" }, "▼");
-            this._upArrow = button$1({ class: "arrow-button", type: "button" }, "▲");
+            this._upArrow = button$1({ class: "arrow-button", type: "button" }, "⠿");
             this.container = div$1({ style: `display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px` }, this._downArrow, this._upArrow);
-            this._upArrow.onclick = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onMoveUp();
-            };
-            this._downArrow.onclick = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onMoveDown();
-            };
-            this._upArrow.onmousedown = (event) => {
-                event.preventDefault();
-            };
-            this._downArrow.onmousedown = (event) => {
-                event.preventDefault();
-            };
+            this._downArrow.style.display = "none";
+            this._upArrow.draggable = true;
         }
     }
 
@@ -57385,7 +57380,7 @@ You should be redirected to the song at:<br /><br />
             this._favoriteRhythms = [];
             this._favoriteRhythmGroup = optgroup({ label: "favorites" });
             this._panMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._panArrows = new EffectArrows(() => this._moveEffect(2, -1), () => this._moveEffect(2, 1));
+            this._panArrows = new EffectArrows();
             this._panKnob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue, newValue) => new ChangePan(this.doc, oldValue, newValue), [0, 50, 100]);
             this._panDropdown = button({ class: "dropdown", style: "margin-top: 0em; margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(1) }, "▼");
             this._panKnobInputBox = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
@@ -57400,7 +57395,7 @@ You should be redirected to the song at:<br /><br />
             this._panTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._panMuteButton, "panning", this._panArrows.container);
             this._panContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em; padding: 2em;" }, this._panTitle, this._panPreContainer);
             this._chorusMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._chorusArrows = new EffectArrows(() => this._moveEffect(1, -1), () => this._moveEffect(1, 1));
+            this._chorusArrows = new EffectArrows();
             this._chorusSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeChorus(this.doc, oldValue, newValue), false);
             this._chorusText = span({ class: "tip", onclick: () => this._openPrompt("chorusMix") }, "mix");
             this._chorusRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._chorusText), this._chorusSlider.container);
@@ -57411,7 +57406,7 @@ You should be redirected to the song at:<br /><br />
             this.reverbShelfHzNum = div({ style: "font-size: 80%; ", id: "reverbShelfHzNum" });
             this.reverbShelfGainNum = div({ style: "font-size: 80%; ", id: "reverbShelfGainnum" });
             this._reverbMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._reverbArrows = new EffectArrows(() => this._moveEffect(0, -1), () => this._moveEffect(0, 1));
+            this._reverbArrows = new EffectArrows();
             this._reverbMixSlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange + 0, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeReverb(this.doc, oldValue, newValue), false);
             this._reverbMixText = span({ class: "tip", onclick: () => this._openPrompt("reverbMix") }, "mix");
             this._reverbMixRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._reverbMixText), this._reverbMixSlider.container);
@@ -57428,7 +57423,7 @@ You should be redirected to the song at:<br /><br />
             this._reverbPreContainer = div({ style: "display: flex; flex-direction: column" }, this._reverbMixRow, this._reverbDelayRow, this._reverbShelfHzRow, this._reverbShelfGainRow);
             this._reverbContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._reverbTitle), this._reverbPreContainer);
             this._ringModMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._ringModArrows = new EffectArrows(() => this._moveEffect(13, -1), () => this._moveEffect(13, 1));
+            this._ringModArrows = new EffectArrows();
             this._ringModWaveSelect = buildOptions(select({}), Config.operatorWaves.map(wave => wave.name));
             this._ringModPulsewidthSlider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "pulse width" }), this.doc, (oldValue, newValue) => new ChangeRingModPulseWidth(this.doc, oldValue, newValue), true);
             this._ringModSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeRingMod(this.doc, oldValue, newValue), false);
@@ -57445,7 +57440,7 @@ You should be redirected to the song at:<br /><br />
             this._ringModTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._ringModMuteButton, "ring mod", this._ringModArrows.container);
             this._ringModContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._ringModTitle), this._ringModPreContainer);
             this._granularMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._granularArrows = new EffectArrows(() => this._moveEffect(14, -1), () => this._moveEffect(14, 1));
+            this._granularArrows = new EffectArrows();
             this._granularSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeGranular(this.doc, oldValue, newValue), false);
             this._granularText = span({ class: "tip", onclick: () => this._openPrompt("granularMix") }, "mix ");
             this._granularRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._granularText), this._granularSlider.container);
@@ -57466,7 +57461,7 @@ You should be redirected to the song at:<br /><br />
             this._granularContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._granularTitle), this._granularPreContainer);
             this.echoDelayNum = div({ class: "display", style: "font-size: 80%; ", id: "echoDelayNum" });
             this._echoMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._echoArrows = new EffectArrows(() => this._moveEffect(6, -1), () => this._moveEffect(6, 1));
+            this._echoArrows = new EffectArrows();
             this._echoSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
             this._echoSustainText = span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "sustain");
             this._echoSustainRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._echoSustainText), this._echoSustainSlider.container);
@@ -57480,7 +57475,7 @@ You should be redirected to the song at:<br /><br />
             this.flangerDelayNum = div({ class: "display", style: "font-size: 80%;", id: "flangerDelayNum" });
             this.flangerDepthNum = div({ class: "display", style: "font-size: 80%;", id: "flangerDepthNum" });
             this._flangerMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._flangerArrows = new EffectArrows(() => this._moveEffect(15, -1), () => this._moveEffect(15, 1));
+            this._flangerArrows = new EffectArrows();
             this._flangerMixSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.flangerMixRange - 1, value: 0, step: "1" }), this.doc, (oldValue, newValue) => new ChangeFlangerMix(this.doc, oldValue, newValue), true);
             this._flangerMixText = span({ style: "text-align: left", class: "tip", onclick: () => this._openPrompt("flangerMix"), }, span("mix"));
             this._flangerMixRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._flangerMixText), this._flangerMixSlider.container);
@@ -57500,7 +57495,7 @@ You should be redirected to the song at:<br /><br />
             this._flangerTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._flangerMuteButton, "flanger", this._flangerArrows.container);
             this._flangerContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._flangerTitle), this._flangerPreContainer);
             this._phaserMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._phaserArrows = new EffectArrows(() => this._moveEffect(16, -1), () => this._moveEffect(16, 1));
+            this._phaserArrows = new EffectArrows();
             this._phaserMixSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangePhaserMix(this.doc, oldValue, newValue), false);
             this._phaserMixText = span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("mix"));
             this._phaserMixRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._phaserMixText), this._phaserMixSlider.container);
@@ -57550,7 +57545,7 @@ You should be redirected to the song at:<br /><br />
             this._fadeInOutEditor = new FadeInOutEditor(this.doc);
             this._fadeInOutRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("fadeInOut") }, "fade"), this._fadeInOutEditor.container);
             this._transitionMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._transitionArrows = new EffectArrows(() => this._moveEffect(10, -1), () => this._moveEffect(10, 1));
+            this._transitionArrows = new EffectArrows();
             this._transitionSelect = buildOptions(select(), Config.transitions.map(transition => transition.name));
             this._transitionDropdown = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(3) }, "▼");
             this._transitionText = span({ class: "tip", onclick: () => this._openPrompt("transition") }, "transition");
@@ -57578,7 +57573,7 @@ You should be redirected to the song at:<br /><br />
             this._eqFilterSimplePeakSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this.doc, (oldValue, newValue) => new ChangeEQFilterSimplePeak(this.doc, oldValue, newValue), false);
             this._eqFilterSimplePeakRow = div({ class: "selectRow", title: "low-pass filter eak resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "filt. peak"), this._eqFilterSimplePeakSlider.container);
             this._noteFilterMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._noteFilterArrows = new EffectArrows(() => this._moveEffect(5, -1), () => this._moveEffect(5, 1));
+            this._noteFilterArrows = new EffectArrows();
             this._noteFilterSimpleButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "note-filter", onclick: () => this._switchNoteFilterType(true) }, "noob");
             this._noteFilterAdvancedButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button note-filter", onclick: () => this._switchNoteFilterType(false) }, "pro");
             this._noteFilterTypeText = span({ style: "", class: "tip", onclick: () => this._openPrompt("filterType") }, "filter type");
@@ -57610,7 +57605,7 @@ You should be redirected to the song at:<br /><br />
             this._decimalOffsetRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("decimalOffset") }, "‣ offset"), this._decimalOffsetSlider.container);
             this._pulseWidthDropdownGroup = div({ class: "editor-controls-alt", style: "display: none;" }, this._decimalOffsetRow);
             this._pitchShiftMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._pitchShiftArrows = new EffectArrows(() => this._moveEffect(7, -1), () => this._moveEffect(7, 1));
+            this._pitchShiftArrows = new EffectArrows();
             this._pitchShiftKnob = new Knob(0, Config.pitchShiftRange - 1, 1, 0, true, this.doc, (oldValue, newValue) => new ChangePitchShift(this.doc, oldValue, newValue), [0, 7, 12, 19, 24], [false, true, false, true]);
             this._pitchShiftText = span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "transpose");
             this._pitchShiftRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._pitchShiftText), this._pitchShiftKnob.container);
@@ -57618,7 +57613,7 @@ You should be redirected to the song at:<br /><br />
             this._pitchShiftTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._pitchShiftMuteButton, "pitch shift", this._pitchShiftArrows.container);
             this._pitchShiftContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._pitchShiftTitle), this._pitchShiftPreContainer);
             this._detuneMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._detuneArrows = new EffectArrows(() => this._moveEffect(8, -1), () => this._moveEffect(8, 1));
+            this._detuneArrows = new EffectArrows();
             this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this.doc, (oldValue, newValue) => new ChangeDetune(this.doc, oldValue, newValue), true);
             this._detuneSliderInputBox = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
             this._detuneSliderText = span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("detune") }, "cents ");
@@ -57627,7 +57622,7 @@ You should be redirected to the song at:<br /><br />
             this._detuneTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._detuneMuteButton, "detune", this._detuneArrows.container);
             this._detuneContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._detuneTitle), this._detunePreContainer);
             this._distortionMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._distortionArrows = new EffectArrows(() => this._moveEffect(3, -1), () => this._moveEffect(3, 1));
+            this._distortionArrows = new EffectArrows();
             this._distortionSlider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeDistortion(this.doc, oldValue, newValue), false);
             this._distortionText = span({ class: "tip", onclick: () => this._openPrompt("distortionMix") }, "mix");
             this._distortionRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._distortionText), this._distortionSlider.container);
@@ -57638,7 +57633,7 @@ You should be redirected to the song at:<br /><br />
             this._distortionPreContainer = div({ style: "display: flex; flex-direction: column" }, this._distortionRow, this._aliasingRow);
             this._distortionContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._distortionTitle), this._distortionPreContainer);
             this._bitcrusherMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._bitcrusherArrows = new EffectArrows(() => this._moveEffect(4, -1), () => this._moveEffect(4, 1));
+            this._bitcrusherArrows = new EffectArrows();
             this._bitcrusherQuantizationSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this.doc, (oldValue, newValue) => new ChangeBitcrusherQuantization(this.doc, oldValue, newValue), false);
             this._bitcrusherQuantizationText = span({ class: "tip", onclick: () => this._openPrompt("bitcrusherQuantization") }, "crush");
             this._bitcrusherQuantizationRow = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._bitcrusherQuantizationText), this._bitcrusherQuantizationSlider.container);
@@ -57649,7 +57644,7 @@ You should be redirected to the song at:<br /><br />
             this._bitcrusherTitle = div({ style: "cursor: pointer;", class: "effect-title" }, this._bitcrusherMuteButton, "bitcrusher", this._bitcrusherArrows.container);
             this._bitcrusherContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._bitcrusherTitle), this._bitcrusherPreContainer);
             this._noteRangeMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._noteRangeArrows = new EffectArrows(() => this._moveEffect(12, -1), () => this._moveEffect(12, 1));
+            this._noteRangeArrows = new EffectArrows();
             this._upperNoteLimitInputBox = input({ class: "arrowsOnHover", style: "width: 3em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
             this._lowerNoteLimitInputBox = input({ class: "arrowsOnHover", style: "width: 3em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
             this._lowerNoteLimitText = span({ class: "tip", style: `flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "[60] ");
@@ -57680,7 +57675,7 @@ You should be redirected to the song at:<br /><br />
             this._unisonSignRow = div({ class: "selectRow dropFader" }, div({}, span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonSign") }, "‣ sign: "), div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSignInputBox)));
             this._unisonDropdownGroup = div({ class: "editor-controls-alt", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
             this._chordMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._chordArrows = new EffectArrows(() => this._moveEffect(11, -1), () => this._moveEffect(11, 1));
+            this._chordArrows = new EffectArrows();
             this._chordSelect = buildOptions(select({ style: "flex-shrink: 100" }), Config.chords.map(chord => chord.name));
             this._chordDropdown = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(2) }, "▼");
             this._monophonicNoteInputBox = input({ class: "arrowsOnHover", style: "width: 2.35em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1.0 });
@@ -57703,7 +57698,7 @@ You should be redirected to the song at:<br /><br />
             this._chordTitle = div({ style: "cursor: pointer", class: "effect-title" }, this._chordMuteButton, "chord type", this._chordArrows.container);
             this._chordContainer = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em" }, span(this._chordTitle), this._chordPreContainer);
             this._vibratoMuteButton = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
-            this._vibratoArrows = new EffectArrows(() => this._moveEffect(9, -1), () => this._moveEffect(9, 1));
+            this._vibratoArrows = new EffectArrows();
             this._vibratoSelect = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
             this._vibratoDropdown = button({ class: "dropdown", style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(0) }, "▼");
             this._vibratoText = span({ class: "tip", onclick: () => this._openPrompt("vibrato") }, "vibrato ");
@@ -61134,6 +61129,7 @@ You should be redirected to the song at:<br /><br />
             this._zoomOutButton.addEventListener("click", this._zoomOut);
             this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
             this._trackArea.addEventListener("mousedown", this.refocusStage);
+            this._setupEffectDragAndDrop();
             this._renderEffectOrder();
             this._panKnobInputBox.addEventListener("input", () => { this.doc.record(new ChangePan(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panKnobInputBox.value))))); });
             this._panTitle.addEventListener("click", () => this.collapseEffect("pan"));
@@ -62471,29 +62467,6 @@ You should be redirected to the song at:<br /><br />
             }
             return;
         }
-        _moveEffect(effect, direction) {
-            const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
-            const oldOrder = [...instrument.effectOrder];
-            const newOrder = [...oldOrder];
-            const index = newOrder.indexOf(effect);
-            let newIndex = index + direction;
-            if (index === -1)
-                return;
-            while (newIndex >= 0 && newIndex < newOrder.length) {
-                const candidate = newOrder[newIndex];
-                if (instrument.effects & (1 << candidate)) {
-                    break;
-                }
-                newIndex += direction;
-            }
-            if (newIndex < 0 || newIndex >= newOrder.length)
-                return;
-            [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]];
-            const change = new ChangeEffectOrder(this.doc, oldOrder, newOrder);
-            this.doc.setProspectiveChange(change);
-            this.doc.record(change);
-            this._renderEffectOrder();
-        }
         _renderEffectOrder() {
             const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
             for (const effect of instrument.effectOrder) {
@@ -62501,6 +62474,80 @@ You should be redirected to the song at:<br /><br />
                 if (element) {
                     this._effectsContainer.appendChild(element);
                 }
+            }
+        }
+        _moveEffectTo(effect, target, before) {
+            const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+            const oldOrder = [...instrument.effectOrder];
+            const newOrder = [...oldOrder];
+            const index = newOrder.indexOf(effect);
+            const targetIndex = newOrder.indexOf(target);
+            if (index === -1 || targetIndex === -1 || index === targetIndex)
+                return;
+            if (!(instrument.effects & (1 << target)))
+                return;
+            newOrder.splice(index, 1);
+            const adjustedTargetIndex = newOrder.indexOf(target);
+            const insertionIndex = adjustedTargetIndex + (before ? 0 : 1);
+            newOrder.splice(insertionIndex, 0, effect);
+            const change = new ChangeEffectOrder(this.doc, oldOrder, newOrder);
+            this.doc.setProspectiveChange(change);
+            this.doc.record(change);
+            this._renderEffectOrder();
+        }
+        _setupEffectDragAndDrop() {
+            let draggedEffect = null;
+            let currentTarget = null;
+            let dropBefore = true;
+            const clearDropIndicator = () => {
+                currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.classList.remove("effect-drop-before", "effect-drop-after");
+                currentTarget = null;
+            };
+            for (const [effect, element] of this._effectElements) {
+                const title = element.querySelector(".effect-title");
+                if (!title)
+                    continue;
+                title.draggable = true;
+                title.addEventListener("dragstart", (event) => {
+                    if (event.target.closest(".mute-button")) {
+                        event.preventDefault();
+                        return;
+                    }
+                    draggedEffect = effect;
+                    if (event.dataTransfer) {
+                        event.dataTransfer.effectAllowed = "move";
+                        event.dataTransfer.setData("text/plain", String(effect));
+                    }
+                });
+                title.addEventListener("dragend", () => {
+                    draggedEffect = null;
+                    clearDropIndicator();
+                });
+                element.addEventListener("dragover", (event) => {
+                    if (draggedEffect === null || draggedEffect === effect)
+                        return;
+                    event.preventDefault();
+                    if (event.dataTransfer) {
+                        event.dataTransfer.dropEffect = "move";
+                    }
+                    const rect = element.getBoundingClientRect();
+                    dropBefore = event.clientY < rect.top + rect.height / 2;
+                    if (currentTarget !== element) {
+                        currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.classList.remove("effect-drop-before", "effect-drop-after");
+                        currentTarget = element;
+                    }
+                    currentTarget.classList.toggle("effect-drop-before", dropBefore);
+                    currentTarget.classList.toggle("effect-drop-after", !dropBefore);
+                });
+                element.addEventListener("drop", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (draggedEffect !== null && draggedEffect !== effect) {
+                        this._moveEffectTo(draggedEffect, effect, dropBefore);
+                    }
+                    draggedEffect = null;
+                    clearDropIndicator();
+                });
             }
         }
     }

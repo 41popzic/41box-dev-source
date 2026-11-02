@@ -5,30 +5,13 @@ const { div, button } = HTML;
 
 export class EffectArrows {
     public readonly _downArrow: HTMLButtonElement = button({ class: "arrow-button", type: "button" }, "▼");
-    public readonly _upArrow: HTMLButtonElement = button({ class: "arrow-button", type: "button" }, "▲");
+    public readonly _upArrow: HTMLButtonElement = button({ class: "arrow-button", type: "button" }, "⠿");
     
     public readonly container: HTMLDivElement = div({ style: `display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px` },
         this._downArrow, this._upArrow
     );
-    public constructor(onMoveUp: () => void, onMoveDown: () => void) {
-        this._upArrow.onclick = (event: MouseEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onMoveUp()
-        };
-
-        this._downArrow.onclick = (event: MouseEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onMoveDown()
-        };
-
-        this._upArrow.onmousedown = (event: MouseEvent) => {
-            event.preventDefault();
-        };
-
-        this._downArrow.onmousedown = (event: MouseEvent) => {
-            event.preventDefault();
-        };
+    public constructor() {
+        this._downArrow.style.display = "none";
+        this._upArrow.draggable = true;
     }
 }

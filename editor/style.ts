@@ -1803,16 +1803,25 @@ content: "";
 .beepboxEditor .effect-container {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	border-radius: 2px;
-	margin: 2px -5px;
+	margin: 2px 0px;
 	padding: 0.667em 0.5em !important
 }
+
+.effect-container.effect-drop-before {
+    box-shadow: 0 -2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
+.effect-container.effect-drop-after {
+    box-shadow: 0 2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
 .beepboxEditor .arrow-button {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	padding: 0px; 
 	width: 1.25em; 
 	height: 1.25em; 
 	font-size: 1.1em;
-	margin: 0 -2px;
+	margin: 0;
 }
 
 .beepboxEditor .arrow-button:focus {
@@ -1825,10 +1834,10 @@ content: "";
 	font-weight: 1000;
 	margin: -3px 0;
 	display: grid;
-	grid-template-columns: 0.8fr 2.1fr 0.8fr; // equal sections to compensate for mute button
+	grid-template-columns: 0.8fr 2.4fr 0.5fr; // equal sections to compensate for mute button
 	align-items: center;
 	justify-items: left;
-	padding-top: 2px
+	padding-top: 2px;
 }
 
 .beepboxEditor .effect-title.muted {
