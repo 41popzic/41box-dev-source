@@ -15920,12 +15920,16 @@ content: "";
 	padding: 0.667em 0.5em !important
 }
 
-.effect-container.effect-drop-before {
+.beepboxEditor .effect-container.effect-drop-before {
     box-shadow: 0 -2px 0 ${ColorConfig.uiWidgetFocus};
 }
 
-.effect-container.effect-drop-after {
+.beepboxEditor .effect-container.effect-drop-after {
     box-shadow: 0 2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
+.effect-drag-overlay {
+    background: ${ColorConfig.editorBackground};
 }
 
 .beepboxEditor .arrow-button {
@@ -34264,7 +34268,6 @@ li.select2-results__option[role=group] > strong:hover {
             if (!usesSelectiveRandom)
                 selectiveRandom.instrumentType = true;
             if (selectiveRandom.effects) {
-                instrument.effects = 0;
                 instrument.aliases = false;
             }
             if (selectiveRandom.envelopes)
@@ -35288,6 +35291,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeToggleEffects extends Change {
@@ -35300,8 +35305,6 @@ li.select2-results__option[role=group] > strong:hover {
             const wasSelected = ((oldValue & (1 << toggleFlag)) != 0);
             const newValue = wasSelected ? (oldValue & (~(1 << toggleFlag))) : (oldValue | (1 << toggleFlag));
             instrument.effects = newValue;
-            if (toggleFlag != 2)
-                instrument.preset = instrument.type;
             if (toggleFlag == 3 && wasSelected)
                 instrument.aliases = false;
             if (wasSelected)
@@ -35798,6 +35801,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeEnvelopeSpeed extends Change {
@@ -35907,6 +35912,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeClicklessTransition extends Change {
@@ -35942,6 +35949,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeSpectrum extends Change {
@@ -36064,6 +36073,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeDetune extends ChangeInstrumentSlider {
@@ -36083,6 +36094,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeRingMod extends ChangeInstrumentSlider {
@@ -36132,6 +36145,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeGranular extends ChangeInstrumentSlider {
@@ -36179,6 +36194,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeDistortion extends ChangeInstrumentSlider {
@@ -36218,6 +36235,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeStringSustain extends ChangeInstrumentSlider {
@@ -36290,6 +36309,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeEQFilterSimpleCut extends ChangeInstrumentSlider {
@@ -38067,6 +38088,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeFlangerDelay extends ChangeInstrumentSlider {
@@ -38122,6 +38145,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangePhaserMix extends ChangeInstrumentSlider {
@@ -38167,6 +38192,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeChorus extends ChangeInstrumentSlider {
@@ -38186,6 +38213,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeReverb extends ChangeInstrumentSlider {
@@ -38232,6 +38261,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeEffectOrder extends UndoableChange {
@@ -38241,6 +38272,8 @@ li.select2-results__option[role=group] > strong:hover {
             this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             this._oldOrder = [...oldOrder];
             this._newOrder = [...newOrder];
+            let instrument = _doc.song.channels[_doc.channel].instruments[_doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
             this._doForwards();
             this._doc.notifier.changed();
             this._didSomething();
@@ -38831,6 +38864,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeSizeBend extends UndoableChange {
@@ -39006,6 +39041,8 @@ li.select2-results__option[role=group] > strong:hover {
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
+            let instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            instrument.preset = instrument.type;
         }
     }
     class ChangeNoiseWave extends Change {
@@ -61146,6 +61183,7 @@ You should be redirected to the song at:<br /><br />
                 this._panDropdown.classList.toggle("muted", instrument.panMuted);
                 this._panDelaySlider.setMute(instrument.panMuted);
                 this._panDelayText.classList.toggle("muted", instrument.panMuted);
+                this.whenUpdated();
             });
             this._reverbTitle.addEventListener("click", () => this.collapseEffect("reverb"));
             this._reverbMuteButton.addEventListener("click", () => {
@@ -61167,6 +61205,7 @@ You should be redirected to the song at:<br /><br />
                 this._reverbShelfGainSlider.setMute(instrument.reverbMuted);
                 this._reverbShelfGainText.classList.toggle("muted", instrument.reverbMuted);
                 this.reverbShelfGainNum.classList.toggle("muted", instrument.reverbMuted);
+                this.whenUpdated();
             });
             this._chorusTitle.addEventListener("click", () => this.collapseEffect("chorus"));
             this._chorusMuteButton.addEventListener("click", () => {
@@ -61179,6 +61218,7 @@ You should be redirected to the song at:<br /><br />
                 this._chorusTitle.classList.toggle("muted", instrument.chorusMuted);
                 this._chorusSlider.setMute(instrument.chorusMuted);
                 this._chorusText.classList.toggle("muted", instrument.chorusMuted);
+                this.whenUpdated();
             });
             this._transitionTitle.addEventListener("click", () => this.collapseEffect("transition"));
             this._transitionMuteButton.addEventListener("click", () => {
@@ -61197,6 +61237,7 @@ You should be redirected to the song at:<br /><br />
                 this._clicklessTransitionText.classList.toggle("muted", instrument.transitionMuted);
                 this._slideSpeedText.classList.toggle("muted", instrument.transitionMuted);
                 this._slideSpeedDisplay.classList.toggle("muted", instrument.transitionMuted);
+                this.whenUpdated();
             });
             this._chordTitle.addEventListener("click", () => this.collapseEffect("chord type"));
             this._chordMuteButton.addEventListener("click", () => {
@@ -61218,6 +61259,7 @@ You should be redirected to the song at:<br /><br />
                 this._strumSpeedDisplay.classList.toggle("muted", instrument.chordMuted);
                 this._strumSpeedText.classList.toggle("muted", instrument.chordMuted);
                 this._twoNoteArpText.classList.toggle("muted", instrument.chordMuted);
+                this.whenUpdated();
             });
             this._pitchShiftTitle.addEventListener("click", () => this.collapseEffect("pitch shift"));
             this._pitchShiftMuteButton.addEventListener("click", () => {
@@ -61230,6 +61272,7 @@ You should be redirected to the song at:<br /><br />
                 this._pitchShiftTitle.classList.toggle("muted", instrument.pitchShiftMuted);
                 this._pitchShiftKnob.setMute(instrument.pitchShiftMuted);
                 this._pitchShiftText.classList.toggle("muted", instrument.pitchShiftMuted);
+                this.whenUpdated();
             });
             this._detuneTitle.addEventListener("click", () => this.collapseEffect("detune"));
             this._detuneMuteButton.addEventListener("click", () => {
@@ -61242,6 +61285,7 @@ You should be redirected to the song at:<br /><br />
                 this._detuneTitle.classList.toggle("muted", instrument.detuneMuted);
                 this._detuneSlider.setMute(instrument.detuneMuted);
                 this._detuneSliderText.classList.toggle("muted", instrument.detuneMuted);
+                this.whenUpdated();
             });
             this._vibratoTitle.addEventListener("click", () => this.collapseEffect("vibrato"));
             this._vibratoMuteButton.addEventListener("click", () => {
@@ -61266,6 +61310,7 @@ You should be redirected to the song at:<br /><br />
                 this._vibratoDepthText.classList.toggle("muted", instrument.vibratoMuted);
                 this._vibratoSpeedDisplay.classList.toggle("muted", instrument.vibratoMuted);
                 this._vibratoText.classList.toggle("muted", instrument.vibratoMuted);
+                this.whenUpdated();
             });
             this._distortionTitle.addEventListener("click", () => this.collapseEffect("distortion"));
             this._distortionMuteButton.addEventListener("click", () => {
@@ -61279,6 +61324,7 @@ You should be redirected to the song at:<br /><br />
                 this._distortionText.classList.toggle("muted", instrument.distortionMuted);
                 this._aliasingText.classList.toggle("muted", instrument.distortionMuted);
                 this._distortionSlider.setMute(instrument.distortionMuted);
+                this.whenUpdated();
             });
             this._noteFilterTitle.addEventListener("click", () => this.collapseEffect("note filter"));
             this._noteFilterMuteButton.addEventListener("click", () => {
@@ -61299,6 +61345,7 @@ You should be redirected to the song at:<br /><br />
                 this._noteFilterSimpleCutText.classList.toggle("muted", instrument.noteFilterMuted);
                 this._noteFilterSimplePeakText.classList.toggle("muted", instrument.noteFilterMuted);
                 this._noteFilterEditor.render();
+                this.whenUpdated();
             });
             this._granularTitle.addEventListener("click", () => this.collapseEffect("granular"));
             this._granularMuteButton.addEventListener("click", () => {
@@ -61319,6 +61366,7 @@ You should be redirected to the song at:<br /><br />
                 this._grainSizeText.classList.toggle("muted", instrument.granularMuted);
                 this.grainRangeNum.classList.toggle("muted", instrument.granularMuted);
                 this.grainSizeNum.classList.toggle("muted", instrument.granularMuted);
+                this.whenUpdated();
             });
             this._bitcrusherTitle.addEventListener("click", () => this.collapseEffect("bitcrusher"));
             this._bitcrusherMuteButton.addEventListener("click", () => {
@@ -61333,6 +61381,7 @@ You should be redirected to the song at:<br /><br />
                 this._bitcrusherQuantizationSlider.setMute(instrument.bitcrusherMuted);
                 this._bitcrusherFreqText.classList.toggle("muted", instrument.bitcrusherMuted);
                 this._bitcrusherQuantizationText.classList.toggle("muted", instrument.bitcrusherMuted);
+                this.whenUpdated();
             });
             this._echoTitle.addEventListener("click", () => this.collapseEffect("echo"));
             this._echoMuteButton.addEventListener("click", () => {
@@ -61348,6 +61397,7 @@ You should be redirected to the song at:<br /><br />
                 this._echoSustainText.classList.toggle("muted", instrument.echoMuted);
                 this._echoDelayText.classList.toggle("muted", instrument.echoMuted);
                 this.echoDelayNum.classList.toggle("muted", instrument.echoMuted);
+                this.whenUpdated();
             });
             this._ringModTitle.addEventListener("click", () => this.collapseEffect("ring mod"));
             this._ringModMuteButton.addEventListener("click", () => {
@@ -61366,6 +61416,7 @@ You should be redirected to the song at:<br /><br />
                 this._ringModWaveText.classList.toggle("muted", instrument.ringModMuted);
                 this._ringModHzText.classList.toggle("muted", instrument.ringModMuted);
                 this.ringModHzNum.classList.toggle("muted", instrument.ringModMuted);
+                this.whenUpdated();
             });
             this._flangerTitle.addEventListener("click", () => this.collapseEffect("flanger"));
             this._flangerMuteButton.addEventListener("click", () => {
@@ -61389,6 +61440,7 @@ You should be redirected to the song at:<br /><br />
                 this.flangerRateNum.classList.toggle("muted", instrument.flangerMuted);
                 this.flangerDelayNum.classList.toggle("muted", instrument.flangerMuted);
                 this.flangerDepthNum.classList.toggle("muted", instrument.flangerMuted);
+                this.whenUpdated();
             });
             this._phaserTitle.addEventListener("click", () => this.collapseEffect("phaser"));
             this._phaserMuteButton.addEventListener("click", () => {
@@ -61407,6 +61459,7 @@ You should be redirected to the song at:<br /><br />
                 this._phaserFreqText.classList.toggle("muted", instrument.phaserMuted);
                 this._phaserStagesText.classList.toggle("muted", instrument.phaserMuted);
                 this._phaserFeedbackText.classList.toggle("muted", instrument.phaserMuted);
+                this.whenUpdated();
             });
             this._noteRangeTitle.addEventListener("click", () => this.collapseEffect("note range"));
             this._noteRangeMuteButton.addEventListener("click", () => {
@@ -61420,6 +61473,7 @@ You should be redirected to the song at:<br /><br />
                 this._noteRangeDoubSlider.setMute(instrument.noteRangeMuted);
                 this._upperNoteLimitText.classList.toggle("muted", instrument.noteRangeMuted);
                 this._lowerNoteLimitText.classList.toggle("muted", instrument.noteRangeMuted);
+                this.whenUpdated();
             });
             this._volumeSlider.container.style.setProperty("flex-grow", "1");
             this._volumeSlider.container.style.setProperty("display", "flex");
@@ -62494,6 +62548,7 @@ You should be redirected to the song at:<br /><br />
             this.doc.setProspectiveChange(change);
             this.doc.record(change);
             this._renderEffectOrder();
+            this.whenUpdated();
         }
         _setupEffectDragAndDrop() {
             let draggedEffect = null;
@@ -62508,47 +62563,109 @@ You should be redirected to the song at:<br /><br />
                 if (!title)
                     continue;
                 title.draggable = true;
+                let dragOverlay = null;
                 title.addEventListener("dragstart", (event) => {
-                    if (event.target.closest(".mute-button")) {
-                        event.preventDefault();
-                        return;
-                    }
                     draggedEffect = effect;
                     if (event.dataTransfer) {
                         event.dataTransfer.effectAllowed = "move";
                         event.dataTransfer.setData("text/plain", String(effect));
+                        const rect = element.getBoundingClientRect();
+                        event.dataTransfer.setDragImage(element, event.clientX - rect.left, event.clientY - rect.top);
+                        dragOverlay = document.createElement("div");
+                        dragOverlay.className = "effect-drag-overlay";
+                        Object.assign(dragOverlay.style, {
+                            position: "fixed",
+                            left: `${rect.left}px`,
+                            top: `${rect.top}px`,
+                            width: `${rect.width}px`,
+                            height: `${rect.height}px`,
+                            pointerEvents: "none",
+                            zIndex: "100",
+                        });
+                        document.body.appendChild(dragOverlay);
                     }
                 });
                 title.addEventListener("dragend", () => {
                     draggedEffect = null;
                     clearDropIndicator();
-                });
-                element.addEventListener("dragover", (event) => {
-                    if (draggedEffect === null || draggedEffect === effect)
-                        return;
-                    event.preventDefault();
-                    if (event.dataTransfer) {
-                        event.dataTransfer.dropEffect = "move";
-                    }
-                    const rect = element.getBoundingClientRect();
-                    dropBefore = event.clientY < rect.top + rect.height / 2;
-                    if (currentTarget !== element) {
-                        currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.classList.remove("effect-drop-before", "effect-drop-after");
-                        currentTarget = element;
-                    }
-                    currentTarget.classList.toggle("effect-drop-before", dropBefore);
-                    currentTarget.classList.toggle("effect-drop-after", !dropBefore);
-                });
-                element.addEventListener("drop", (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (draggedEffect !== null && draggedEffect !== effect) {
-                        this._moveEffectTo(draggedEffect, effect, dropBefore);
-                    }
-                    draggedEffect = null;
-                    clearDropIndicator();
+                    dragOverlay === null || dragOverlay === void 0 ? void 0 : dragOverlay.remove();
+                    dragOverlay = null;
                 });
             }
+            this._effectsContainer.addEventListener("dragover", (event) => {
+                if (draggedEffect === null)
+                    return;
+                event.preventDefault();
+                if (event.dataTransfer) {
+                    event.dataTransfer.dropEffect = "move";
+                }
+                let closestElement = null;
+                let closestDistance = Infinity;
+                for (const [, element] of this._effectElements) {
+                    const rect = element.getBoundingClientRect();
+                    const centerY = rect.top + rect.height / 2;
+                    const distance = Math.abs(event.clientY - centerY);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestElement = element;
+                    }
+                }
+                const rect = closestElement.getBoundingClientRect();
+                dropBefore = event.clientY < rect.top + rect.height / 2;
+                if (currentTarget !== closestElement) {
+                    currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.classList.remove("effect-drop-before", "effect-drop-after");
+                    currentTarget = closestElement;
+                }
+                currentTarget.classList.toggle("effect-drop-before", dropBefore);
+                currentTarget.classList.toggle("effect-drop-after", !dropBefore);
+            });
+            this._effectsContainer.addEventListener("drop", (event) => {
+                var _a;
+                if (draggedEffect === null)
+                    return;
+                event.preventDefault();
+                event.stopPropagation();
+                if (currentTarget) {
+                    const targetEffect = (_a = [...this._effectElements.entries()].find(([, element]) => element === currentTarget)) === null || _a === void 0 ? void 0 : _a[0];
+                    if (targetEffect !== undefined && draggedEffect !== targetEffect)
+                        this._moveEffectTo(draggedEffect, targetEffect, dropBefore);
+                }
+                draggedEffect = null;
+                clearDropIndicator();
+            });
+            document.addEventListener("dragover", (event) => {
+                if (draggedEffect === null)
+                    return;
+                event.preventDefault();
+            });
+            document.addEventListener("drop", (event) => {
+                if (draggedEffect === null)
+                    return;
+                const containerRect = this._effectsContainer.getBoundingClientRect();
+                const insideContainer = event.clientX >= containerRect.left &&
+                    event.clientX <= containerRect.right &&
+                    event.clientY >= containerRect.top &&
+                    event.clientY <= containerRect.bottom;
+                if (!insideContainer) {
+                    event.preventDefault();
+                    const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+                    if (instrument.effects & (1 << draggedEffect)) {
+                        const change = new ChangeToggleEffects(this.doc, draggedEffect, null);
+                        this.doc.setProspectiveChange(change);
+                        this.doc.record(change);
+                        this.whenUpdated();
+                        instrument.preset = instrument.type;
+                    }
+                }
+                draggedEffect = null;
+                clearDropIndicator();
+            });
+            this._effectsContainer.addEventListener("dragleave", (event) => {
+                if (event.relatedTarget instanceof Node && this._effectsContainer.contains(event.relatedTarget)) {
+                    return;
+                }
+                clearDropIndicator();
+            });
         }
     }
     SongEditor._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));

@@ -2086,6 +2086,7 @@ export class SongEditor {
             this._panDropdown.classList.toggle("muted", instrument.panMuted); // Pan dropdown
             this._panDelaySlider.setMute(instrument.panMuted); // Pan delay slider
             this._panDelayText.classList.toggle("muted", instrument.panMuted); // Pan delay tip prompt text
+            this.whenUpdated();
         });
 
         // Reverb
@@ -2112,6 +2113,7 @@ export class SongEditor {
             this._reverbShelfGainSlider.setMute(instrument.reverbMuted); // Reverb shelf gain slider
             this._reverbShelfGainText.classList.toggle("muted", instrument.reverbMuted); // Reverb shelf gain tip prompt text
             this.reverbShelfGainNum.classList.toggle("muted", instrument.reverbMuted); // Reverb shelf gain display
+            this.whenUpdated();
         });
 
         // Chorus
@@ -2129,6 +2131,7 @@ export class SongEditor {
             this._chorusTitle.classList.toggle("muted", instrument.chorusMuted);
             this._chorusSlider.setMute(instrument.chorusMuted); // Chorus slider
             this._chorusText.classList.toggle("muted", instrument.chorusMuted); // Chorus tip prompt text
+            this.whenUpdated();
         });
 
         // Transition
@@ -2152,6 +2155,7 @@ export class SongEditor {
             this._clicklessTransitionText.classList.toggle("muted", instrument.transitionMuted); // Clickless transition tip prompt text
             this._slideSpeedText.classList.toggle("muted", instrument.transitionMuted); // Slide speed tip prompt text
             this._slideSpeedDisplay.classList.toggle("muted", instrument.transitionMuted); // Slide speed display
+            this.whenUpdated();
         });
 
         // Chord
@@ -2178,6 +2182,7 @@ export class SongEditor {
             this._strumSpeedDisplay.classList.toggle("muted", instrument.chordMuted); // Chord strum speed display
             this._strumSpeedText.classList.toggle("muted", instrument.chordMuted); // Chord strum speed tip prompt text
             this._twoNoteArpText.classList.toggle("muted", instrument.chordMuted); // Chord two note tip prompt text
+            this.whenUpdated();
         });
 
         // Pitch shift
@@ -2195,6 +2200,7 @@ export class SongEditor {
             this._pitchShiftTitle.classList.toggle("muted", instrument.pitchShiftMuted);
             this._pitchShiftKnob.setMute(instrument.pitchShiftMuted); // Pitch shift knob
             this._pitchShiftText.classList.toggle("muted", instrument.pitchShiftMuted); // Pitch shift tip prompt text
+            this.whenUpdated();
         });
 
         // Detune
@@ -2212,6 +2218,7 @@ export class SongEditor {
             this._detuneTitle.classList.toggle("muted", instrument.detuneMuted);
             this._detuneSlider.setMute(instrument.detuneMuted); // Detune slider
             this._detuneSliderText.classList.toggle("muted", instrument.detuneMuted);
+            this.whenUpdated();
         });
 
         // Vibrato
@@ -2241,6 +2248,7 @@ export class SongEditor {
             this._vibratoDepthText.classList.toggle("muted", instrument.vibratoMuted); // Vibrato
             this._vibratoSpeedDisplay.classList.toggle("muted", instrument.vibratoMuted); // Vibrato
             this._vibratoText.classList.toggle("muted", instrument.vibratoMuted); // Vibrato
+            this.whenUpdated();
         });
 
         // Distortion
@@ -2259,6 +2267,7 @@ export class SongEditor {
             this._distortionText.classList.toggle("muted", instrument.distortionMuted); // Distortion
             this._aliasingText.classList.toggle("muted", instrument.distortionMuted); // Distortion
             this._distortionSlider.setMute(instrument.distortionMuted); // Distortion slider
+            this.whenUpdated();
         });
 
         // Note filter
@@ -2284,6 +2293,7 @@ export class SongEditor {
             this._noteFilterSimpleCutText.classList.toggle("muted", instrument.noteFilterMuted); // Note filter
             this._noteFilterSimplePeakText.classList.toggle("muted", instrument.noteFilterMuted); // Note filter
             this._noteFilterEditor.render();
+            this.whenUpdated();
         });
 
         // Granular
@@ -2309,6 +2319,7 @@ export class SongEditor {
             this._grainSizeText.classList.toggle("muted", instrument.granularMuted); // Granular
             this.grainRangeNum.classList.toggle("muted", instrument.granularMuted); // Granular
             this.grainSizeNum.classList.toggle("muted", instrument.granularMuted); // Granular
+            this.whenUpdated();
         });
 
         // Bitcrusher
@@ -2328,6 +2339,7 @@ export class SongEditor {
             this._bitcrusherQuantizationSlider.setMute(instrument.bitcrusherMuted); // Bitcrusher quantization slider
             this._bitcrusherFreqText.classList.toggle("muted", instrument.bitcrusherMuted); // Bitcrusher
             this._bitcrusherQuantizationText.classList.toggle("muted", instrument.bitcrusherMuted); // Bitcrusher
+            this.whenUpdated();
         });
 
         // Echo
@@ -2348,6 +2360,7 @@ export class SongEditor {
             this._echoSustainText.classList.toggle("muted", instrument.echoMuted); // Echo
             this._echoDelayText.classList.toggle("muted", instrument.echoMuted); // Echo
             this.echoDelayNum.classList.toggle("muted", instrument.echoMuted); // Echo
+            this.whenUpdated();
         });
 
         // Ring modulation
@@ -2371,6 +2384,7 @@ export class SongEditor {
             this._ringModWaveText.classList.toggle("muted", instrument.ringModMuted); // Ring mod
             this._ringModHzText.classList.toggle("muted", instrument.ringModMuted); // Ring mod
             this.ringModHzNum.classList.toggle("muted", instrument.ringModMuted); // Ring mod
+            this.whenUpdated();
         });
 
         // Flanger
@@ -2399,6 +2413,7 @@ export class SongEditor {
             this.flangerRateNum.classList.toggle("muted", instrument.flangerMuted); // Flanger
             this.flangerDelayNum.classList.toggle("muted", instrument.flangerMuted); // Flanger
             this.flangerDepthNum.classList.toggle("muted", instrument.flangerMuted); // Flanger
+            this.whenUpdated();
         });
 
         // Phaser
@@ -2422,6 +2437,7 @@ export class SongEditor {
             this._phaserFreqText.classList.toggle("muted", instrument.phaserMuted); // Phaser
             this._phaserStagesText.classList.toggle("muted", instrument.phaserMuted); // Phaser
             this._phaserFeedbackText.classList.toggle("muted", instrument.phaserMuted); // Phaser
+            this.whenUpdated();
         });
 
         // Note range
@@ -2440,6 +2456,7 @@ export class SongEditor {
             this._noteRangeDoubSlider.setMute(instrument.noteRangeMuted); // Note range double slider
             this._upperNoteLimitText.classList.toggle("muted", instrument.noteRangeMuted); // Upper limit
             this._lowerNoteLimitText.classList.toggle("muted", instrument.noteRangeMuted); // Lower limit
+            this.whenUpdated();
         });
 
         // The song volume slider is styled slightly different than the class' default.
@@ -7234,6 +7251,7 @@ export class SongEditor {
         this.doc.record(change);
 
         this._renderEffectOrder();
+        this.whenUpdated();
     }
 
     private _setupEffectDragAndDrop(): void {
@@ -7251,57 +7269,135 @@ export class SongEditor {
 
             title.draggable = true;
 
-            title.addEventListener("dragstart", (event: DragEvent) => {
-                if ((event.target as HTMLElement).closest(".mute-button")) {
-                    event.preventDefault();
-                    return;
-                }
+            let dragOverlay: HTMLElement | null = null;
 
+            title.addEventListener("dragstart", (event: DragEvent) => {
                 draggedEffect = effect;
 
                 if (event.dataTransfer) {
                     event.dataTransfer.effectAllowed = "move";
                     event.dataTransfer.setData("text/plain", String(effect));
+
+                    const rect = element.getBoundingClientRect();
+
+                    event.dataTransfer.setDragImage(element, event.clientX - rect.left, event.clientY - rect.top);
+
+                    dragOverlay = document.createElement("div");
+                    dragOverlay.className = "effect-drag-overlay";
+
+                    Object.assign(dragOverlay.style, {
+                        position: "fixed",
+                        left: `${rect.left}px`,
+                        top: `${rect.top}px`,
+                        width: `${rect.width}px`,
+                        height: `${rect.height}px`,
+                        pointerEvents: "none",
+                        zIndex: "100",
+                    });
+
+                    document.body.appendChild(dragOverlay);
                 }
             });
 
             title.addEventListener("dragend", () => {
                 draggedEffect = null;
                 clearDropIndicator();
-            });
-
-            element.addEventListener("dragover", (event: DragEvent) => {
-                if (draggedEffect === null || draggedEffect === effect) return;
-
-                event.preventDefault();
-
-                if (event.dataTransfer) {
-                    event.dataTransfer.dropEffect = "move";
-                }
-
-                const rect = element.getBoundingClientRect();
-                dropBefore = event.clientY < rect.top + rect.height / 2;
-
-                if (currentTarget !== element) {
-                    currentTarget?.classList.remove("effect-drop-before", "effect-drop-after");
-                    currentTarget = element;
-                }
-
-                currentTarget.classList.toggle("effect-drop-before", dropBefore);
-                currentTarget.classList.toggle("effect-drop-after", !dropBefore);
-            });
-
-            element.addEventListener("drop", (event: DragEvent) => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                if (draggedEffect !== null && draggedEffect !== effect) {
-                    this._moveEffectTo(draggedEffect, effect, dropBefore);
-                }
-
-                draggedEffect = null;
-                clearDropIndicator();
+                dragOverlay?.remove();
+                dragOverlay = null;
             });
         }
+        this._effectsContainer.addEventListener("dragover", (event: DragEvent) => {
+            if (draggedEffect === null) return;
+
+            event.preventDefault();
+
+            if (event.dataTransfer) {
+                event.dataTransfer.dropEffect = "move";
+            }
+
+            // Find the closest effect element to the cursor.
+            let closestElement: HTMLElement | null = null;
+            let closestDistance = Infinity;
+
+            for (const [, element] of this._effectElements) {
+                const rect = element.getBoundingClientRect();
+                const centerY = rect.top + rect.height / 2;
+                const distance = Math.abs(event.clientY - centerY);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestElement = element;
+                }
+            }
+
+            const rect = closestElement.getBoundingClientRect();
+            dropBefore = event.clientY < rect.top + rect.height / 2;
+
+            if (currentTarget !== closestElement) {
+                currentTarget?.classList.remove("effect-drop-before", "effect-drop-after");
+                currentTarget = closestElement;
+            }
+
+            currentTarget.classList.toggle("effect-drop-before", dropBefore);
+            currentTarget.classList.toggle("effect-drop-after", !dropBefore);
+        });
+
+        this._effectsContainer.addEventListener("drop", (event: DragEvent) => {
+            if (draggedEffect === null) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (currentTarget) {
+                const targetEffect = [...this._effectElements.entries()].find(([, element]) => element === currentTarget)?.[0];
+
+                if (targetEffect !== undefined && draggedEffect !== targetEffect) this._moveEffectTo(draggedEffect, targetEffect, dropBefore);
+            }
+
+            draggedEffect = null;
+            clearDropIndicator();
+        });
+
+        document.addEventListener("dragover", (event: DragEvent) => {
+            if (draggedEffect === null) return;
+
+            event.preventDefault();
+        });
+
+        document.addEventListener("drop", (event: DragEvent) => {
+            if (draggedEffect === null) return;
+
+            const containerRect = this._effectsContainer.getBoundingClientRect();
+
+            const insideContainer =
+                event.clientX >= containerRect.left &&
+                event.clientX <= containerRect.right &&
+                event.clientY >= containerRect.top &&
+                event.clientY <= containerRect.bottom;
+
+            if (!insideContainer) {
+                event.preventDefault();
+
+                const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+
+                // Only disable the effect if it's currently enabled
+                if (instrument.effects & (1 << draggedEffect)) {
+                    const change = new ChangeToggleEffects(this.doc, draggedEffect, null);
+                    this.doc.setProspectiveChange(change);
+                    this.doc.record(change);
+                    this.whenUpdated();
+                    instrument.preset = instrument.type; // Here for some reason
+                }
+            }
+            draggedEffect = null;
+            clearDropIndicator();
+        });
+
+        this._effectsContainer.addEventListener("dragleave", (event: DragEvent) => {
+            if (event.relatedTarget instanceof Node && this._effectsContainer.contains(event.relatedTarget)) {
+                return;
+            }
+            clearDropIndicator();
+        });
     }
 }

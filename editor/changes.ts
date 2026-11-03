@@ -781,7 +781,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
         const selectiveRandom: SelectiveInstrumentSettings = usesSelectiveRandom ? doc.prefs.selectiveRandom : new SelectiveInstrumentSettings();
         if (!usesSelectiveRandom) selectiveRandom.instrumentType = true;
         if (selectiveRandom.effects) {
-            instrument.effects = 0; // disable all existing effects except panning, which should always be on.
+            //instrument.effects = 0;
             instrument.aliases = false;
         }
         if (selectiveRandom.envelopes) instrument.envelopeCount = 0;
@@ -1845,6 +1845,8 @@ export class ChangeTransitionMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].transitionMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -1858,8 +1860,7 @@ export class ChangeToggleEffects extends Change {
         const wasSelected: boolean = ((oldValue & (1 << toggleFlag)) != 0);
         const newValue: number = wasSelected ? (oldValue & (~(1 << toggleFlag))) : (oldValue | (1 << toggleFlag));
         instrument.effects = newValue;
-        // As a special case, toggling the panning effect doesn't remove the preset.
-        if (toggleFlag != EffectType.panning) instrument.preset = instrument.type;
+        //if (toggleFlag != EffectType.panning) instrument.preset = instrument.type;
         // Remove AA when distortion is turned off.
         if (toggleFlag == EffectType.distortion && wasSelected)
             instrument.aliases = false;
@@ -2428,6 +2429,8 @@ export class ChangeVibratoMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].vibratoMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2552,6 +2555,8 @@ export class ChangeChordMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].chordMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2592,6 +2597,8 @@ export class ChangeDistortionMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].distortionMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2722,6 +2729,8 @@ export class ChangePitchShiftMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].pitchShiftMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2742,6 +2751,8 @@ export class ChangeDetuneMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].detuneMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2793,6 +2804,8 @@ export class ChangeRingModMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].ringModMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2843,6 +2856,8 @@ export class ChangeGranularMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].granularMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2883,6 +2898,8 @@ export class ChangeBitcrusherMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].bitcrusherMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -2960,6 +2977,8 @@ export class ChangeNoteFilterMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].noteFilterMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -4974,6 +4993,8 @@ export class ChangeEchoMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].echoMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -5033,6 +5054,8 @@ export class ChangeFlangerMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].flangerMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -5082,6 +5105,8 @@ export class ChangePhaserMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].phaserMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -5101,6 +5126,8 @@ export class ChangeChorusMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].chorusMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -5150,6 +5177,8 @@ export class ChangeReverbMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].reverbMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -5175,6 +5204,9 @@ export class ChangeEffectOrder extends UndoableChange {
 
         this._oldOrder = [...oldOrder];
         this._newOrder = [...newOrder];
+
+        let instrument: Instrument = _doc.song.channels[_doc.channel].instruments[_doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
 
         this._doForwards();
         this._doc.notifier.changed();
@@ -5834,6 +5866,8 @@ export class ChangePanMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].panMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 
@@ -6021,6 +6055,8 @@ export class ChangeNoteRangeMuted extends Change {
         doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].noteRangeMuted = newValue;
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        instrument.preset = instrument.type;
     }
 }
 

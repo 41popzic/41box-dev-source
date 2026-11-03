@@ -1807,12 +1807,16 @@ content: "";
 	padding: 0.667em 0.5em !important
 }
 
-.effect-container.effect-drop-before {
+.beepboxEditor .effect-container.effect-drop-before {
     box-shadow: 0 -2px 0 ${ColorConfig.uiWidgetFocus};
 }
 
-.effect-container.effect-drop-after {
+.beepboxEditor .effect-container.effect-drop-after {
     box-shadow: 0 2px 0 ${ColorConfig.uiWidgetFocus};
+}
+
+.effect-drag-overlay {
+    background: ${ColorConfig.editorBackground};
 }
 
 .beepboxEditor .arrow-button {

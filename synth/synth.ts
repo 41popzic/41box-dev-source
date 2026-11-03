@@ -5577,7 +5577,7 @@ if (playSong && !this.countInMetronome) {
             let effectSaveStage = "";
 
             for (let i = 0; i < instrumentState.effectOrder.length; i++) {
-                if (i === 3 && usesEqFilter) { // eq was originally at index 4?? Oh well it sounds fine like this when importing old songs
+                if (i === 3 && usesEqFilter) { // Sounds fine, might not be a good fix though
                     effectSampleStage += eqFilter.sampleStage;
                 }
 
