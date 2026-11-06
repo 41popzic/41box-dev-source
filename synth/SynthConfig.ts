@@ -123,7 +123,7 @@ export const enum EffectType {
 
     //41Box
     flanger,
-    phaser,
+    phaser, // technically AbyssBox but included in 41box
 
     length,
 }
@@ -163,10 +163,6 @@ export const enum EnvelopeComputeIndex {
     grainRange,
     echoDelay,
 
-    //flangerFeedback,
-    //flangerDelay,
-    //flangerDepth,
-    //flangerRate,
     flangerMix,
 
     phaserFreq,
@@ -175,6 +171,12 @@ export const enum EnvelopeComputeIndex {
     phaserStages,
 
     //Add more here
+
+    //To be added
+    //flangerFeedback,
+    //flangerDelay,
+    //flangerDepth,
+    //flangerRate,
 
     length,
 }
@@ -1308,6 +1310,7 @@ export class Config {
 
     public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "flanger", "phaser"];
     public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord,EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.noteRange, EffectType.phaser, EffectType.flanger, ];
+    // ^ Not to be confused with instrument.effectOrder, which is the visual/synth property.
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
