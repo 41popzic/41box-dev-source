@@ -151,8 +151,8 @@ export class EnvelopeComputer {
                 const noteStartTick: number = tone.noteStartPart * Config.ticksPerPart;
                 const noteEndTick: number = tone.noteEndPart * Config.ticksPerPart;
                 const noteLengthTicks: number = noteEndTick - noteStartTick;
-                const maximumSlideTicks: number = noteLengthTicks * 0.5;
-                let slideTicks: number = instrument.slideTicks * 0.5; // Weird
+                const maximumSlideTicks: number = noteLengthTicks;
+                let slideTicks: number = instrument.slideTicks;
                 //if (synth.isModActive(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex)) { //modulation
                 //    slideTicks = Config.maxSlideTicks + 1 - synth.getModValue(Config.modulators.dictionary["slide speed"].index, channelIndex, instrumentIndex, false);
                 //}

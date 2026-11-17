@@ -2485,7 +2485,7 @@ if (playSong && !this.countInMetronome) {
                             }
                             if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
                                 // if (useStrumSpeed) strumOffsetParts += Config.strumSpeedScale[instrument.strumParts];
-                                if (useStrumSpeed) strumOffsetParts += instrument.strumParts;
+                                if (useStrumSpeed) strumOffsetParts += (instrument.strumParts * 10); // I should probably find a better way than this
                             }
 
                             const atNoteStart: boolean = (Config.ticksPerPart * noteStartPart == currentTick);
