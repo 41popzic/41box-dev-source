@@ -111,13 +111,13 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
     }
 
     // TODO - When you port over the Dogebox2 import/export buttons be sure to uncomment these
-    const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
+    /*const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
     // const randomGroup: HTMLElement = optgroup({ label: "▾ Randomize" });
     randomGroup.appendChild(option({ value: "randomPreset" }, "Random Preset"));
     randomGroup.appendChild(option({ value: "randomGenerated" }, "Random Generated"));
     randomGroup.appendChild(option({ value: "advancedRandomGenerated" }, "Advanced Random Generated"));
     randomGroup.appendChild(option({ value: "customizeAdvancedRandomGenerated" }, "Customize Advanced Random Generated"));
-    menu.appendChild(randomGroup);
+    menu.appendChild(randomGroup);*/
 
     let firstCategoryGroup: HTMLElement | null = null;
     let customSampleCategoryGroup: HTMLElement | null = null;
@@ -848,7 +848,7 @@ export class SongEditor {
     private readonly _scaleSelect: HTMLSelectElement = select();
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
     private readonly _octaveStepper: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 3em;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
-    private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
+    private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "1024", value: "160", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
     private readonly _songEqFilterEditor: FilterEditor = new FilterEditor(this.doc, false, false, true);
     private readonly _songEqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
@@ -6144,7 +6144,7 @@ export class SongEditor {
                     } else if (event.shiftKey) {
                         this._randomGenerated(false);
                     } else {
-                        this._randomPreset();
+                        //this._randomPreset();
                     }
                     event.preventDefault();
                 }

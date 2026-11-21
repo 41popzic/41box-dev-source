@@ -563,10 +563,10 @@ export class Song {
                         vol = Config.perEnvelopeSpeedToIndices[this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeSpeed] - Config.modulators[perEnvSpeedIndex].convertRealFactor;
                         break;
                     case perEnvLowerIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound * 10 - Config.modulators[perEnvLowerIndex].convertRealFactor;
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound * 100 - Config.modulators[perEnvLowerIndex].convertRealFactor;
                         break;
                     case perEnvUpperIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound * 10 - Config.modulators[perEnvUpperIndex].convertRealFactor;
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound * 100 - Config.modulators[perEnvUpperIndex].convertRealFactor;
                         break;
                 }
             }
@@ -682,7 +682,7 @@ export class Song {
         this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
-        this.tempo = 110;
+        this.tempo = 150; // BeepBox and Slarmoo's Box default
         this.loopType = 1;
         this.reverb = 0;
         this.beatsPerBar = 8;
@@ -1281,8 +1281,10 @@ export class Song {
                     if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "pitch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "note size" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "punch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "none") {
                         buffer.push(base64IntToCharCode[Config.perEnvelopeSpeedToIndices[instrument.envelopes[envelopeIndex].perEnvelopeSpeed]]);
                     }
-                    buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].perEnvelopeLowerBound * 10]);
-                    buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].perEnvelopeUpperBound * 10]);
+                    const lowerBound = Math.round(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound * 100);
+                    const upperBound = Math.round(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound * 100);
+
+                    buffer.push(base64IntToCharCode[lowerBound >> 6], base64IntToCharCode[lowerBound & 0x3f], base64IntToCharCode[upperBound >> 6], base64IntToCharCode[upperBound & 0x3f]);
                 }
             }
         }
@@ -1416,7 +1418,7 @@ export class Song {
                             shapeBits.write(bitsPerNoteSize, note.pins[0].size); // volume
                         }
                         else {
-                            shapeBits.write(9, note.pins[0].size); // Modulator value. 9 bits for now = 512 max mod value?
+                            shapeBits.write(10, note.pins[0].size); // Modulator value. 10 bits = 1024 max mod value
                         }
 
                         let shapePart: number = 0;
@@ -1438,7 +1440,7 @@ export class Song {
                             if (!isModChannel) {
                                 shapeBits.write(bitsPerNoteSize, pin.size);
                             } else {
-                                shapeBits.write(9, pin.size);
+                                shapeBits.write(10, pin.size);
                             }
                         }
 
@@ -3286,10 +3288,15 @@ export class Song {
                             if (Config.newEnvelopes[envelope].name != "pitch" && Config.newEnvelopes[envelope].name != "note size" && Config.newEnvelopes[envelope].name != "punch" && Config.newEnvelopes[envelope].name != "none") {
                                 perEnvelopeSpeed = Config.perEnvelopeSpeedIndices[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
-                            perEnvelopeLowerBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
-                            perEnvelopeUpperBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
+                            if (!from41Box || (from41Box && beforeFour)) {
+                                perEnvelopeLowerBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
+                                perEnvelopeUpperBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
+                            } else {
+                                perEnvelopeLowerBound = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 100;
+                                perEnvelopeUpperBound = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 100;
+                            }                     
                         }
-                        if ((!fromSlarmoosBox && !from41Box) || beforeFour) { //update tremolo2
+                        if (((!fromSlarmoosBox) || beforeFour) || !from41Box) { //update tremolo2
                             if (isTremolo2) {
                                 waveform = LFOEnvelopeTypes.sine;
                                 if (envelopeInverse) {
@@ -3303,7 +3310,7 @@ export class Song {
                         }
 
                         instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform, envelopeDiscrete);
-                        if (fromSlarmoosBox && beforeThree && !beforeTwo) { // what if it wasn't from Slarmoo's Box :O
+                        if (fromSlarmoosBox && beforeThree && !beforeTwo) {
                             let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             instrument.envelopes[i].pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -3699,7 +3706,8 @@ export class Song {
                                     } else if (!isModChannel) {
                                         shape.initialSize = bits.read(bitsPerNoteSize);
                                     } else {
-                                        shape.initialSize = bits.read(9);
+                                        const readBitsValue: number = (from41Box && !beforeFour) ? 10 : 9;
+                                        shape.initialSize = bits.read(readBitsValue);
                                     }
 
                                     shape.pins = [];
@@ -3719,7 +3727,8 @@ export class Song {
                                             pinObj.size = bits.read(bitsPerNoteSize);
                                         }
                                         else {
-                                            pinObj.size = bits.read(9);
+                                            const readBitsValue: number = (from41Box && !beforeFour) ? 10 : 9;
+                                            pinObj.size = bits.read(readBitsValue);
                                         }
                                         shape.pins.push(pinObj);
                                     }

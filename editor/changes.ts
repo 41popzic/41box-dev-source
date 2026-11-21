@@ -4720,36 +4720,7 @@ export function setDefaultInstruments(song: Song): void {
         for (const instrument of song.channels[channelIndex].instruments) {
             const isNoise: boolean = song.getChannelIsNoise(channelIndex);
             const isMod: boolean = song.getChannelIsMod(channelIndex);
-            let presetName: string;
-
-            {
-                switch (channelIndex) {
-                    case 3:
-                        presetName = "colored noise";
-                        break;
-                    case 4:
-                        presetName = "chiseled noise";
-                        break;
-                    default:
-                        presetName = "square wave";
-                        break;
-                }
-            }
-
-            const presetValue = EditorConfig.nameToPresetValue(presetName)!;
-            const preset = EditorConfig.valueToPreset(presetValue)!;
-
-            instrument.fromJsonObject(
-                preset.settings,
-                isNoise,
-                isMod,
-                song.rhythm == 0 || song.rhythm == 2,
-                song.rhythm >= 2,
-                1
-            );
-
-            instrument.preset = presetValue;
-            //instrument.effects |= 1 << EffectType.panning;
+            instrument.setTypeAndReset(isMod ? InstrumentType.mod : (isNoise ? InstrumentType.noise : InstrumentType.chip), isNoise, isMod);
         }
     }
 }
@@ -6214,7 +6185,7 @@ export class ChangePerEnvelopeSpeed extends IndexableChange {
 export class ChangeEnvelopeLowerBound extends IndexableChange {
     constructor(doc: SongDocument, oldBound: number, bound: number, index: number) {
         super(index, doc);
-        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.abs(Math.round(bound * 100) - bound * 100) > 1e-8 ? Config.perEnvelopeBoundMin : Math.round(bound * 100) / 100;
         this._instrument.envelopes[index].perEnvelopeLowerBound = bound;
         doc.synth.unsetMod(Config.modulators.dictionary["individual envelope lower bound"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
@@ -6225,7 +6196,7 @@ export class ChangeEnvelopeLowerBound extends IndexableChange {
 export class ChangeEnvelopeUpperBound extends IndexableChange {
     constructor(doc: SongDocument, oldBound: number, bound: number, index: number) {
         super(index, doc);
-        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.abs(Math.round(bound * 100) - bound * 100) > 1e-8 ? Config.perEnvelopeBoundMin : Math.round(bound * 100) / 100;
         this._instrument.envelopes[index].perEnvelopeUpperBound = bound;
         doc.synth.unsetMod(Config.modulators.dictionary["individual envelope upper bound"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();

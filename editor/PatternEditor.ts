@@ -176,8 +176,6 @@ export class PatternEditor {
 
     private readonly _patternBorderRight = SVG.line({x1: 0, y1: 0, x2: 0, y2: 0, stroke: ColorConfig.loopAccent, "stroke-width": 2, "pointer-events": "none", visibility: "hidden",});
 
-    private readonly _alternateBeatOverlays: SVGRectElement[] = [];
-
     constructor(private _doc: SongDocument, private _interactive: boolean, private _barOffset: number) {
         this._svgNoteBackground = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
         this._svgDrumBackground = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
@@ -197,7 +195,6 @@ export class PatternEditor {
             ),
             this._svgBackground,
             this._svgNoteRangeIndicatorOverlay,
-            this._alternateBeatOverlays,
             this._selectionRect,
             this._svgNoteContainer,
             this._svgPreview,
@@ -2909,12 +2906,6 @@ export class PatternEditor {
     }
 
     public render(): void {
-
-        for (const overlay of this._alternateBeatOverlays) {
-            overlay.remove();
-        }
-        this._alternateBeatOverlays.length = 0;
-
         const nextPattern: Pattern | null = this._doc.getCurrentPattern(this._barOffset);
 
         if (this._pattern != nextPattern) {
@@ -3008,23 +2999,6 @@ export class PatternEditor {
 
         const beatWidth = this._editorWidth / this._doc.song.beatsPerBar;
 
-        for (let beat = 0; beat < this._doc.song.beatsPerBar; beat++) {
-            if (beat % 2 == 1) {
-                const overlay = SVG.rect({
-                    x: String(beatWidth * beat),
-                    y: "0",
-                    width: String(beatWidth),
-                    height: String(this._editorHeight),
-                    fill: "#000000",
-                    "fill-opacity": "0.08",
-                    "pointer-events": "none",
-                });
-
-                this._alternateBeatOverlays.push(overlay);
-                this._svg.appendChild(overlay);
-            }
-        }
-
         if (this._renderedBeatWidth != beatWidth || this._renderedPitchHeight != this._pitchHeight) {
             this._renderedBeatWidth = beatWidth;
             this._renderedPitchHeight = this._pitchHeight;
@@ -3038,24 +3012,6 @@ export class PatternEditor {
             this._svgModBackground.setAttribute("y", "" + (this._pitchBorder / 2));
             this._backgroundDrumRow.setAttribute("width", "" + (beatWidth - 1));
             this._backgroundDrumRow.setAttribute("height", "" + (this._pitchHeight - 1));
-            for (let i = 0; i < this._alternateBeatOverlays.length; i++) {
-                const beat = i * 2 + 1;
-
-                this._alternateBeatOverlays[i].setAttribute(
-                    "x",
-                    String(beatWidth * beat)
-                );
-
-                this._alternateBeatOverlays[i].setAttribute(
-                    "width",
-                    String(beatWidth)
-                );
-
-                this._alternateBeatOverlays[i].setAttribute(
-                    "height",
-                    String(this._editorHeight)
-                );
-            }
             if (this._pitchHeight > this._pitchBorder) {
                 this._backgroundModRow.setAttribute("width", "" + (beatWidth - 2));
                 this._backgroundModRow.setAttribute("height", "" + (this._pitchHeight - this._pitchBorder));

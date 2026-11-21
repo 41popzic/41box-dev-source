@@ -16836,8 +16836,8 @@ var beepbox = (function (exports) {
                     const noteStartTick = tone.noteStartPart * Config.ticksPerPart;
                     const noteEndTick = tone.noteEndPart * Config.ticksPerPart;
                     const noteLengthTicks = noteEndTick - noteStartTick;
-                    const maximumSlideTicks = noteLengthTicks * 0.5;
-                    let slideTicks = instrument.slideTicks * 0.5;
+                    const maximumSlideTicks = noteLengthTicks;
+                    let slideTicks = instrument.slideTicks;
                     slideTicks = Math.min(maximumSlideTicks, slideTicks *= instrument.slideTicks * 3);
                     if (tone.prevNote != null && !tone.forceContinueAtStart) {
                         if (tickTimeStartReal - noteStartTick < slideTicks) {
@@ -25813,7 +25813,7 @@ var beepbox = (function (exports) {
                                 }
                                 if ((!transition.continues && !forceContinueAtStart) || prevNoteForThisTone == null) {
                                     if (useStrumSpeed)
-                                        strumOffsetParts += instrument.strumParts;
+                                        strumOffsetParts += (instrument.strumParts * 10);
                                 }
                                 const atNoteStart = (Config.ticksPerPart * noteStartPart == currentTick);
                                 let tone;

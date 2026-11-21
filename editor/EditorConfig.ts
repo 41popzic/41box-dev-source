@@ -52,7 +52,7 @@ export class EditorConfig {
                 { name: TypePresets[InstrumentType.customChipWave], customType: InstrumentType.customChipWave },
                 { name: TypePresets[InstrumentType.fm6op], customType: InstrumentType.fm6op },
             ])
-        },
+        }/*,
         {
             name: "Retro Presets", presets: <DictionaryArray<Preset>>toNameMap([
                 { name: "square wave", midiProgram: 80, settings: { "type": "chip", "eqFilter": [], "effects": ["aliasing"], "transition": "interrupt", "fadeInSeconds": 0, "fadeOutTicks": -10, "chord": "arpeggio", "wave": "square", "unison": "none", "envelopes": [] } },
@@ -435,7 +435,7 @@ export class EditorConfig {
                 { name: "nylon hit", generalMidi: false, isNoise: true, settings: {"type":"noise","volume":0,"eqFilter":[{"type":"low-pass","cutoffHz":16000,"linearGain":0.5},{"type":"high-pass","cutoffHz":210.22,"linearGain":0.3536}],"eqFilterType":false,"eqSimpleCut":10,"eqSimplePeak":0,"envelopeSpeed":12,"eqSubFilters0":[{"type":"low-pass","cutoffHz":16000,"linearGain":0.5},{"type":"high-pass","cutoffHz":210.22,"linearGain":0.3536}],"eqSubFilters1":[],"effects":["panning","bitcrusher","chorus"],"bitcrusherOctave":6.5,"bitcrusherQuantization":14,"pan":0,"panDelay":0,"chorus":14,"fadeInSeconds":0,"fadeOutTicks":-30,"unison":"shimmer","wave":"deep","envelopes":[{"target":"noteVolume","envelope":"fall","inverse":true,"perEnvelopeSpeed":256,"perEnvelopeLowerBound":0,"perEnvelopeUpperBound":1,"discrete":false},{"target":"unison","envelope":"fall","inverse":false,"perEnvelopeSpeed":6,"perEnvelopeLowerBound":0,"perEnvelopeUpperBound":1,"discrete":false}],"isDrum":true}},
 
             ])
-        }
+        }*/
     ]);
 
     public static valueToPreset(presetValue: number): Preset | null {
