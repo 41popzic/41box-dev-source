@@ -1179,6 +1179,7 @@ content: "";
 	pointer-events: none;
 	width: 14px;
 	height: var(--button-size);
+	padding-right: 6px;
 	background: currentColor;
 	-webkit-mask-image: var(--internal-select-arrows-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1235,11 +1236,6 @@ content: "";
 	color: ${ColorConfig.linkAccent};
 	font-weight: bold;
 }
-
-//.beepboxEditor select:hover {
-	//outline: 1px solid #fff;
-//}
-// This looks hella vibecoded wtf
 
 .select2-container .select2-selection--single {
   height: auto;
@@ -1608,6 +1604,12 @@ content: "";
 	-webkit-mask-position: center;
 }
 
+.beepboxEditor .chordButton {
+	width: 8em;
+	height: 2em;
+
+}
+
 .beepboxEditor .control-point-path.muted {
 	fill: var(--effect-muted, color-mix(in srgb, ${ColorConfig.editorBackground} 60%, ${ColorConfig.whitePianoKey}));
 }
@@ -1800,6 +1802,21 @@ content: "";
 	justify-content: space-between;
 }
 
+.beepboxEditor .selectRowKnob {
+	margin: 2px 0;
+	padding-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: -1.5em;
+}
+
+.beepboxEditor .knobs { /* This was the only way that I could get a row of knobs to work for some reason */
+	display: grid;
+}
+
 .beepboxEditor .effect-container {
 	background: color-mix(in srgb, ${ColorConfig.editorBackground} 95%, grey);
 	border-radius: 2px;
@@ -1826,6 +1843,7 @@ content: "";
 	height: 1.25em; 
 	font-size: 1.1em;
 	margin: 0;
+	margin-right: -34px;
 }
 
 .beepboxEditor .arrow-button:focus {

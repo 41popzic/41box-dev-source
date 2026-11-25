@@ -8,8 +8,7 @@ import { ColorConfig, ChannelColors } from "./ColorConfig";
 import { prettyNumber } from "./EditorConfig";
 import { ChangeGroup } from "./Change";
 import { ChangeEnsurePatternExists, ChangePatternNumbers, ChangeNoteAdded, ChangeInsertBars } from "./changes";
-import { Note, NotePin, makeNotePin } from "../synth/Pattern";
-import { Pattern } from "../synth/Pattern"
+import { Note, NotePin, makeNotePin, Pattern } from "../synth/synth";
 
 const { button, div, h2, input } = HTML;
 

@@ -1,5 +1,5 @@
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-import { Song } from "../synth/Song";
+import { Song } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 
 const { button, div, span } = HTML;

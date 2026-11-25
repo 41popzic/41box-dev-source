@@ -2,10 +2,7 @@
 
 import { Config } from "../synth/SynthConfig";
 import { EditorConfig, isMobile } from "./EditorConfig";
-import { Synth } from "../synth/synth";
-import { Pattern } from "../synth/Pattern";
-import { Channel } from "../synth/Channel";
-import { Song } from "../synth/Song";
+import { Synth, Pattern, Channel, Song } from "../synth/synth";
 import { SongRecovery, generateUid, errorAlert } from "./SongRecovery";
 import { ColorConfig } from "./ColorConfig";
 import { Layout } from "./Layout";

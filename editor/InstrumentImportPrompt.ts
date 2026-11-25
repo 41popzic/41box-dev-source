@@ -4,8 +4,7 @@ import { SongDocument } from "./SongDocument";
 //import { SongEditor } from "./SongEditor";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-import { Channel } from "../synth/Channel";
-import { Instrument } from "../synth/Instrument";
+import { Channel, Instrument } from "../synth/synth";
 import { ChangePasteInstrument, ChangeAppendInstrument, ChangeViewInstrument } from "./changes";
 
 const { button, div, h2, input, select, option, code } = HTML;

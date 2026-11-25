@@ -15,9 +15,7 @@ import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
-import { Synth } from "../synth/synth";
-import { Instrument } from "../synth/Instrument";
-import { Channel } from "../synth/Channel"
+import { Synth, Instrument, Channel } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
@@ -50,7 +48,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, ChangeReverbDelay, ChangeReverbShelfHz, ChangeReverbShelfGain, ChangeSlideSpeed, ChangeStrumSpeed, ChangePhaserMix, ChangePhaserFeedback, ChangePhaserFreq, ChangePhaserStages, ChangeUpperLimit, ChangeLowerLimit, ChangePanMuted, ChangeReverbMuted, ChangeChorusMuted, ChangeTransitionMuted, ChangeChordMuted, ChangePitchShiftMuted, ChangeDetuneMuted, ChangeVibratoMuted, ChangeDistortionMuted, ChangeNoteFilterMuted, ChangeGranularMuted, ChangeBitcrusherMuted, ChangeEchoMuted, ChangeRingModMuted, ChangeFlangerMuted, ChangePhaserMuted, ChangeNoteRangeMuted, ChangeEffectOrder, } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangeLoop, ChangeChannelBar, ChangePasteInstrumentEditSelective, ChangeSwapInstrumentOrder, ChangeFlangerDelay, ChangeFlangerDepth, ChangeFlangerFeedback, ChangeFlangerMix, ChangeFlangerRate, ChangeRhythmEnabled, ChangeReverbDelay, ChangeReverbShelfHz, ChangeReverbShelfGain, ChangeSlideSpeed, ChangeStrumSpeed, ChangePhaserMix, ChangePhaserFeedback, ChangePhaserFreq, ChangePhaserStages, ChangeUpperLimit, ChangeLowerLimit, ChangePanMuted, ChangeReverbMuted, ChangeChorusMuted, ChangeTransitionMuted, ChangeChordMuted, ChangePitchShiftMuted, ChangeDetuneMuted, ChangeVibratoMuted, ChangeDistortionMuted, ChangeNoteFilterMuted, ChangeGranularMuted, ChangeBitcrusherMuted, ChangeEchoMuted, ChangeRingModMuted, ChangeFlangerMuted, ChangePhaserMuted, ChangeNoteRangeMuted, ChangeEffectOrder, ChangeEchoFeedback, } from "./changes";
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
@@ -866,7 +864,7 @@ export class SongEditor {
     //private readonly _panSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.panMax, value: Config.panCenter, step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), true);
     private readonly _panMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
     private readonly _panArrows: EffectArrows = new EffectArrows();
-    private readonly _panKnob: Knob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), [0, 50, 100])
+    private readonly _panKnob: Knob = new Knob(0, Config.panMax, 1, Config.panCenter, true, this.doc, (oldValue: number, newValue: number) => new ChangePan(this.doc, oldValue, newValue), [0, Config.panCenter, Config.panMax], [false, true, false])
     private readonly _panDropdown: HTMLButtonElement = button({ class: "dropdown", style: "margin-top: 0em; margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Pan) }, "▼");
     private readonly _panKnobInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "panSliderInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
     /*private readonly _panSliderRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, div({},
@@ -880,7 +878,7 @@ export class SongEditor {
     ), this._panDropdown, this._panKnobInputBoxRow,);
     private readonly _panDelayText = span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("panDelay") }, "‣ delay");
     private readonly _panDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["pan delay"].maxRawVol, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangePanDelay(this.doc, oldValue, newValue), false);
-    private readonly _panDelayRow: HTMLElement = div({ style: "margin-top: 1.667em", class: "selectRow dropFader" }, span(this._panDelayText), this._panDelaySlider.container);
+    private readonly _panDelayRow: HTMLElement = div({ style: "margin-top: 1em", class: "selectRow dropFader" }, span(this._panDelayText), this._panDelaySlider.container);
     private readonly _panDropdownGroup: HTMLElement = div({ class: "editor-controls-alt", style: "display: none;" }, this._panDelayRow);
     private readonly _panPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._panKnobRow, this._panDropdownGroup);
     private readonly _panTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title" }, this._panMuteButton, "panning", this._panArrows.container);
@@ -984,18 +982,25 @@ export class SongEditor {
     private readonly _granularContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._granularTitle), this._granularPreContainer);
 
     public readonly echoDelayNum: HTMLParagraphElement = div({ class: "display", style: "font-size: 80%; ", id: "echoDelayNum" });
+    private readonly _echoDelayStep = Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat);
     private readonly _echoMuteButton: HTMLDivElement = div({ class: "mute-button", title: "", style: `display: block; pointer-events: auto; width: 16px; height: 20px; transform: translate(2px, 1px);` });
     private readonly _echoArrows: EffectArrows = new EffectArrows();
-    private readonly _echoSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoSustain(this.doc, oldValue, newValue), false);
-    private readonly _echoSustainText = span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "sustain");
-    private readonly _echoSustainRow: HTMLDivElement = div({ style: "margin-top: 0.667em", class: "selectRow" }, span(this._echoSustainText), this._echoSustainSlider.container);
-    private readonly _echoDelaySlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), true);
+    private readonly _echoSustainKnob: Knob = new Knob(0, Config.echoSustainRange - 1, 1, 0, true, this.doc, (oldValue: number, newValue: number) => new ChangeEchoSustain(this.doc, oldValue, newValue));
+    private readonly _echoSustainText = span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "mix ");
+    private readonly _echoSustainKnobInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "echoSustainKnobInputBox", type: "number", step: "1", min: "0", max: "100", value: "0" });
+    private readonly _echoSustainRow: HTMLDivElement = div({ class: "selectRowKnob" }, span(this._echoSustainText), this._echoSustainKnob.container, this._echoSustainKnobInputBox);
+    private readonly _echoDelayKnob: Knob = new Knob(0, Config.echoDelayRange - 1, 1, 0, false, this.doc, (oldValue: number, newValue: number) => new ChangeEchoDelay(this.doc, oldValue, newValue), [1, (Config.echoDelayRange - 1 ) / 8, (Config.echoDelayRange - 1 ) / 4, (Config.echoDelayRange - 1 ) / 2.7, (Config.echoDelayRange - 1 ) / 2, (Config.echoDelayRange - 1 ) / 1.58, (Config.echoDelayRange - 1 ) / 1.33, (Config.echoDelayRange - 1 ) / 1.15, (Config.echoDelayRange - 1 )], [false, false, false, false, false, false, false, false, false])
     private readonly _echoDelayText = span({ class: "tip", style: "font-size: small;", onclick: () => this._openPrompt("echoDelay") }, "delay ");
-    private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" },
+    private readonly _echoDelayKnobInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "echoDelayKnobInputBox", type: "number", step: "0.01", min: "0", max: "100", value: "0" });
+    private readonly _echoDelayRow: HTMLDivElement = div({ class: "selectRowKnob" }, div({ style: "display:flex; flex-direction:column; align-items:center;" },
         span(this._echoDelayText),
         div(this.echoDelayNum),
-    ), this._echoDelaySlider.container);
-    private readonly _echoPreContainer: HTMLDivElement = div({ style: "display: flex; flex-direction: column" }, this._echoSustainRow, this._echoDelayRow);
+    ), this._echoDelayKnob.container, this._echoDelayKnobInputBox);
+    private readonly _echoFeedbackText = span({ class: "tip", style: "font-size: small;", onclick: () => this._openPrompt("echoFeedback") }, "cycles ");
+    private readonly _echoFeedbackKnob: Knob = new Knob(0, Config.echoFeedbackRange, 1, 1, false, this.doc, (oldValue: number, newValue: number) => new ChangeEchoFeedback(this.doc, oldValue, newValue));
+    private readonly _echoFeedbackKnobInputBox: HTMLInputElement = input({ class: "arrowsOnHover", style: "width: 4em; font-size: 80%; margin-bottom: 2em", id: "echoFeedbackKnobInputBox", type: "number", step: "1", min: "0", max: Config.echoFeedbackRange, value: "0" });
+    private readonly _echoFeedbackRow: HTMLDivElement = div({ class: "selectRowKnob" }, div({ style: "display: flex; flex-direction: column; width: 100%; min-width: 0; align-items: center;" }, span(this._echoFeedbackText)), this._echoFeedbackKnob.container, this._echoFeedbackKnobInputBox);
+    private readonly _echoPreContainer: HTMLDivElement = div({ style: "display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%;", class: "knobs" }, this._echoSustainRow, this._echoDelayRow, this._echoFeedbackRow);
     private readonly _echoTitle: HTMLDivElement = div({ style: "cursor: pointer", class: "effect-title"}, this._echoMuteButton, "echo", this._echoArrows.container);
     private readonly _echoContainer: HTMLDivElement = div({ class: "effect-container", style: "display: flex; flex-direction: column; text-align: center; padding: 0.33em"}, span(this._echoTitle), this._echoPreContainer);
 
@@ -1515,8 +1520,8 @@ export class SongEditor {
     private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
         span({ style: "font-size: smaller; padding-top: 4px;", class: "tip", onclick: () => this._openPrompt("instrumentType") }, "instrument"),
         div( 
-            div({ class: "pitchSelect" }, this._pitchedPresetSelect),
-            div({ class: "drumSelect" }, this._drumPresetSelect)
+            div({ class: "selectContainer" }, this._pitchedPresetSelect),
+            div({ class: "selectContainer" }, this._drumPresetSelect)
         ),
     );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls-alt" },
@@ -1577,7 +1582,7 @@ export class SongEditor {
         //this._newSong,
         //this._import,
         this._buttonsRow,
-        div({ class: "selectContainer menu file" },
+        div({ class: "selectContainer menu edit" },
             this._editMenu,
         ),
         div({ class: "selectContainer menu pref" },
@@ -2343,6 +2348,14 @@ export class SongEditor {
         });
 
         // Echo
+        this._echoSustainKnobInputBox.addEventListener("input", () => { this.doc.record(new ChangeEchoSustain(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].echoSustain, Math.min(100.0, Math.max(0.0, Math.round(+this._echoSustainKnobInputBox.value))))) });
+        this._echoDelayKnobInputBox.addEventListener("input", () => {
+            const instrument = this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()];
+            const newValue = Math.min(Config.echoDelayRange - 1, Math.max(0, Math.round(Number(this._echoDelayKnobInputBox.value) / this._echoDelayStep) - 1));
+
+            this.doc.record(new ChangeEchoDelay(this.doc, instrument.echoDelay, newValue));
+        });
+        this._echoFeedbackKnobInputBox.addEventListener("input", () => { this.doc.record(new ChangeEchoFeedback(this.doc, this.doc.song.channels[this.doc.channel].instruments[this.doc.getCurrentInstrument()].echoFeedback, Math.min(100.0, Math.max(0.0, Math.round(+this._echoFeedbackKnobInputBox.value))))) });
         this._echoTitle.addEventListener("click", () => this.collapseEffect("echo"));
         this._echoMuteButton.addEventListener("click", () => {
             event.stopPropagation();
@@ -2355,10 +2368,12 @@ export class SongEditor {
 
             this._echoMuteButton.classList.toggle("muted", newValue);
             this._echoTitle.classList.toggle("muted", instrument.echoMuted);
-            this._echoSustainSlider.setMute(instrument.echoMuted); // Echo sustain slider
-            this._echoDelaySlider.setMute(instrument.echoMuted); // Echo delay slider
+            this._echoSustainKnob.setMute(instrument.echoMuted); // Echo sustain knob
+            this._echoDelayKnob.setMute(instrument.echoMuted); // Echo delay knob
+            this._echoFeedbackKnob.setMute(instrument.echoMuted); // Echo feedback knob
             this._echoSustainText.classList.toggle("muted", instrument.echoMuted); // Echo
             this._echoDelayText.classList.toggle("muted", instrument.echoMuted); // Echo
+            this._echoFeedbackText.classList.toggle("muted", instrument.echoMuted); // Echo feedback text
             this.echoDelayNum.classList.toggle("muted", instrument.echoMuted); // Echo
             this.whenUpdated();
         });
@@ -3119,10 +3134,10 @@ export class SongEditor {
                 return this._chorusSlider;
             case Config.modulators.dictionary["flanger mix"].index:
                 return this._flangerMixSlider;
-            case Config.modulators.dictionary["echo"].index:
-                return this._echoSustainSlider;
-            case Config.modulators.dictionary["echo delay"].index:
-                return this._echoDelaySlider;
+            //case Config.modulators.dictionary["echo"].index:
+            //    return this._echoSustainSlider;
+            //case Config.modulators.dictionary["echo delay"].index:
+            //    return this._echoDelaySlider;
             case Config.modulators.dictionary["sustain"].index:
                 return this._stringSustainSlider;
             case Config.modulators.dictionary["fm slider 5"].index:
@@ -3592,12 +3607,15 @@ export class SongEditor {
         this._echoMuteButton.classList.toggle("muted", instrumentEffects.echoMuted);
         this._echoTitle.classList.toggle("muted", instrumentEffects.echoMuted);
         
-        this._echoSustainSlider.setMute(instrumentEffects.echoMuted); // Echo sustain slider
+        this._echoSustainKnob.setMute(instrumentEffects.echoMuted); // Echo sustain knob
         this._echoSustainText.classList.toggle("muted", instrumentEffects.echoMuted); // Echo        
 
-        this._echoDelaySlider.setMute(instrumentEffects.echoMuted); // Echo delay slider
+        this._echoDelayKnob.setMute(instrumentEffects.echoMuted); // Echo delay knob
         this._echoDelayText.classList.toggle("muted", instrumentEffects.echoMuted); // Echo
+        this._echoFeedbackText.classList.toggle("muted", instrumentEffects.echoMuted); // Echo feedback text
         this.echoDelayNum.classList.toggle("muted", instrumentEffects.echoMuted); // Echo
+
+        this._echoFeedbackKnob.setMute(instrumentEffects.echoMuted); // Echo feedback knob
 
         // Ring modulation
         this._ringModMuteButton.classList.toggle("muted", instrumentEffects.ringModMuted);
@@ -4258,9 +4276,13 @@ export class SongEditor {
 
             if (effectsIncludeEcho(instrument.effects)) {
                 this._echoSustainRow.style.display = "";
-                this._echoSustainSlider.updateValue(instrument.echoSustain);
+                this._echoSustainKnob.updateValue(instrument.echoSustain);
                 this._echoDelayRow.style.display = "";
-                this._echoDelaySlider.updateValue(instrument.echoDelay);
+                this._echoDelayKnob.updateValue(instrument.echoDelay);
+                this._echoDelayKnobInputBox.value = ((instrument.echoDelay + 1) * this._echoDelayStep).toFixed(2);
+                this._echoSustainKnobInputBox.value = instrument.echoSustain.toFixed(); // Anything but converting to a string properly...
+                this._echoFeedbackKnobInputBox.value = instrument.echoFeedback.toFixed();
+                this._echoFeedbackKnob.updateValue(instrument.echoFeedback);
                 this._echoContainer.style.display = "";
                 this._echoPreContainer.style.display = this._echoCollapsed ? "none" : "";
                 //this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
@@ -4425,7 +4447,7 @@ export class SongEditor {
             this.reverbDelayNum.innerHTML = " " + prettyNumber(Math.round((instrument.reverbDelay + 0) * Config.reverbDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
             this.reverbShelfHzNum.innerHTML = " (" + (prettyNumber(instrument.reverbShelfHz * Config.reverbShelfHzStepTicks) + " hz)");
             this.reverbShelfGainNum.innerHTML = " (" + (prettyNumber(instrument.reverbShelfGain * Config.reverbShelfGainStepDb - 12) + " db)");
-            this.echoDelayNum.innerHTML = " " + prettyNumber(Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
+            //this.echoDelayNum.innerHTML = " " + prettyNumber(Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
             this.grainSizeNum.innerHTML = " (" + instrument.grainSize * Config.grainSizeStep + ")";
             this.grainRangeNum.innerHTML = " (" + instrument.grainRange * Config.grainSizeStep + ")";
             this._instrumentVolumeSlider.updateValue(instrument.volume);

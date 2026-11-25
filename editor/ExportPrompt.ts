@@ -1,11 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { InstrumentType, /*EnvelopeType,*/ Config, getArpeggioPitchIndex } from "../synth/SynthConfig";
-import { Synth } from "../synth/synth";
-import { Song } from "../synth/Song";
-import { Note } from "../synth/Pattern";
-import { Instrument } from "../synth/Instrument";
-import { Pattern } from "../synth/Pattern"
+import { Synth, Song, Note, Instrument, Pattern } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
 import { Preset, EditorConfig } from "./EditorConfig";
 import { SongDocument } from "./SongDocument";

@@ -1,16 +1,9 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
-import { Synth } from "../synth/synth";
-import { NotePin, Note, makeNotePin } from "../synth/Pattern";
+import { Synth, Song, Pattern, Channel, Instrument, NotePin, Note, makeNotePin, SpectrumWave, HarmonicsWave, EnvelopeSettings } from "../synth/synth";
 import { FilterSettings, FilterControlPoint } from "../synth/Filter";
-import { SpectrumWave, HarmonicsWave } from "../synth/Instrument";
-import { Song } from "../synth/Song";
 import { clamp } from "../synth/utils";
-import { EnvelopeSettings } from "../synth/Envelope";
-import { Instrument } from "../synth/Instrument";
-import { Pattern } from "../synth/Pattern";
-import { Channel } from "../synth/Channel"
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
@@ -781,7 +774,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
         const selectiveRandom: SelectiveInstrumentSettings = usesSelectiveRandom ? doc.prefs.selectiveRandom : new SelectiveInstrumentSettings();
         if (!usesSelectiveRandom) selectiveRandom.instrumentType = true;
         if (selectiveRandom.effects) {
-            //instrument.effects = 0;
+            instrument.effects = 0;
             instrument.aliases = false;
         }
         if (selectiveRandom.envelopes) instrument.envelopeCount = 0;
@@ -900,7 +893,11 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.reverbShelfHz = selectCurvedDistribution(1, Config.reverbShelfHzRange, 1, 1);
                     instrument.reverbShelfGain = selectCurvedDistribution(1, Config.reverbShelfGainRange, 1, 1)
                 }
-             
+                if (Math.random() < 0.2) {
+                    instrument.effects |= 1 << EffectType.phaser;
+                    instrument.phaserMix = selectCurvedDistribution(1, Config.phaserMixRange - 1, Config.phaserMixRange - 1, 1);
+                    instrument.phaserFreq = selectCurvedDistribution(1, Config.phaserFreqRange - 1, Config.phaserFreqRange - 1, 1);
+                }
             }
 
             // Configure this to whatever you'd like.
@@ -1362,6 +1359,34 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             envelopeUpperBound = 1;
                         }
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["reverb"].index, 0, Config.newEnvelopes.dictionary[selectWeightedRandom([
+                            { item: "note size", weight: 3 },
+                            { item: "pitch", weight: 4 },
+                            { item: "random", weight: 1 },
+                            { item: "punch", weight: 2 },
+                            { item: "flare", weight: 3 },
+                            { item: "twang", weight: 10 },
+                            { item: "swell", weight: 8 },
+                            { item: "lfo", weight: 7 },
+                            { item: "decay", weight: 5 },
+                            { item: "wibble", weight: 5 },
+                            { item: "linear", weight: 4 },
+                            { item: "rise", weight: 8 },
+                            { item: "fall", weight: 2 },
+                        ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 45, 20)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 63, 32, 31),
+                            selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 2 }, { item: LFOEnvelopeTypes.triangle, weight: 5 }]));
+                    }
+                }
+                if (Math.random() < 0.2) {
+                    instrument.effects |= 1 << EffectType.phaser;
+                    instrument.phaserMix = selectCurvedDistribution(1, Config.phaserMixRange - 1, 1, 1);
+                    if (selectiveRandom.envelopes && Math.random() < 0.03) {
+                        let envelopeLowerBound = selectCurvedDistribution(0, 20, 8, 5) / 10;
+                        let envelopeUpperBound = selectCurvedDistribution(0, 20, 8, 5) / 10;
+                        if (envelopeLowerBound >= envelopeUpperBound) {
+                            envelopeLowerBound = 0;
+                            envelopeUpperBound = 1;
+                        }
+                        instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["phaser mix"].index, 0, Config.newEnvelopes.dictionary[selectWeightedRandom([
                             { item: "note size", weight: 3 },
                             { item: "pitch", weight: 4 },
                             { item: "random", weight: 1 },
@@ -2058,7 +2083,7 @@ export class ChangeSwapInstrumentOrder extends Change {
             // update patterns if different instruments per pattern is used
             if (doc.song.patternInstruments) {
                 for (const pattern of doc.song.channels[channel].patterns) {
-                    pattern.instruments.forEach((value, index) => {
+                    pattern.instruments.forEach((value: number, index: number) => {
                         if (value == instrumentLeft) pattern.instruments[index] = instrumentLeft + 1;
                         else if (value == instrumentLeft + 1) pattern.instruments[index] = instrumentLeft;
                     })
@@ -4953,6 +4978,16 @@ export class ChangeEchoSustain extends ChangeInstrumentSlider {
         super(doc);
         this._instrument.echoSustain = newValue;
         doc.synth.unsetMod(Config.modulators.dictionary["echo"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeEchoFeedback extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.echoFeedback = newValue;
+        doc.synth.unsetMod(Config.modulators.dictionary["echo feedback"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

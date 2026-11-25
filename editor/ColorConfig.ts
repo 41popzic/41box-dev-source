@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { BeepBoxOption, DictionaryArray, toNameMap, Config } from "../synth/SynthConfig";
-import { Song } from "../synth/Song";
+import { Song } from "../synth/synth";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 
 export interface ChannelColors extends BeepBoxOption {
@@ -637,7 +637,7 @@ export class ColorConfig {
 			--pitch-background: #222121;
 			--tonic: #555955;
 			--fifth-note: #1a1818;
-			--third-note: #578844;
+			--third-note: #1c1f2e;
 			--white-piano-key: #a89e9e;
 			--black-piano-key: #2d2424;
             --black-piano-key-text: #ffffff;
@@ -1568,7 +1568,7 @@ export class ColorConfig {
 			--pitch-background: #141414;
 			--tonic: #2C212B;
 			--fifth-note: #2E2A15;
-			--third-note: #578844;
+			--third-note: #2d2e42;
 			--white-piano-key: #bbbaba;
 			--black-piano-key: #2d2d2d;
 			--track-editor-bg-pitch: #2d2e42;
@@ -1681,7 +1681,7 @@ export class ColorConfig {
 			--pitch-background: #141c15;
 			--tonic: #282c21;
 			--fifth-note: #18221a;
-			--third-note: #578844;
+			--third-note: #6b7f19;
 			--white-piano-key: #e3e3e3;
 			--black-piano-key: #2d2d2d;
 			--track-editor-bg-pitch: #38293e;

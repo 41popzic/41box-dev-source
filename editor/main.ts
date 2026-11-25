@@ -5,12 +5,7 @@ import { isMobile, EditorConfig } from "./EditorConfig";
 import { ColorConfig } from "./ColorConfig";
 import "./style"; // Import for the side effects, there's no exports.
 import { SongEditor } from "./SongEditor";
-import { Synth } from "../synth/synth";
-import { NotePin, Note } from "../synth/Pattern";
-import { Song } from "../synth/Song";
-import { Instrument } from "../synth/Instrument";
-import { Pattern } from "../synth/Pattern";
-import { Channel } from "../synth/Channel";
+import { Synth, NotePin, Note, Song, Instrument, Pattern, Channel } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ExportPrompt } from "./ExportPrompt";
 import { ChangePreset } from "./changes";
@@ -38,8 +33,9 @@ editor.mainLayer.getElementsByClassName("trackAndMuteContainer")[0].className +=
 editor.mainLayer.getElementsByClassName("barScrollBar")[0].className += " load";
 
 // Give select2 class to these
-$('#pitchPresetSelect').select2({ dropdownAutoWidth: true });
-$('#drumPresetSelect').select2({ dropdownAutoWidth: true });
+// No because the presets aren't listed so it's unnecessary -41popzic
+//$('#pitchPresetSelect').select2({ dropdownAutoWidth: true });
+//$('#drumPresetSelect').select2({ dropdownAutoWidth: true });
 // $('#envelopeSelect').select2({ dropdownAutoWidth: true });
 
 // Onclick event to expand/collapse optgroups

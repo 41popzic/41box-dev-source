@@ -170,6 +170,7 @@ export const enum EnvelopeComputeIndex {
     phaserFeedback,
     phaserStages,
 
+    echoFeedback,
     //Add more here
 
     //To be added
@@ -970,10 +971,11 @@ export class Config {
     public static readonly tempoMax: number = 1024;
     public static readonly octaveMin: number = -2;
     public static readonly octaveMax: number = 2;
-    public static readonly echoDelayRange: number = 24;
-    public static readonly echoDelayStepTicks: number = 40;
-    public static readonly echoSustainRange: number = 8;
-    public static readonly echoShelfHz: number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes.
+    public static readonly echoDelayRange: number = 192;
+    public static readonly echoDelayStepTicks: number = 5;
+    public static readonly echoSustainRange: number = 101;
+    public static readonly echoFeedbackRange: number = 24;
+    public static readonly echoShelfHz: number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes. // Todo: make this user-facing?
     public static readonly echoShelfGain: number = Math.pow(2.0, -0.5);
     //public static readonly reverbShelfHz: number = 8000; // The cutoff freq of the shelf filter that is used to decay reverb.
     public static readonly reverbShelfHzRange: number = 52;
@@ -1345,7 +1347,6 @@ export class Config {
         { name: "arpeggio", customInterval: false, arpeggiates: true, strumParts: 0, singleTone: true },
         { name: "custom interval", customInterval: true, arpeggiates: false, strumParts: 0, singleTone: true },
         { name: "monophonic", customInterval: false, arpeggiates: false, strumParts: 0, singleTone: true},
-        //{ name: "interval strum [E]", customInterval: true, arpeggiates: false, strumParts: 5, singleTone: true }
     ]);
     public static readonly maxChordSize: number = 9;
     public static readonly operatorCount: number = 4;
@@ -1868,6 +1869,7 @@ export class Config {
         { name: "phaserMix", computeIndex: EnvelopeComputeIndex.phaserMix, displayName: "phaser", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserFeedback", computeIndex: EnvelopeComputeIndex.phaserFeedback, displayName: "phaser feedback",  perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
         { name: "phaserStages", computeIndex: EnvelopeComputeIndex.phaserStages, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.phaser, compatibleInstruments: null },
+        { name: "echoFeedback", computeIndex: EnvelopeComputeIndex.echoFeedback, displayName: "echo feedback", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null },
         
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
@@ -2033,6 +2035,9 @@ export class Config {
             promptName: "Phaser Feedback", promptDesc: [ "This setting controls the phaser feedback of your insturment, just like the phaser feedback slider.", "At $LO, your instrument will have no phaser feedback. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0, },     
         { name: "phaser stages", pianoName: "Phaser Stages", maxRawVol: Config.phaserMaxStages, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser,
             promptName: "Phaser Stages", promptDesc: [ "This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"], maxIndex: 0, },                       
+        { name: "echo feedback", pianoName: "Echo Feedback", maxRawVol: Config.echoDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.echo, maxIndex: 0,
+            promptName: "Instrument Echo Feedback", promptDesc: ["This setting controls the echo feedback of your instrument, just like the echo feedback knob.", "At $LO, your instrument will have very little echo delay, and this increases up to 2 beats of delay at $HI.", "[OVERWRITING] [$LO - $HI] [~beats ÷12]" ]}, 
+        
     ]);
 }
 
